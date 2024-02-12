@@ -1,0 +1,129 @@
+is_global = true
+build_property.TargetFramework = net7.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = Food_Ordering_Web
+build_property.RootNamespace = Food_Ordering_Web
+build_property.ProjectDir = D:\Folder\Food_Ordering\Food_Ordering_Web\
+build_property.RazorLangVersion = 7.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\Folder\Food_Ordering\Food_Ordering_Web
+build_property._RazorSourceGeneratorDebug = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Areas/Identity/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Account/Signup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTaWdudXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Account/SpecialLogin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTcGVjaWFsTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Account/UpdateProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxVcGRhdGVQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Administrator/MainPaige.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5pc3RyYXRvclxNYWluUGFpZ2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Customer/MainPaige.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJcTWFpblBhaWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Home/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Home/Restaurant.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZXN0YXVyYW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Kitchen/kitchenView.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2l0Y2hlblxraXRjaGVuVmlldy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Menu/AuthCheckOut.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxBdXRoQ2hlY2tPdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Menu/AuthenticatedMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxBdXRoZW50aWNhdGVkTWVudS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Menu/AuthFoodItem.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxBdXRoRm9vZEl0ZW0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Menu/CheckOutGuest.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxDaGVja091dEd1ZXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Menu/FoodItemGuest.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxGb29kSXRlbUd1ZXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Menu/GuestMenu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxHdWVzdE1lbnUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Owner/AddOutlet.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcQWRkT3V0bGV0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Owner/MainPaige.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcTWFpblBhaWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Owner/Manage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcTWFuYWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Owner/Tables.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcVGFibGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Shared/_LoginPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Folder/Food_Ordering/Food_Ordering_Web/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-b3345p22pm

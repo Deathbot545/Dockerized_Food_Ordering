@@ -1,0 +1,205 @@
+﻿
+<main class="container">
+    <h1 class="display-4 fst mb-3">Add Outlet</h1>
+    <form class="row g-3" id="addOutletForm" enctype="multipart/form-data">
+        <div class="col-md-4">
+            <label for="validationServer01" class="form-label">Outlet Name (Internal)</label>
+            <input type="text" class="form-control" id="outletInternalName" placeholder="Enter Internal Name" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-title="Outlet Name (Internal)" data-bs-content="This is the name used internally within your outlets or restaurant management system and may not be visible to customers." required>
+            <div class="valid-feedback">
+                Looks good!
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationServer02" class="form-label">Customer-Facing Name</label>
+            <input type="text" class="form-control" id="outletCustomerName" placeholder="Enter Customer-Facing Name" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-title="Customer-Facing Name" data-bs-content="This is the name that customers will see and interact with when they visit your website or app" required>
+            <div class="valid-feedback">
+                Looks good!
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationServerUsername" class="form-label">Business Type</label>
+            <select class="form-select" id="businessTypeSelect" required aria-label="Select Business Type">
+                <option value="">Choose...</option>
+                <option value="fine-dining">Fine Dining Restaurant</option>
+                <option value="fast-food">Fast-Food Chain</option>
+                <option value="cafe">Cafe</option>
+                <option value="other">Other</option>
+            </select>
+            <div class="invalid-feedback">Please select a business type.</div>
+        </div>
+
+        <div class="col-md-6">
+            <label for="validationServer08" class="form-label">Country</label>
+            <select class="form-select" id="countrySelect" required aria-label="Select Country">
+                <option value="">Choose...</option>
+                <option value="usa">United States</option>
+                <option value="canada">Canada</option>
+                <option value="uk">United Kingdom</option>
+                <!-- Add more countries as needed -->
+            </select>
+            <div class="invalid-feedback">Please select a country.</div>
+        </div>
+        <div class="col-md-6">
+            <label for="validationServer03" class="form-label">City</label>
+            <input type="text" class="form-control" id="cityInput" aria-describedby="validationServer03Feedback" required>
+            <div id="validationServer03Feedback" class="invalid-feedback">
+                Please provide a valid city.
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label for="validationServer04" class="form-label">State</label>
+            <select class="form-select" id="stateSelect" aria-describedby="validationServer04Feedback" required>
+                <option selected disabled value="">Choose...</option>
+                <option value="usa">United States</option>
+                <option value="canada">Canada</option>
+            </select>
+            <div id="validationServer04Feedback" class="invalid-feedback">
+                Please select a valid state.
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label for="validationServer05" class="form-label">Zip</label>
+            <input type="text" class="form-control" id="zipInput" aria-describedby="validationServer05Feedback" required>
+            <div id="validationServer05Feedback" class="invalid-feedback">
+                Please provide a valid zip.
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label for="validationServer06" class="form-label">Street Address</label>
+            <input type="text" class="form-control" id="streetAddressInput" placeholder="Enter Street Address" required>
+        </div>
+        <div class="col-md-6">
+            <label for="validationServer07" class="form-label">Postal/ZIP Code</label>
+            <input type="text" class="form-control" id="postalCodeInput" aria-describedby="validationServer07Feedback" required>
+            <div id="validationServer07Feedback" class="invalid-feedback">
+                Please provide a valid postal/ZIP code.
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label for="dateOpened" class="form-label">Date Opened</label>
+            <input type="date" class="form-control" id="dateOpenedInput" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+        <div class="mb-3">
+            <label for="validationTextarea" class="form-label">Discription</label>
+            <textarea class="form-control" id="discriptionInput" placeholder="Required example textarea" required></textarea>
+            <div class="invalid-feedback">
+                Please enter a Description about the Outlet.
+            </div>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="validationFormCheck1" required>
+            <label class="form-check-label" for="validationFormCheck1">Health and Safety Compliance</label>
+            <div class="invalid-feedback">Example invalid feedback text</div>
+        </div>
+        <div class="col-md-6">
+            <label for="employeeCount" class="form-label">Employee Count</label>
+            <input type="number" class="form-control" id="employeeCountInput" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+        <div class="col-md-3">
+            <label for="operatingHoursStart" class="form-label">Operating Hours Start</label>
+            <input type="time" class="form-control" id="operatingHoursStartInput" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+        <div class="col-md-3">
+            <label for="operatingHoursEnd" class="form-label">Operating Hours End</label>
+            <input type="time" class="form-control" id="operatingHoursEndInput" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+
+        <!-- Add this section to your HTML -->
+       
+        <div class="col-md-3">
+            <label for="Contact" class="form-label">Contact</label>
+            <input type="number" class="form-control" id="ContactInput" name="Contact" placeholder="Contact number for outlet">
+        </div>
+
+        <div class="mb-3">
+            <label for="validationServer07" class="form-label">Bussiness logo</label>
+            <input type="file" class="form-control" aria-label="file example" id="bussinesslogo" name="Logo" required>
+            <div class="invalid-feedback">Example invalid form file feedback</div>
+        </div>
+        <div class="mb-3">
+            <label for="validationServer07" class="form-label">Image for Restaurent</label>
+            <input type="file" class="form-control" aria-label="file example" id="restaurentimage" name="RestaurantImage" required>
+            <div class="invalid-feedback">Example invalid form file feedback</div>
+        </div>
+
+        <div class="col-12">
+            <div class="form-check">
+                <input class="form-check-input is-invalid" type="checkbox" value="" id="termsAndConditionsCheck" aria-describedby="invalidCheck3Feedback" required>
+                <label class="form-check-label" for="invalidCheck3">
+                    Agree to terms and conditions
+                </label>
+                <div id="invalidCheck3Feedback" class="invalid-feedback">
+                    You must agree before submitting.
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">Submit form</button>
+        </div>
+    </form>
+
+</main>
+
+    <script>
+        // JavaScript code for the layout
+        // This will load before the view-specific JavaScript
+        const layoutPopoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+        const layoutPopoverList = [...layoutPopoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+    </script>
+<script>
+    $(document).ready(function () {
+        $("#addOutletForm").on("submit", function (event) {
+            event.preventDefault(); // Stop the default form submit action
+
+            let formData = new FormData();
+            formData.append("InternalOutletName", $("#outletInternalName").val());
+            formData.append("CustomerFacingName", $("#outletCustomerName").val());
+            formData.append("BusinessType", $("#businessTypeSelect").val());
+            formData.append("Country", $("#countrySelect").val());
+            formData.append("City", $("#cityInput").val());
+            formData.append("State", $("#stateSelect").val());
+            formData.append("Zip", $("#zipInput").val());
+            formData.append("StreetAddress", $("#streetAddressInput").val());
+            formData.append("PostalCode", $("#postalCodeInput").val());
+            formData.append("DateOpened", $("#dateOpenedInput").val());
+            formData.append("Description", $("#discriptionInput").val());
+            formData.append("HealthAndSafetyCompliance", $("#validationFormCheck1").prop('checked'));
+            formData.append("EmployeeCount", $("#employeeCountInput").val());
+            formData.append("OperatingHoursStart", $("#operatingHoursStartInput").val());
+            formData.append("OperatingHoursEnd", $("#operatingHoursEndInput").val());
+            formData.append("Contact", $("#ContactInput").val());
+            formData.append("AgreeToTerms", $("#termsAndConditionsCheck").prop('checked'));
+            formData.append("Logo", $('#bussinesslogo')[0].files[0]);
+            formData.append("RestaurantImage", $('#restaurentimage')[0].files[0]);
+
+            // Perform the AJAX request
+            $.ajax({
+                url: "/Restaurant/AddOutlet",
+                type: "POST",
+                data: formData,
+                processData: false, // Important
+                contentType: false, // Important
+                headers: {
+                    "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        console.log("Successfully added the outlet");
+                        window.location.href = '/Restaurant/Index'; // Redirect to main page
+                    } else {
+                        console.log("Failed to add the outlet");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("AJAX call failed: ", textStatus, ", ", errorThrown);
+                }
+            });
+        });
+    });
+
+
+</script>

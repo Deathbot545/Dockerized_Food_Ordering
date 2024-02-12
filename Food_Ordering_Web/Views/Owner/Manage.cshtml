@@ -1,0 +1,300 @@
+﻿<div class="container">
+    <div class="row">
+      
+        <!-- Category Form -->
+        <div class="container">
+            <div id="alert-placeholder"></div>
+
+            <div class="row">
+                <!-- Add Category Form -->
+                <div class="col-md-6">
+                    <h2>Add Category</h2>
+                    <form id="category-form">
+                        <!-- Ensure that ViewBag.OutletId actually contains a value -->
+                        <input type="hidden" id="outlet_id" value="@ViewBag.OutletId">
+                        <div class="form-group">
+                            <label for="category_name">Category Name</label>
+                            <input type="text" class="form-control" id="category_name" placeholder="Enter Category Name" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Category</button>
+                    </form>
+
+                </div>
+                <!-- Category Table -->
+                <div class="col-md-6">
+                    <h2>Category Table</h2>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Category Name</th>
+                            </tr>
+                        </thead>
+                        <tbody id="category-table-body">
+                            <!-- Sample category rows, replace with actual data from your database -->
+                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Add Menu Item Form -->
+                <div class="col-md-6">
+                    <h2>Add Menu Item</h2>
+                    <form id="food-form">
+                        <div class="form-group">
+                            <label for="food_name">Food Name</label>
+                            <input type="text" class="form-control" id="food_name" placeholder="Enter Food Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="food_description">Food Description</label>
+                            <textarea class="form-control" id="food_description" placeholder="Enter Food Description" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="food_category">Food Category</label>
+                            <select class="form-control" id="food_category" required>
+                                <option value="">Choose...</option>
+                                
+                                <!-- Add more categories as needed -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="food_price">Food Price ($)</label>
+                            <input type="number" step="0.01" class="form-control" id="food_price" placeholder="Enter Food Price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="food_image">Food Image</label>
+                            <input type="file" class="form-control-file" id="food_image" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Food</button>
+                    </form>
+                </div>
+                <!-- Menu Item Table -->
+                <div class="col-md-6">
+                    <h2>Menu Item Table</h2>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Food Name</th>
+                                <th>Food Description</th>
+                                <th>Category</th>
+                                <th>Price ($)</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="menu-item-table-body">
+                            <!-- Make sure this id matches what's used in the JavaScript -->
+                            <!-- Rows will be filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+      </div>
+</div>
+<script>
+    $(document).ready(function () {
+        function fetchAndPopulateCategories() {
+            let outletId = parseInt($('#outlet_id').val(), 10);
+            let apiEndpoint = `https://localhost:7115/api/MenuApi/GetAllCategories/${outletId}`;
+
+            $.get(apiEndpoint, function (categories) {
+                console.log("Fetched categories:", categories);
+                let tableBody = '';
+                let dropdownOptions = '<option value="">Choose...</option>';
+
+                categories.forEach(categoryDto => {
+                    tableBody += `<tr><td>${categoryDto.categoryName}</td><td><button class="btn btn-danger btn-sm delete-category" data-id="${categoryDto.id}"><i class="fas fa-times"></i></button></td></tr>`;
+                    dropdownOptions += `<option value="${categoryDto.id}" data-name="${categoryDto.categoryName}">${categoryDto.categoryName}</option>`;
+                });
+
+                $('#category-table-body').html(tableBody);
+                $('#food_category').html(dropdownOptions);
+
+            })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("Request failed:", textStatus, errorThrown);
+                });
+        }
+        // New function to fetch and populate menu items
+        function fetchAndPopulateMenuItems() {
+            let outletId = parseInt($('#outlet_id').val(), 10);
+            let apiEndpoint = `https://localhost:7115/api/MenuApi/GetMenuItems/${outletId}`;
+
+            $.get(apiEndpoint, function (menuItems) {
+                console.log("Fetched menu items:", menuItems);
+                let tableBody = '';
+
+                menuItems.forEach(menuItemDto => {
+                    const imageBase64 = menuItemDto.image;
+                    tableBody += `<tr data-item-id="${menuItemDto.id}">
+                        <td>${menuItemDto.name}</td>
+                        <td>${menuItemDto.description}</td>
+                        <td>${menuItemDto.categoryName}</td>
+                        <td>${menuItemDto.price.toFixed(2)}</td>
+                        <td><img src="data:image/png;base64,${imageBase64}" width="100"/></td>
+                        <td><button class="btn btn-danger delete-button">Delete</button></td>
+                      </tr>`;
+                });
+
+
+                // Assuming your menu items table body has an id "menu-item-table-body"
+                $('#menu-item-table-body').html(tableBody);
+            })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("Request failed:", textStatus, errorThrown);
+                });
+        }
+
+
+        // Call the function initially to populate categories and menu items when the page loads.
+        fetchAndPopulateCategories();
+        fetchAndPopulateMenuItems(); // new call
+
+        $('#category-form').submit(function (e) {
+            e.preventDefault();
+
+            let outletId = parseInt($('#outlet_id').val(), 10);
+            let categoryName = $('#category_name').val();
+            let internalOutletName = '@ViewBag.InternalOutletName';
+
+            $.ajax({
+                url: 'https://localhost:7115/api/MenuApi/AddCategory',
+                method: 'POST',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    outletId: outletId,
+                    categoryName: categoryName,
+                    internalOutletName: internalOutletName
+                }),
+                success: function (response) {
+                    console.log("Category added:", response);
+                    fetchAndPopulateCategories();  // Reload categories
+                },
+                error: function (error) {
+                    console.log("Error adding category:", error);
+                }
+            });
+        });
+
+        $(document).on('click', '.delete-category', function () {
+            const categoryId = $(this).attr('data-id');
+            const categoryName = $(this).closest('tr').find('td:first').text(); // Get the name of the category
+
+            let categoryHasMenuItems = false;
+
+            // Check each menu item
+            $('#menu-item-table-body tr').each(function () {
+                const menuItemCategoryName = $(this).find('td:nth-child(3)').text(); // Assuming category name is in the third column
+                if (menuItemCategoryName === categoryName) {
+                    categoryHasMenuItems = true;
+                    return false; // Break the loop
+                }
+            });
+
+            if (categoryHasMenuItems) {
+                // Show Bootstrap alert instead of JavaScript alert
+                showBootstrapAlert('This category has menu items. Please delete them first before deleting the category.');
+                return;
+            }
+
+            // Proceed with deletion if no menu items are found
+            $.ajax({
+                url: `https://localhost:7115/api/MenuApi/DeleteCategory/${categoryId}`,
+                method: 'DELETE',
+                success: function (response) {
+                    console.log("Category deleted:", response);
+                    fetchAndPopulateCategories();  // Reload categories
+                },
+                error: function (error) {
+                    console.log("Error deleting category:", error);
+                }
+            });
+        });
+
+        $('#food-form').submit(function (e) {
+            e.preventDefault();
+
+            let foodName = $('#food_name').val();
+            let foodDescription = $('#food_description').val();
+            let foodCategoryId = $('#food_category').val(); // Assuming this is the ID
+            let foodCategoryName = $('#food_category option:selected').text(); // Assuming this is the name
+            let foodPrice = parseFloat($('#food_price').val());
+            let foodImage = $('#food_image')[0].files[0];
+
+
+            getBase64(foodImage, (base64Image) => {
+                $.ajax({
+                    url: 'https://localhost:7115/api/MenuApi/AddMenuItem',
+                    method: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        name: foodName,
+                        description: foodDescription,
+                        menuCategoryId: foodCategoryId,
+                        categoryName: foodCategoryName, // Added this field
+                        price: foodPrice,
+                        image: base64Image.split(',')[1]
+                    }),
+
+                    success: function (response) {
+                        console.log("Menu item added:", response);
+                        // Refresh the menu items and categories tables
+                        fetchAndPopulateCategories();
+                        fetchAndPopulateMenuItems();
+
+                    },
+                    error: function (error) {
+                        console.log("Error adding menu item:", error);
+                    }
+                });
+            });
+        });
+
+        $(document).on('click', '.delete-button', function () {
+            const row = $(this).closest('tr');
+            const itemId = row.data('item-id');
+            const apiEndpoint = `https://localhost:7115/api/MenuApi/DeleteMenuItem/${itemId}`;
+
+            $.ajax({
+                url: apiEndpoint,
+                type: 'DELETE',
+                success: function (result) {
+                    console.log("Item deleted:", result);
+                    row.remove();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Request failed:", textStatus, errorThrown);
+                }
+            });
+        });
+
+
+    });
+
+    function getBase64(file, callback) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            callback(reader.result);
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
+
+    // Function to display a Bootstrap alert
+    function showBootstrapAlert(message) {
+        const alertHtml = `
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Attention!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+        $('#alert-placeholder').html(alertHtml);
+    }
+
+</script>
+
+

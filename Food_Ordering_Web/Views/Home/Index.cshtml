@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<style>
+       body {
+            font-family: 'Open Sans', sans-serif;
+        }
+        .jumbotron-custom {
+             background-image: url('/Images/background.jpg'); /* Replace with path to your hero image */
+            background-size: cover;
+            color: #f7f3f3;
+        }
+        .qr-scan-button {
+            background-color: #007bff;
+            color: white;
+        }
+        .shop-register, .customer-register {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .icon-image {
+            width: 100px; /* Adjust as needed */
+            height: auto;
+        }
+</style>
+
+
+    
+    <div class="p-5 mb-4 jumbotron-custom rounded-3">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-5 fw-bold">Welcome to Restro</h1>
+            <p class="fs-4">Your Easy Food Ordering App! Scan the QR code below to place your order.</p>
+            <button id="orderButton" class="btn qr-scan-button btn-lg mt-3" type="button">
+                Scan QR Code <i class="fas fa-qrcode ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row align-items-stretch">
+            <div class="col-md-6 mb-3">
+                <div class="p-5 bg-light border rounded-3 text-center">
+                    <img src="path-to-customer-icon.png" alt="Customer Icon" class="icon-image"> <!-- Replace with path to customer icon -->
+                    <h2>Customer</h2>
+                    <p>Order food quickly and easily.</p>
+                    <a href="@Url.Action("Register", "Customer")" class="btn customer-register">Register as Customer</a>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="p-5 bg-dark text-white rounded-3 text-center">
+                    <img src="path-to-shop-icon.png" alt="Shop Icon" class="icon-image"> <!-- Replace with path to shop icon -->
+                    <h2>Add Your Own Shop</h2>
+                    <p>Manage your restaurant's orders.</p>
+                    <a href="@Url.Action("Register", "Shop")" class="btn shop-register">Register as Shop</a>
+                </div>
+            </div>
+        </div>
+    </div>

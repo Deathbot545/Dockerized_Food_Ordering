@@ -1,0 +1,29 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5433;Database=Food_OrderingDB;Username=postgres;Password=raaed"
+
+  },
+  "StripeSettings": {
+    "ApiKey": "sk_test_51NjhBQFU6tKdw4REQ4sdK5t4EUN3aNkvW7Z3v9e41eXjEgfHwcnFztdPvwrRIFeGgwuMpzvkrcn8CSghhoCbJS9S006L3W13JP",
+    "WebhookSecret": "pk_test_51NjhBQFU6tKdw4RE8kO4funmhbcbtQur1zsSD3YNbNBBAYQRZqR1omJtSp4KesSL3eHKPr03uZnuCoWUK233DYvD00wd9n7wfQ"
+  },
+  "EmailSettings": {
+    "Host": "smtp.gmail.com",
+    "Port": 587,
+    "Email": "sitewebsite73@gmail.com",
+    "Password": "otrzdbifusqsiuoc"
+  },
+  "Authentication": {
+    "Google": {
+      "ClientId": "720720527870-lgss8d497dl1cv4ce8bleuk2ei8fkihk.apps.googleusercontent.com",
+      "ClientSecret": "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"
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}

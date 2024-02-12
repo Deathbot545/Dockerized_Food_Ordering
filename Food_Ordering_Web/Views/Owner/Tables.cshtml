@@ -1,0 +1,166 @@
+﻿<style>
+    /* Your existing style for the image */
+    .img {
+        max-width: 150px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    /* Style for the card */
+    .qr-card {
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Style for the card header */
+    .qr-card-header {
+        background-color: #f9f9f9;
+        padding: 15px;
+        font-weight: bold;
+    }
+
+    /* Style for the card body */
+    .qr-card-body {
+        padding: 20px;
+        text-align: center;
+    }
+</style>
+
+<div class="container mt-5">
+    <h1 class="mb-5">Tables for Outlet @ViewBag.InternalOutletName (@ViewBag.CustomerFacingName)</h1>
+    
+    <!-- Action bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Available Tables</h2>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTableModal">Add New Table</button>
+    </div>
+    
+    <!-- Table Cards -->
+    <div class="row g-4" id="tableCards">
+      
+    </div>
+</div>
+
+<!-- Add Table Modal -->
+<div class="modal fade" id="addTableModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Table</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="newTableName" class="form-control" placeholder="Enter Table Name or Number">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveTableBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- JavaScript to handle new table addition -->
+<script>
+    $(document).ready(function () {
+       
+        fetchTables();
+    });
+    const outletId = @ViewBag.OutletId;
+
+    function fetchTables() {
+        $.ajax({
+            url: `https://localhost:7115/api/TablesApi/GetTables?id=${outletId}`,
+            type: 'GET',
+            success: function (tables) {
+                populateTables(tables);
+            },
+            error: function (error) {
+                console.error('Error fetching tables:', error);
+            }
+        });
+    }
+
+    function populateTables(tables) {
+        const tableCards = $('#tableCards');
+        tableCards.empty();
+
+        tables.forEach(function (tableDto) {
+            const tableCard = `
+        <div class="col-md-4">
+            <div class="card qr-card">
+                <div class="card-header text-center qr-card-header">
+                    ${tableDto.tableIdentifier}
+                    <button class="btn btn-danger btn-sm float-end remove-qr-btn" data-id="${tableDto.id}">x</button>
+                </div>
+                <div class="card-body text-center qr-card-body">
+                    <img src="data:image/svg+xml;base64,${tableDto.qrCodeData}" alt="QR Code for ${tableDto.tableIdentifier}" class="img img-fluid mb-3">
+                </div>
+            </div>
+        </div>
+    `;
+
+
+            tableCards.append(tableCard);
+        });
+    }
+
+    // Fetch tables when the page loads
+    
+    $("#saveTableBtn").click(function () {
+        const tableIdentifier = $("#newTableName").val();
+        const outletId = @ViewBag.OutletId;
+        $.ajax({
+            url: 'https://localhost:7115/api/TablesApi/AddTable',
+            method: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify({
+                OutletId: parseInt(outletId, 10),
+                TableIdentifier: tableIdentifier
+            }),
+            success: function (response) {
+                console.log("Success:", response);
+
+                // Hide the modal after a short delay
+                setTimeout(function () {
+                    var myModalEl = document.getElementById('addTableModal');
+                    var modal = bootstrap.Modal.getInstance(myModalEl);  // Get instance
+                    console.log("Is modal null?", modal === null);  // Diagnostic line
+                    modal.hide();
+                }, 100);
+
+                // Clear the input for the next use
+                $('#newTableName').val('');
+
+                // Fetch tables again
+                fetchTables();
+            }
+            ,
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log('Error:', textStatus, errorThrown);
+                console.log('Response:', jqXHR.responseText);
+            }
+        });
+    });
+    $("#tableCards").on("click", ".remove-qr-btn", function () {
+        const tableId = $(this).attr("data-id");
+
+        $.ajax({
+            url: `https://localhost:7115/api/TablesApi/RemoveQRCode?id=${tableId}`,
+            type: 'DELETE', // Assuming that the method to remove QR code is a DELETE
+            success: function (response) {
+                console.log("QR code removed:", response);
+
+                // Refresh the tables after successfully removing the QR code
+                fetchTables();
+            },
+            error: function (error) {
+                console.error('Error removing QR code:', error);
+            }
+        });
+    });
+
+
+</script>
+

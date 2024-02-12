@@ -1,0 +1,208 @@
+﻿@{
+    ViewData["Title"] = "Signin";
+}
+
+<style>
+    body {
+        background-color: #f5f5f5;
+        transition: background-color 0.5s ease;
+        background-image: none;
+    }
+
+    .container {
+        margin-top: 50px;
+    }
+
+    .btn-google {
+        background-color: #4285F4;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-google img {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+        }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .toggle-button {
+        cursor: pointer;
+    }
+
+    .center-button {
+        display: flex;
+        justify-content: center;
+    }
+
+
+    .hidden {
+        display: none;
+    }
+
+    .customer-theme {
+        background-image: url('/Images/jason-leung-UMncYEfO9-U-unsplash.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .owner-theme {
+        background-image: url('/Images/omar-flores-lQT_bOWtysE-unsplash.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+</style>
+<link rel="preload" href="/Images/jason-leung-UMncYEfO9-U-unsplash.jpg" as="image">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4>Sign Up</h4>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary toggle-button" id="showCustomer">Customer</button>
+                        <button type="button" class="btn btn-secondary toggle-button" id="showOwner">Shop Owner</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="customerForm">
+                        <form id="signupFormCustomer" method="post" action="/Account/AddUser">
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
+
+
+                            </div><div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+
+                            </div><div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password">
+                            </div>
+                            <input type="hidden" name="roleName" value="Customer" />
+                            <div class="center-button">
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </div>
+                        </form>
+                        <div class="form-group text-center mt-4">
+                            <p class="mb-2">Or join using:</p>
+                            <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
+                                <input type="hidden" name="provider" value="Google" />
+                                <input type="hidden" name="role" value="Customer" />
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fab fa-google"></i> Google
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="ownerForm" class="hidden">
+                        <form id="signupFormRestaurant" method="post" action="/Account/AddUser">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
+
+
+                            </div><div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+
+                            </div><div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password">
+                            </div>
+                            <input type="hidden" name="roleName" value="Restaurant" />
+                            <div class="center-button">
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </div>
+
+                        </form>
+                        <div class="form-group text-center mt-4">
+                            <p class="mb-2">Or join using:</p>
+                            <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
+                                <input type="hidden" name="provider" value="Google" />
+                                <input type="hidden" name="role" value="Restaurant" />
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fab fa-google"></i> Google
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Preload image during window load, not DOMContentLoaded
+    window.addEventListener("load", function () {
+        const image = new Image();
+        image.src = '/Images/jason-leung-UMncYEfO9-U-unsplash.jpg';
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const customerForm = document.getElementById("customerForm");
+        const ownerForm = document.getElementById("ownerForm");
+        const body = document.body;
+
+        document.getElementById("showCustomer").addEventListener("click", function () {
+            customerForm.classList.remove("hidden");
+            ownerForm.classList.add("hidden");
+            body.classList.add("customer-theme");
+            body.classList.remove("owner-theme");
+        });
+
+        document.getElementById("showOwner").addEventListener("click", function () {
+            ownerForm.classList.remove("hidden");
+            customerForm.classList.add("hidden");
+            body.classList.add("owner-theme");
+            body.classList.remove("customer-theme");
+        });
+        document.getElementById("signupFormCustomer").addEventListener("submit", validatePassword);
+        document.getElementById("signupFormRestaurant").addEventListener("submit", validatePassword);
+    });
+
+   
+
+    function displayErrors(errors) {
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "alert alert-danger";
+        errorDiv.innerHTML = "<ul>";
+
+        errors.forEach(function (error) {
+            errorDiv.innerHTML += "<li>" + error + "</li>";
+        });
+
+        errorDiv.innerHTML += "</ul>";
+        const container = document.querySelector(".container");
+        container.prepend(errorDiv);
+    }
+</script>

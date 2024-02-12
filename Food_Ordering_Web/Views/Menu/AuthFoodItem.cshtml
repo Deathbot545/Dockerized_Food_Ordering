@@ -1,0 +1,187 @@
+﻿<style>
+    .cart-fixed-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #343a40;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        display: none; /* Initially hidden */
+        cursor: pointer;
+    }
+
+    .food-image {
+        width: 400px;
+        height: 300px;
+        object-fit: cover;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .image-container {
+        position: relative;
+    }
+
+    .back-button {
+        position: absolute;
+        top: -40px;
+        left: 10px;
+        z-index: 10;
+    }
+</style>
+<div class="container my-5" style="padding-top: 50px;">
+    <h1>Authenticated</h1>
+    <!-- Added padding to the container -->
+    <div class="row">
+        <div class="col-md-6" style="position: relative;">
+            <!-- Back Button -->
+            <a href="javascript:void(0)" onclick="goBack()" class="btn btn-link back-button">← Back to @ViewBag.CustomerFacingName</a>
+
+            <!-- Image -->
+            <img class="img-fluid rounded food-image" alt="Food Image">
+
+        </div>
+        <div class="col-md-6">
+            <!-- Title and Price -->
+            <h2 class="mb-3">Loading... <span class="text-primary">LKR 0.00</span></h2>
+
+            <!-- Description -->
+            <p id="food-description">Loading...</p>
+
+            <!-- Rating -->
+            <p><span class="text-success">👍 Loading...</span> (0)</p>
+
+            <!-- Packaging Charges Section -->
+            <div class="mb-3">
+                <label><strong>Packaging Charges</strong></label>
+                <div class="border rounded p-3">
+                    <label><input type="radio" name="packaging" required> Additional Charges <span class="ml-2">+LKR 109.00</span></label>
+                </div>
+            </div>
+
+            <!-- Quantity Selector -->
+            <div class="mb-3">
+                <select class="form-control w-auto" id="quantity-selector">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+
+            <!-- Order Button -->
+            <button class="btn btn-dark btn-lg btn-block" id="order-button">Add 1 to order • LKR 0.00</button>
+        </div>
+    </div>
+</div>
+<div id="cart-button" class="cart-fixed-bottom">
+    <span id="cart-items-count">0</span> Items - LKR <span id="cart-total">0.00</span>
+</div>
+
+
+<script>
+
+    function goBack() {
+        window.history.back();
+    }
+    $(document).ready(function () {
+        const menuItemId = '@ViewBag.ItemId';
+        const apiEndpoint = `https://localhost:7115/api/MenuApi/GetMenuItem/${menuItemId}`;
+
+        // Fetch the data from the API
+        $.ajax({
+            url: apiEndpoint,
+            method: 'GET',
+            success: function (data) {
+                // Populate the HTML elements with the fetched data
+                if (data && data.image) {
+                    $('img').attr('src', 'data:image/png;base64,' + data.image);
+                } else {
+                    console.error("Image data is missing or invalid:", data);
+                }
+
+                if (data && data.price) {
+                    $('h2').html(data.name + ' <span class="text-primary">LKR ' + data.price.toFixed(2) + '</span>');
+                } else {
+                    console.error("Price data is missing or invalid:", data);
+                }
+
+                $('#food-description').text(data.description);
+
+
+                // For the rating, I am assuming you'll provide the rating and total votes in your data, for now I'm hardcoding
+                $('p').eq(2).html('<span class="text-success">👍 ' + data.Rating + '%</span> (' + data.Votes + ')');  // Adjust as per your API data
+
+                // Handle quantity change
+                $('#quantity-selector').change(function () {
+                    let quantity = $(this).val();
+                    let total = data.Price * quantity;
+                    $('#order-button').text(`Add ${quantity} to order • LKR ${total.toFixed(2)}`);
+
+                }).trigger('change');
+
+
+                // If there are more data to be populated, you can continue here.
+            },
+            error: function (error) {
+                console.error("Error fetching data:", error);
+            }
+        });
+    });
+
+
+    // Cart functions
+    function updateCartButton() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let itemCount = cart.reduce((count, item) => count + item.qty, 0);
+        let total = cart.reduce((total, item) => total + (item.price * item.qty), 0).toFixed(2);
+
+        $("#cart-items-count").text(itemCount);
+        $("#cart-total").text(total);
+
+        if (itemCount > 0) {
+            $('#cart-button').show();
+        } else {
+            $('#cart-button').hide();
+        }
+    }
+
+    // This will be called when an item is added to the cart
+    function addToCart(item) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let existingItem = cart.find(x => x.id === item.id);
+        if (existingItem) {
+            existingItem.qty += item.qty;
+        } else {
+            cart.push(item);
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartButton();
+    }
+
+    // For the Food Item page
+    $('#order-button').click(function () {
+        const qty = parseInt($('#quantity-selector').val());
+        const price = parseFloat($('h2 span').text().replace('LKR', '').trim());
+        const h2Text = $('h2').text();
+        const priceText = $('h2 span').text();
+        const name = h2Text.replace(priceText, '').trim();
+
+
+        addToCart({
+            id: '@ViewBag.ItemId'.toString(),
+            name: name,
+            qty: qty,
+            price: price
+        });
+    });
+    $('#cart-button').click(function () {
+        window.location.href = '/Order/Checkout';
+    });
+    // Initialization
+    $(document).ready(function () {
+        updateCartButton();
+    });
+
+</script>

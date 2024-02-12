@@ -1,0 +1,26 @@
+﻿@model Core.ViewModels.UserProfileModel
+
+<!-- Your HTML layout -->
+<div class="container mt-4">
+    <h4 class="mb-3">Personal Details</h4>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Username:</strong> @Model.UserName
+                </div>
+                <div class="col-md-6">
+                    <strong>Email:</strong> @Model.Email
+                </div>
+                <div class="col-md-6">
+                    <strong>PhoneNumber:</strong> @Model.PhoneNumber
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-right mt-3">
+        <a href="@Url.Action("EditProfile", "UserProfile")" class="btn btn-primary">Edit Profile</a>
+        <a href="@Url.Action("ChangePassword", "UserProfile")" class="btn btn-secondary">Change Password</a>
+    </div>
+</div>

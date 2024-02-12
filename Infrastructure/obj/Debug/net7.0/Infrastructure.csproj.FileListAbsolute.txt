@@ -12,3 +12,17 @@ D:\Folder\Food_Ordering\Infrastructure\obj\Debug\net7.0\refint\Infrastructure.dl
 D:\Folder\Food_Ordering\Infrastructure\obj\Debug\net7.0\Infrastructure.pdb
 D:\Folder\Food_Ordering\Infrastructure\obj\Debug\net7.0\Infrastructure.genruntimeconfig.cache
 D:\Folder\Food_Ordering\Infrastructure\obj\Debug\net7.0\ref\Infrastructure.dll
+D:\Dockerize\dockerize\Infrastructure\bin\Debug\net7.0\Infrastructure.deps.json
+D:\Dockerize\dockerize\Infrastructure\bin\Debug\net7.0\Infrastructure.runtimeconfig.json
+D:\Dockerize\dockerize\Infrastructure\bin\Debug\net7.0\Infrastructure.dll
+D:\Dockerize\dockerize\Infrastructure\bin\Debug\net7.0\Infrastructure.pdb
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.csproj.AssemblyReference.cache
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.AssemblyInfoInputs.cache
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.AssemblyInfo.cs
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.csproj.CoreCompileInputs.cache
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.dll
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\refint\Infrastructure.dll
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.pdb
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\Infrastructure.genruntimeconfig.cache
+D:\Dockerize\dockerize\Infrastructure\obj\Debug\net7.0\ref\Infrastructure.dll

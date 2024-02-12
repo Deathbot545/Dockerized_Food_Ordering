@@ -124,7 +124,7 @@
         let outletId = '@ViewBag.OutletId';
 
         function fetchAndDisplayMenuItems() {
-            let apiEndpoint = `https://localhost:7115/api/MenuApi/GetMenuItems/${outletId}`;
+            let apiEndpoint = `https://walksy.shop:7115/api/MenuApi/GetMenuItems/${outletId}`;
             $.get(apiEndpoint, function (menuItems) {
                 let categoryMap = {};
                 let navbarItems = '';
@@ -172,7 +172,7 @@
                 });
         }
         function fetchAndDisplayOutletInfo() {
-            let outletInfoEndpoint = `https://localhost:7115/api/MenuApi/outletInfo/${outletId}`;
+            let outletInfoEndpoint = `https://walksy.shop:7115/api/MenuApi/outletInfo/${outletId}`;
 
             console.log(`Fetching data from endpoint: ${outletInfoEndpoint}`); // Logs the endpoint being hit.
 

@@ -1,0 +1,15 @@
+D:\Dockerize\dockerize\Core\bin\Release\net7.0\Core.deps.json
+D:\Dockerize\dockerize\Core\bin\Release\net7.0\Core.dll
+D:\Dockerize\dockerize\Core\bin\Release\net7.0\Core.pdb
+D:\Dockerize\dockerize\Core\bin\Release\net7.0\Infrastructure.dll
+D:\Dockerize\dockerize\Core\bin\Release\net7.0\Infrastructure.pdb
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.csproj.AssemblyReference.cache
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.AssemblyInfoInputs.cache
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.AssemblyInfo.cs
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.csproj.CoreCompileInputs.cache
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.csproj.CopyComplete
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.dll
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\refint\Core.dll
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\Core.pdb
+D:\Dockerize\dockerize\Core\obj\Release\net7.0\ref\Core.dll

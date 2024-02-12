@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+u8UsGiCZZJ5/PUO6PiViImeyjutKXTUbNoMlwREv1QuFOCwEKxAoCVV6B2lPtXczCIF8gmppJvZ6mNH3Hv0EA==",
+  "dgSpecHash": "2c3mowWDv1hNvn61+fbimZVMpaz6XWt1BZCPk705CBnIZLGuvRpBhk4nzoCJIIGWnqSK4wg4CX2swU9hLPEgTg==",
   "success": true,
-  "projectFilePath": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj",
+  "projectFilePath": "D:\\Dockerize\\dockerize\\Core\\Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\7.0.5\\microsoft.aspnetcore.cryptography.internal.7.0.5.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\7.0.5\\microsoft.aspnetcore.cryptography.keyderivation.7.0.5.nupkg.sha512",

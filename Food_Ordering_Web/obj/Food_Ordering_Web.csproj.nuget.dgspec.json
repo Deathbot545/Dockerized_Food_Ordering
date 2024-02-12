@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Folder\\Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {}
+    "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {}
   },
   "projects": {
-    "D:\\Folder\\Food_Ordering\\Core\\Core.csproj": {
+    "D:\\Dockerize\\dockerize\\Core\\Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj",
+        "projectUniqueName": "D:\\Dockerize\\dockerize\\Core\\Core.csproj",
         "projectName": "Core",
-        "projectPath": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj",
+        "projectPath": "D:\\Dockerize\\dockerize\\Core\\Core.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Folder\\Food_Ordering\\Core\\obj\\",
+        "outputPath": "D:\\Dockerize\\dockerize\\Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,8 +33,8 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj"
+              "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -78,14 +78,14 @@
         }
       }
     },
-    "D:\\Folder\\Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj": {
+    "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Folder\\Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj",
+        "projectUniqueName": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj",
         "projectName": "Food_Ordering_API",
-        "projectPath": "D:\\Folder\\Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj",
+        "projectPath": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Folder\\Food_Ordering\\Food_Ordering_API\\obj\\",
+        "outputPath": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -107,11 +107,11 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Folder\\Food_Ordering\\Core\\Core.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj"
+              "D:\\Dockerize\\dockerize\\Core\\Core.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Core\\Core.csproj"
               },
-              "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj"
+              "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -152,6 +152,10 @@
               "target": "Package",
               "version": "[1.16.0, )"
             },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.17.2, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.4.0, )"
@@ -180,14 +184,14 @@
         }
       }
     },
-    "D:\\Folder\\Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {
+    "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Folder\\Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
+        "projectUniqueName": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
         "projectName": "Food_Ordering_Web",
-        "projectPath": "D:\\Folder\\Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
+        "projectPath": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Folder\\Food_Ordering\\Food_Ordering_Web\\obj\\",
+        "outputPath": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -209,20 +213,20 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Folder\\Food_Ordering\\Core\\Core.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj"
+              "D:\\Dockerize\\dockerize\\Core\\Core.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Core\\Core.csproj"
               },
-              "D:\\Folder\\Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj"
+              "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj"
               },
-              "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj"
+              "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj"
               },
-              "D:\\Folder\\Food_Ordering\\Order_API\\Order_API.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Order_API\\Order_API.csproj"
+              "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj"
               },
-              "D:\\Folder\\Food_Ordering\\Restaurant_API\\Restaurant_API.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Restaurant_API\\Restaurant_API.csproj"
+              "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj"
               }
             }
           }
@@ -263,6 +267,10 @@
               "target": "Package",
               "version": "[7.0.11, )"
             },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.17.2, )"
+            },
             "Microsoft.VisualStudio.Services.Notifications.WebApi": {
               "target": "Package",
               "version": "[16.205.1, )"
@@ -299,14 +307,14 @@
         }
       }
     },
-    "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
+    "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj",
+        "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\obj\\",
+        "outputPath": "D:\\Dockerize\\dockerize\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -391,14 +399,14 @@
         }
       }
     },
-    "D:\\Folder\\Food_Ordering\\Order_API\\Order_API.csproj": {
+    "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Folder\\Food_Ordering\\Order_API\\Order_API.csproj",
+        "projectUniqueName": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
         "projectName": "Order_API",
-        "projectPath": "D:\\Folder\\Food_Ordering\\Order_API\\Order_API.csproj",
+        "projectPath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Folder\\Food_Ordering\\Order_API\\obj\\",
+        "outputPath": "D:\\Dockerize\\dockerize\\Order_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -420,11 +428,11 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Folder\\Food_Ordering\\Core\\Core.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj"
+              "D:\\Dockerize\\dockerize\\Core\\Core.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Core\\Core.csproj"
               },
-              "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj"
+              "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -446,6 +454,10 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.5, )"
+            },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.17.2, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -475,14 +487,14 @@
         }
       }
     },
-    "D:\\Folder\\Food_Ordering\\Restaurant_API\\Restaurant_API.csproj": {
+    "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Folder\\Food_Ordering\\Restaurant_API\\Restaurant_API.csproj",
+        "projectUniqueName": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj",
         "projectName": "Restaurant_API",
-        "projectPath": "D:\\Folder\\Food_Ordering\\Restaurant_API\\Restaurant_API.csproj",
+        "projectPath": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Folder\\Food_Ordering\\Restaurant_API\\obj\\",
+        "outputPath": "D:\\Dockerize\\dockerize\\Restaurant_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -504,11 +516,11 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Folder\\Food_Ordering\\Core\\Core.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj"
+              "D:\\Dockerize\\dockerize\\Core\\Core.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Core\\Core.csproj"
               },
-              "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj"
+              "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -526,6 +538,10 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.5, )"
+            },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.17.2, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",

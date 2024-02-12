@@ -224,7 +224,7 @@
         const selectedId = $('#deleteConfirmationModal').data('selected-id');
 
         $.ajax({
-            url: `https://localhost:7115/api/OutletApi/delete/${selectedId}`,
+            url: `https://walksy.shop:7115/api/OutletApi/delete/${selectedId}`,
             type: 'DELETE',
             success: function (response) {
                 console.log(response);  // Debugging line

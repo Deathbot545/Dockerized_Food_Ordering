@@ -71,7 +71,7 @@
 
     function fetchTables() {
         $.ajax({
-            url: `https://localhost:7115/api/TablesApi/GetTables?id=${outletId}`,
+            url: `https://walksy.shop:7115/api/TablesApi/GetTables?id=${outletId}`,
             type: 'GET',
             success: function (tables) {
                 populateTables(tables);
@@ -112,7 +112,7 @@
         const tableIdentifier = $("#newTableName").val();
         const outletId = @ViewBag.OutletId;
         $.ajax({
-            url: 'https://localhost:7115/api/TablesApi/AddTable',
+            url: 'https://walksy.shop:7115/api/TablesApi/AddTable',
             method: 'POST',
             contentType: "application/json",
             data: JSON.stringify({
@@ -147,7 +147,7 @@
         const tableId = $(this).attr("data-id");
 
         $.ajax({
-            url: `https://localhost:7115/api/TablesApi/RemoveQRCode?id=${tableId}`,
+            url: `https://walksy.shop:7115/api/TablesApi/RemoveQRCode?id=${tableId}`,
             type: 'DELETE', // Assuming that the method to remove QR code is a DELETE
             success: function (response) {
                 console.log("QR code removed:", response);

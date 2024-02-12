@@ -1460,11 +1460,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj",
+      "projectUniqueName": "D:\\Dockerize\\dockerize\\Core\\Core.csproj",
       "projectName": "Core",
-      "projectPath": "D:\\Folder\\Food_Ordering\\Core\\Core.csproj",
+      "projectPath": "D:\\Dockerize\\dockerize\\Core\\Core.csproj",
       "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-      "outputPath": "D:\\Folder\\Food_Ordering\\Core\\obj\\",
+      "outputPath": "D:\\Dockerize\\dockerize\\Core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1486,8 +1486,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
-              "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj"
+            "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
+              "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj"
             }
           }
         }

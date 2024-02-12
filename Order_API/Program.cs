@@ -36,7 +36,7 @@ builder.Services.AddCors(options =>
 
 bool IsOriginAllowed(string origin)
 {
-    var allowedRegex = new Regex(@"^(https:\/\/)([\w-]+\.)*localhost:7257$");
+    var allowedRegex = new Regex(@"^(https:\/\/)([\w-]+\.)*walksy.shop:7257$");
     return allowedRegex.IsMatch(origin);
 }
 

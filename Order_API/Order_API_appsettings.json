@@ -6,8 +6,7 @@
     }
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5433;Database=Food_OrderingDB;Username=postgres;Password=raaed"
-
+    "DefaultConnection": "Host=database-1.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=postgres;User Id=postgres;Password=NxPostgrsql;"
   },
   "AllowedHosts": "*"
 }

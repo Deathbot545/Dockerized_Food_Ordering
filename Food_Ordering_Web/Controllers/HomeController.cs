@@ -78,7 +78,7 @@ namespace Food_Ordering_Web.Controllers
             List<OrderDTO> orders;
             using (var httpClient = new HttpClient())
             {
-                var response = await httpClient.GetAsync($"https://localhost:7268/api/OrderApi/GetOrdersForOutlet/{outlet.Id}");
+                var response = await httpClient.GetAsync($"https://walksy.shop:7268/api/OrderApi/GetOrdersForOutlet/{outlet.Id}");
 
                 if (!response.IsSuccessStatusCode)
                 {

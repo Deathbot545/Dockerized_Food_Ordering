@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {}
+    "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {}
   },
   "projects": {
-    "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj": {
+    "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\Infrastructure.csproj",
+        "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Folder\\Food_Ordering\\Infrastructure\\obj\\",
+        "outputPath": "D:\\Dockerize\\dockerize\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

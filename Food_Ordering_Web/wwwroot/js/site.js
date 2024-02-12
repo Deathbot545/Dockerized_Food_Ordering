@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // If 'currentOrder' exists in local storage, establish a SignalR connection.
 
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://localhost:7268/orderStatusHub?orderId=" + currentOrder.orderId)
+            .withUrl("https://walksy.shop:7268/orderStatusHub?orderId=" + currentOrder.orderId)
             .configureLogging(signalR.LogLevel.Information)
             .build();
 

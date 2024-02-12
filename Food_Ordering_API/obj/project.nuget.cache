@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ge1T/aRNoJ1EaNQ+r8Q1JEqo2qbHiioHCWGdfzid3LoUUhNqBBumMfM7Dz81meJPq158jRVq+PmE2Y8vtxlPkg==",
+  "dgSpecHash": "ijXxvQ/WSJ85J6JkLVSu3LZfpRQKVh1Br1190T5Tr++cJfJDXEl674yVClrNKcswrseBw9t9JUG3tYi1OPPESw==",
   "success": true,
-  "projectFilePath": "D:\\Folder\\Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj",
+  "projectFilePath": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\azure.core\\1.6.0\\azure.core.1.6.0.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\azure.identity\\1.3.0\\azure.identity.1.3.0.nupkg.sha512",
@@ -56,6 +56,7 @@
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.identitymodel.tokens\\6.15.1\\microsoft.identitymodel.tokens.6.15.1.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.net.http.headers\\2.2.0\\microsoft.net.http.headers.2.2.0.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512",
+    "C:\\Users\\Asus\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.17.2\\microsoft.visualstudio.azure.containers.tools.targets.1.17.2.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\npgsql\\7.0.6\\npgsql.7.0.6.nupkg.sha512",

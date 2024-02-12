@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "lIX+7I8B5Uv2rEeLk6qobPQFzMoNfwtaEeoadm3G5pHUAzuOuB99VR6PfHSS/d7o4J4Dh1VzoMcicEeoLIuNVg==",
+  "dgSpecHash": "wtcm2s87TVYW9ZsvbwEIE/gxXp2nhXmCoN5STH0JWMVGNc5M0HXufQEaQNzp+l9l5mkzXimK5A0iT7K9D+2XCQ==",
   "success": true,
-  "projectFilePath": "D:\\Folder\\Food_Ordering\\Order_API\\Order_API.csproj",
+  "projectFilePath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.aspnetcore.cors\\2.2.0\\microsoft.aspnetcore.cors.2.2.0.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\7.0.5\\microsoft.aspnetcore.cryptography.internal.7.0.5.nupkg.sha512",
@@ -36,6 +36,7 @@
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0\\microsoft.extensions.primitives.7.0.0.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.net.http.headers\\2.2.0\\microsoft.net.http.headers.2.2.0.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512",
+    "C:\\Users\\Asus\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.17.2\\microsoft.visualstudio.azure.containers.tools.targets.1.17.2.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\npgsql\\7.0.6\\npgsql.7.0.6.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\7.0.11\\npgsql.entityframeworkcore.postgresql.7.0.11.nupkg.sha512",

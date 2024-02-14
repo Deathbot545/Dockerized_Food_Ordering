@@ -4,25 +4,25 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://walksy.shop:5075"
+      "applicationUrl": "http://restosolutionssaas.com:5075"
     },
     "https": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://walksy.shop:7257;http://walksy.shop:5075"
+      "applicationUrl": "https://restosolutionssaas.com:7257;http://restosolutionssaas.com:5075"
     },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
     },
     "Docker": {
@@ -37,7 +37,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://walksy.shop:20476",
+      "applicationUrl": "http://restosolutionssaas.com:20476",
       "sslPort": 44353
     }
   }

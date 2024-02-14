@@ -71,6 +71,11 @@ builder.Services.Configure<JsonOptions>(options =>
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
+// Temporarily apply these for debugging purposes
+app.UseDeveloperExceptionPage();
+
+
 // Apply migrations automatically (consider the implications in production environments)
 using (var scope = app.Services.CreateScope())
 {
@@ -82,7 +87,6 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-   
 }
 else
 {
@@ -96,31 +100,21 @@ app.UseCookiePolicy(new CookiePolicyOptions
 });
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();  // Add this line
-app.UseAuthorization();   // Add this line
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapHub<OrderStatusHub>("/orderStatusHub"); // Map your hub here
-
-    endpoints.MapControllerRoute(
-    name: "SubdomainRoute",
-    pattern: "{controller=Home}/{action=SubdomainRedirection}/{id?}",
-    constraints: new { subdomain = new SubdomainRouteConstraint() });
-
-
-    // ... your other routes
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
-
-    endpoints.MapRazorPages();
 });
+
 
 app.MapRazorPages();
 

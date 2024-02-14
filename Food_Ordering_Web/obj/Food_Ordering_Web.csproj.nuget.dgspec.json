@@ -433,6 +433,9 @@
               },
               "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj": {
                 "projectPath": "D:\\Dockerize\\dockerize\\Infrastructure\\Infrastructure.csproj"
+              },
+              "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj": {
+                "projectPath": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj"
               }
             }
           }

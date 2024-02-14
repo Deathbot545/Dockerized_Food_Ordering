@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Restaurant_API\Restaurant_API.csproj" />
   </ItemGroup>
 
 </Project>

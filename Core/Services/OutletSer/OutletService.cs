@@ -210,7 +210,7 @@ namespace Core.Services.OutletSer
 
             // Include table number in the URL
             // Point to your MVC Controller and Action instead of API endpoint
-            var urlToEncode = $"https://walksy.shop:7257/Account/SpecialLogin?outletId={outletId}&tableId={tableId}";
+            var urlToEncode = $"https://restosolutionssaas.com:7257/Account/SpecialLogin?outletId={outletId}&tableId={tableId}";
 
             var svgContent = qrCodeWriter.Write(urlToEncode);
 

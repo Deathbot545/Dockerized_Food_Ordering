@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  food_ordering_web:
-    image: ${DOCKER_REGISTRY-}foodorderingweb
-    build:
-      context: .
-      dockerfile: Food_Ordering_Web/Dockerfile

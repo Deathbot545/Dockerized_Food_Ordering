@@ -1,16 +1,26 @@
 name: dockercompose13095794290409034173
 services:
-  food_ordering_web:
-    build:
-      context: D:\Dockerize\dockerize
-      dockerfile: Food_Ordering_Web/Dockerfile
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: https://+:443;http://+:80
-    image: foodorderingweb
+  food_ordering_api:
+    image: deathbot545/foodorderingapi:latest
     networks:
       default: null
     ports:
+      - mode: ingress
+        target: 80
+        published: "7248"
+        protocol: tcp
+  food_ordering_web:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:443;http://+:80
+    image: deathbot545/foodorderingweb:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "7257"
+        protocol: tcp
       - mode: ingress
         target: 80
         protocol: tcp
@@ -30,6 +40,24 @@ services:
         read_only: true
         bind:
           create_host_path: true
+  order_api:
+    image: deathbot545/orderapi:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "7268"
+        protocol: tcp
+  restaurant_api:
+    image: deathbot545/restaurantapi:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "7115"
+        protocol: tcp
 networks:
   default:
     name: dockercompose13095794290409034173_default

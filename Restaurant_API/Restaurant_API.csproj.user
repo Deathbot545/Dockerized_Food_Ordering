@@ -2,5 +2,6 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ActiveDebugProfile>Docker</ActiveDebugProfile>
+    <NameOfLastUsedPublishProfile>D:\Dockerize\dockerize\Restaurant_API\Properties\PublishProfiles\registry.hub.docker.com_deathbot545.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

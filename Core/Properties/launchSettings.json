@@ -6,7 +6,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://walksy.shop:57276;http://walksy.shop:57278"
+      "applicationUrl": "https://restosolutionssaas.com:57276;http://restosolutionssaas.com:57278"
     }
   }
 }

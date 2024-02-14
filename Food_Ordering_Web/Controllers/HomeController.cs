@@ -32,12 +32,22 @@ namespace Food_Ordering_Web.Controllers
 
         public IActionResult Index()
         {
-            if (User.Identity.IsAuthenticated)
+            try
             {
-                var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-                return RedirectToRoleBasedView(userRole);
+                if (User.Identity.IsAuthenticated)
+                {
+                    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+                    return RedirectToRoleBasedView(userRole);
+                }
+                return View();
             }
-            return View();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing the request in {ControllerName}", nameof(HomeController));
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return View("Error"); // Make sure you have an Error view that can display a generic error message.
+            }
+
         }
 
         private IActionResult RedirectToRoleBasedView(string userRole)
@@ -78,7 +88,7 @@ namespace Food_Ordering_Web.Controllers
             List<OrderDTO> orders;
             using (var httpClient = new HttpClient())
             {
-                var response = await httpClient.GetAsync($"https://walksy.shop:7268/api/OrderApi/GetOrdersForOutlet/{outlet.Id}");
+                var response = await httpClient.GetAsync($"https://restosolutionssaas.com:7268/api/OrderApi/GetOrdersForOutlet/{outlet.Id}");
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -101,10 +111,5 @@ namespace Food_Ordering_Web.Controllers
             var model = new OutletViewModel { OutletInfo = outlet, Tables = tables, Orders = orders };
             return View("Views/Kitchen/kitchenView.cshtml", model);
         }
-
-
-
-
-
     }
 }

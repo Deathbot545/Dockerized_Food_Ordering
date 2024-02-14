@@ -3082,6 +3082,7 @@
           "Microsoft.AspNetCore.Cors": "2.2.0",
           "Microsoft.AspNetCore.OpenApi": "7.0.5",
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "1.17.2",
+          "Restaurant_API": "1.0.0",
           "Swashbuckle.AspNetCore": "6.4.0"
         },
         "compile": {

@@ -20,8 +20,8 @@
   },
   "Authentication": {
     "Google": {
-      "ClientId": "720720527870-lgss8d497dl1cv4ce8bleuk2ei8fkihk.apps.googleusercontent.com",
-      "ClientSecret": "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"
+      "ClientId": "247244252156-cqtuh8m6k4s6mcumhkri2grnkf5g5a8d.apps.googleusercontent.com",
+      "ClientSecret": "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"
     }
   },
   "Jwt": {

@@ -385,82 +385,64 @@ namespace Food_Ordering_API.Controllers
             }
 
         }
-        public IActionResult SetSimpleCookieTest()
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = false, // Set to true if you're testing over HTTPS.
-                Expires = DateTime.UtcNow.AddDays(1),
-            };
-
-            Response.Cookies.Append("SimpleTestCookie", "SimpleValue", cookieOptions);
-            return Ok("Simple cookie set.");
-        }
-
-        public IActionResult SetCookieViaHeaders()
-        {
-            Response.Headers.Append("Set-Cookie", "DirectSetTestCookie=DirectValue; path=/; httpOnly; SameSite=Lax");
-            return Ok("Cookie set directly via headers.");
-        }
-
-        public IActionResult SetCookieTest()
-        {
-            Response.Cookies.Append("TestCookie", "TestValue", new CookieOptions { HttpOnly = true, Secure = false });
-
-            return Ok("Cookie set");
-        }
+      
         public async Task<IActionResult> HandleLogin(ApplicationUser user, string token, int? outletId = null, int? tableId = null)
         {
             try
             {
-                // Example of getting roles directly from the ApplicationUser if available
-                // This might require querying the database or your user management service
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var roleName = userRoles.FirstOrDefault(); // Assuming a user has at least one role
+                // Decode JWT to get role
+                var handler = new JwtSecurityTokenHandler();
+                var tokenS = handler.ReadToken(token) as JwtSecurityToken;
 
+                // Check for role claim safely
+                var roleClaim = tokenS.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
+                if (roleClaim == null)
+                {
+                    _logger.LogError("Role claim not found in JWT.");
+                    return BadRequest("Role claim not found in JWT.");
+                }
+
+                var role = roleClaim.Value;
+
+                // Create claims
                 var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, roleName) // Use actual role here
+            new Claim(ClaimTypes.Role, role),
+            new Claim("UserId", user.Id)
         };
 
+                // Create ClaimsIdentity
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true, // For a persistent session
-                };
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+                // Use SignInManager to sign in the user
+                await _signInManager.SignInWithClaimsAsync(user, isPersistent: true, claimsIdentity.Claims);
 
-                _logger.LogInformation("User signed in successfully.");
+                // Set the JWT token in a cookie
+                Response.Cookies.Append("jwtCookie", token, new CookieOptions
+                {
+                    HttpOnly = true, // Recommended for security
+                    Secure = false, // IMPORTANT: Set to false since you're using HTTP
+                    SameSite = SameSiteMode.Lax, // Adjusted for HTTP and cross-site access
+                    Expires = DateTime.UtcNow.AddMinutes(30) // Set the same expiry as your JWT token
+                });
 
-                // Redirect logic based on role
-                if (roleName == "Admin")
+                _logger.LogInformation("User logged in and cookie set successfully.");
+
+                // Redirect based on role
+                if (outletId.HasValue && tableId.HasValue)
                 {
-                    return RedirectToAction("Index", "Admin");
-                }
-                else if (roleName == "User")
-                {
-                    if (outletId.HasValue && tableId.HasValue)
-                    {
-                        return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
-                    }
-                    return RedirectToAction("Index", "User");
+                    return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
                 }
                 else
                 {
-                    // Default redirect if role is not matched
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", role); // Assuming you have an Index action for each role.
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred during the login process.");
-                // Ensure there is an Error action method to handle this redirect properly
-                return RedirectToAction("Error", new { message = ex.Message });
+                return View("Error"); // Ensure you have an Error view to handle exceptions gracefully
             }
         }
 

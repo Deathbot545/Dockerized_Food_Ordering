@@ -59,6 +59,18 @@
        
 </head>
 <body>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div>Authenticated as @User.Identity.Name</div>
+    }
+    else
+    {
+        <div>Not Authenticated</div>
+    }
+    @foreach (var claim in User.Claims)
+    {
+        <div>@claim.Type: @claim.Value</div>
+    }
     <nav class="navbar bg-body-tertiary fixed-top">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">

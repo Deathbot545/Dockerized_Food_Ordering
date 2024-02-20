@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+
 // Register the HttpClient, set its base address, and configure the timeout
 builder.Services.AddHttpClient("namedClient", c =>
 {
@@ -37,11 +38,26 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.Lax;
+    options.HttpOnly = HttpOnlyPolicy.Always;
+    options.Secure = CookieSecurePolicy.SameAsRequest; // Important for HTTP
+});
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.LoginPath = "/Account/Login"; // Adjust if necessary
+    options.LogoutPath = "/Account/Logout"; // Adjust if necessary
+    options.Cookie.SameSite = SameSiteMode.Lax; // Adjust based on your requirements
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Important for HTTP
 })
 
     .AddJwtBearer(options =>
@@ -105,20 +121,12 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    HttpOnly = HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.Always
-});
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseCookiePolicy();
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>

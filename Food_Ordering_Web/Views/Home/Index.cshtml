@@ -65,7 +65,14 @@
         }
 
 </style>
-
+@if (User.Identity.IsAuthenticated)
+{
+    <div>Authenticated as @User.Identity.Name</div>
+}
+else
+{
+    <div>Not Authenticated</div>
+}
 <!-- QR Code Scanner Modal -->
 <div id="qrScannerModal" class="qr-scanner-modal">
     <div class="qr-scanner-modal-content">

@@ -1,59 +1,141 @@
 ﻿@{
     ViewData["Title"] = "Home";
 }
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
-       body {
-            font-family: 'Open Sans', sans-serif;
+    body {
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    .jumbotron-custom {
+        background-image: url('/Images/background.jpg'); /* Replace with path to your hero image */
+        background-size: cover;
+        color: #f7f3f3;
+    }
+
+    .qr-scan-button {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .shop-register, .customer-register {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .icon-image {
+        width: 100px; /* Adjust as needed */
+        height: auto;
+    }
+
+    .qr-scanner-modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    .qr-scanner-modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+    }
+
+    .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
-        .jumbotron-custom {
-             background-image: url('/Images/background.jpg'); /* Replace with path to your hero image */
-            background-size: cover;
-            color: #f7f3f3;
-        }
-        .qr-scan-button {
-            background-color: #007bff;
-            color: white;
-        }
-        .shop-register, .customer-register {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .icon-image {
-            width: 100px; /* Adjust as needed */
-            height: auto;
-        }
+
 </style>
 
-
-    
-    <div class="p-5 mb-4 jumbotron-custom rounded-3">
-        <div class="container-fluid py-5 text-center">
-            <h1 class="display-5 fw-bold">Welcome to Restro</h1>
-            <p class="fs-4">Your Easy Food Ordering App! Scan the QR code below to place your order.</p>
-            <button id="orderButton" class="btn qr-scan-button btn-lg mt-3" type="button">
-                Scan QR Code <i class="fas fa-qrcode ml-2"></i>
-            </button>
-        </div>
+<!-- QR Code Scanner Modal -->
+<div id="qrScannerModal" class="qr-scanner-modal">
+    <div class="qr-scanner-modal-content">
+        <span class="close-button">&times;</span>
+        <div id="qr-reader" style="width:100%"></div>
     </div>
+</div>
 
-    <div class="container">
-        <div class="row align-items-stretch">
-            <div class="col-md-6 mb-3">
-                <div class="p-5 bg-light border rounded-3 text-center">
-                    <img src="path-to-customer-icon.png" alt="Customer Icon" class="icon-image"> <!-- Replace with path to customer icon -->
-                    <h2>Customer</h2>
-                    <p>Order food quickly and easily.</p>
-                    <a href="@Url.Action("Register", "Customer")" class="btn customer-register">Register as Customer</a>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="p-5 bg-dark text-white rounded-3 text-center">
-                    <img src="path-to-shop-icon.png" alt="Shop Icon" class="icon-image"> <!-- Replace with path to shop icon -->
-                    <h2>Add Your Own Shop</h2>
-                    <p>Manage your restaurant's orders.</p>
-                    <a href="@Url.Action("Register", "Shop")" class="btn shop-register">Register as Shop</a>
-                </div>
+
+<div class="p-5 mb-4 jumbotron-custom rounded-3">
+    <div class="container-fluid py-5 text-center">
+        <h1 class="display-5 fw-bold">Welcome to Restro</h1>
+        <p class="fs-4">Your Easy Food Ordering App! Scan the QR code below to place your order.</p>
+        <button id="orderButton" class="btn qr-scan-button btn-lg mt-3" type="button">
+            Scan QR Code <i class="fas fa-qrcode ml-2"></i>
+        </button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row align-items-stretch">
+        <div class="col-md-6 mb-3">
+            <div class="p-5 bg-light border rounded-3 text-center">
+                <img src="path-to-customer-icon.png" alt="Customer Icon" class="icon-image"> <!-- Replace with path to customer icon -->
+                <h2>Customer</h2>
+                <p>Order food quickly and easily.</p>
+                <a href="@Url.Action("Register", "Customer")" class="btn customer-register">Register as Customer</a>
             </div>
         </div>
+        <div class="col-md-6 mb-3">
+            <div class="p-5 bg-dark text-white rounded-3 text-center">
+                <img src="path-to-shop-icon.png" alt="Shop Icon" class="icon-image"> <!-- Replace with path to shop icon -->
+                <h2>Add Your Own Shop</h2>
+                <p>Manage your restaurant's orders.</p>
+                <a href="@Url.Action("Register", "Shop")" class="btn shop-register">Register as Shop</a>
+            </div>
+        </div>
     </div>
+</div>
+<script>
+    document.getElementById('orderButton').addEventListener('click', function () {
+        // Show the modal
+        document.getElementById('qrScannerModal').style.display = "block";
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Handle the decoded text as needed, for example, redirect to a URL
+            console.log(`Code matched = ${decodedText}`, decodedResult);
+            html5QrcodeScanner.clear(); // Optionally close the scanner after a successful scan
+            document.getElementById('qrScannerModal').style.display = "none"; // Hide the modal on successful scan
+        }
+
+        function onScanError(errorMessage) {
+            // handle scan error
+        }
+
+        var config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
+        var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
+    });
+
+    // When the user clicks on <span> (x), close the modal
+    document.getElementsByClassName("close-button")[0].onclick = function () {
+        document.getElementById('qrScannerModal').style.display = "none";
+    }
+
+    // Close the modal if the user clicks anywhere outside of it
+    window.onclick = function (event) {
+        if (event.target == document.getElementById('qrScannerModal')) {
+            document.getElementById('qrScannerModal').style.display = "none";
+        }
+    }
+
+</script>

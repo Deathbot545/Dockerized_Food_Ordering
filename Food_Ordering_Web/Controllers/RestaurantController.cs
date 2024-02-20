@@ -11,7 +11,7 @@ using ZXing.QrCode.Internal;
 
 namespace Food_Ordering_Web.Controllers
 {
-    [Authorize(Roles = "Restaurant")]
+ 
     public class RestaurantController : Controller
     {
         private readonly HttpClient _httpClient;
@@ -22,16 +22,18 @@ namespace Food_Ordering_Web.Controllers
 
         public RestaurantController(IHttpClientFactory clientFactory, IConfiguration configuration, IWebHostEnvironment environment, ILogger<RestaurantController> logger)
         {
-            _httpClient = new HttpClient();
+            _httpClient = clientFactory.CreateClient();
             _apiBaseUrl = configuration.GetValue<string>("RestaurantApiBaseUrl");
-            _httpClient.BaseAddress = new Uri(_apiBaseUrl);  // Set the BaseAddress here
+            _httpClient.BaseAddress = new Uri(_apiBaseUrl); // Ensure this is the correct API base URL
             _configuration = configuration;
             _environment = environment;
             _logger = logger;
 
+            // Logging for debugging purposes
             _logger.LogInformation($"_apiBaseUrl: {_apiBaseUrl}");
             _logger.LogInformation($"HttpClient Base Address: {_httpClient.BaseAddress}");
         }
+
 
         public async Task<IActionResult> Index()
         {

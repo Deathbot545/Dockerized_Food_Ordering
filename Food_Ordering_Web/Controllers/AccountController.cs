@@ -77,7 +77,9 @@ namespace Food_Ordering_API.Controllers
 
         private async Task<IActionResult> AddUserToApi(string apiEndpoint, string username, string password, string actionName, string controllerName, string roleName)
         {
-            var userDto = new { Username = username, Password = password };
+            try
+            {
+                var userDto = new { Username = username, Password = password };
             var response = await _httpClient.PostAsync($"{_apiBaseUrl}/{apiEndpoint}",
                 new StringContent(System.Text.Json.JsonSerializer.Serialize(userDto), Encoding.UTF8, "application/json"));
 
@@ -118,6 +120,12 @@ namespace Food_Ordering_API.Controllers
                 // Return the view directly with the model errors
                 return View("Signup"); // Assuming "Register" is the name of your view
             }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in MyAction");
+                throw; // Rethrow the exception or handle it as needed
+            }
 
         }
 
@@ -127,66 +135,77 @@ namespace Food_Ordering_API.Controllers
             {
                 ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
             }
+          
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string actionName, string controllerName, int? outletId = null, int? tableId = null)
         {
-            var loginDto = new LoginDto
+            try
             {
-                UsernameOrEmail = model.UserName, // Ensure this is the user's email.
-                Password = model.Password
-            };
-
-            // Using System.Text.Json for serialization
-            var jsonPayload = System.Text.Json.JsonSerializer.Serialize(loginDto);
-            var httpResponse = await _httpClient.PostAsync(
-                $"{_apiBaseUrl}/Login",
-                new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
-
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                var responseContent = await httpResponse.Content.ReadAsStringAsync();
-                var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
-
-                _logger.LogInformation($"Raw API Response: {responseContent}");
-                if (responseObject != null)
+                var loginDto = new LoginDto
                 {
-                    // Create a new ApplicationUser object
-                    ApplicationUser user = new ApplicationUser
-                    {
-                        Id = responseObject.User.Id,
-                        UserName = responseObject.User.UserName,
-                        Email = responseObject.User.Email
-                        // Populate other necessary fields
-                    };
+                    UsernameOrEmail = model.UserName, // Ensure this is the user's email.
+                    Password = model.Password
+                };
 
-                    return await HandleLogin(user, responseObject.Token, outletId, tableId);
+                // Using System.Text.Json for serialization
+                var jsonPayload = System.Text.Json.JsonSerializer.Serialize(loginDto);
+                var httpResponse = await _httpClient.PostAsync(
+                    $"{_apiBaseUrl}/Login",
+                    new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = await httpResponse.Content.ReadAsStringAsync();
+                    var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
+
+                    _logger.LogInformation($"Raw API Response: {responseContent}");
+                    if (responseObject != null)
+                    {
+                        // Create a new ApplicationUser object
+                        ApplicationUser user = new ApplicationUser
+                        {
+                            Id = responseObject.User.Id,
+                            UserName = responseObject.User.UserName,
+                            Email = responseObject.User.Email
+                            // Populate other necessary fields
+                        };
+                        _logger.LogInformation("JWT token read.");
+                        return await HandleLogin(user, responseObject.Token, outletId, tableId);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Could not deserialize response.");
+                        ViewBag.ErrorMessage = "Could not deserialize response.";
+                        _logger.LogInformation("JWT token read.");
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Could not deserialize response.");
-                    ViewBag.ErrorMessage = "Could not deserialize response.";
+                    var responseContent = await httpResponse.Content.ReadAsStringAsync();
+                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(responseContent);
+
+                    if (errorResponse != null && errorResponse.ContainsKey("message"))
+                    {
+                        ViewBag.ErrorMessage = errorResponse["message"];
+                    }
+                    else
+                    {
+                        ViewBag.ErrorMessage = "An unknown error occurred.";
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                var responseContent = await httpResponse.Content.ReadAsStringAsync();
-                var errorResponse = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(responseContent);
-
-                if (errorResponse != null && errorResponse.ContainsKey("message"))
-                {
-                    ViewBag.ErrorMessage = errorResponse["message"];
-                }
-                else
-                {
-                    ViewBag.ErrorMessage = "An unknown error occurred.";
-                }
+                _logger.LogError(ex, "An error occurred in MyAction");
+                throw; // Rethrow the exception or handle it as needed
             }
 
             return View(model);
         }
+
 
         public class LoginResponse
         {
@@ -366,53 +385,82 @@ namespace Food_Ordering_API.Controllers
             }
 
         }
+        public IActionResult SetSimpleCookieTest()
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // Set to true if you're testing over HTTPS.
+                Expires = DateTime.UtcNow.AddDays(1),
+            };
+
+            Response.Cookies.Append("SimpleTestCookie", "SimpleValue", cookieOptions);
+            return Ok("Simple cookie set.");
+        }
+
+        public IActionResult SetCookieViaHeaders()
+        {
+            Response.Headers.Append("Set-Cookie", "DirectSetTestCookie=DirectValue; path=/; httpOnly; SameSite=Lax");
+            return Ok("Cookie set directly via headers.");
+        }
+
+        public IActionResult SetCookieTest()
+        {
+            Response.Cookies.Append("TestCookie", "TestValue", new CookieOptions { HttpOnly = true, Secure = false });
+
+            return Ok("Cookie set");
+        }
         public async Task<IActionResult> HandleLogin(ApplicationUser user, string token, int? outletId = null, int? tableId = null)
         {
-            // Decode JWT to get role
-            var handler = new JwtSecurityTokenHandler();
-            var tokenS = handler.ReadToken(token) as JwtSecurityToken;
-
-            // Check for role claim safely
-            var roleClaim = tokenS.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
-            if (roleClaim == null)
+            try
             {
-                _logger.LogError("Role claim not found in JWT.");
-                return BadRequest("Role claim not found in JWT.");
+                // Example of getting roles directly from the ApplicationUser if available
+                // This might require querying the database or your user management service
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var roleName = userRoles.FirstOrDefault(); // Assuming a user has at least one role
+
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, roleName) // Use actual role here
+        };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true, // For a persistent session
+                };
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                _logger.LogInformation("User signed in successfully.");
+
+                // Redirect logic based on role
+                if (roleName == "Admin")
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+                else if (roleName == "User")
+                {
+                    if (outletId.HasValue && tableId.HasValue)
+                    {
+                        return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
+                    }
+                    return RedirectToAction("Index", "User");
+                }
+                else
+                {
+                    // Default redirect if role is not matched
+                    return RedirectToAction("Index", "Home");
+                }
             }
-
-            var role = roleClaim.Value;
-
-            // Create claims
-            var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.UserName),
-        new Claim(ClaimTypes.Role, role),
-        new Claim("UserId", user.Id)
-    };
-
-            // Create ClaimsIdentity
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Use SignInManager to sign in the user
-            await _signInManager.SignInWithClaimsAsync(user, isPersistent: false, claimsIdentity.Claims);
-
-            // Set the JWT token in a cookie
-            Response.Cookies.Append("jwtCookie", token, new CookieOptions
+            catch (Exception ex)
             {
-                HttpOnly = true, // Recommended for security
-                Secure = true, // Send the cookie over HTTPS only
-                SameSite = SameSiteMode.Strict, // Recommended for security
-                Expires = DateTime.UtcNow.AddMinutes(30) // Set the same expiry as your JWT token
-            });
-
-            // Redirect based on role
-            if (outletId.HasValue && tableId.HasValue)
-            {
-                return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
-            }
-            else
-            {
-                return RedirectToAction("Index", role); // Assuming you have an Index action for each role.
+                _logger.LogError(ex, "An error occurred during the login process.");
+                // Ensure there is an Error action method to handle this redirect properly
+                return RedirectToAction("Error", new { message = ex.Message });
             }
         }
 

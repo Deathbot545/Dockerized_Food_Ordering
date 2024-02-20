@@ -37,12 +37,13 @@ builder.Configuration.AddJsonFile("Restaurant_API_appsettings.json", optional: t
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+  
 }
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowMyOrigins");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

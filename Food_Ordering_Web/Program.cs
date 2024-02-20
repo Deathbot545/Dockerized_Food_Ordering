@@ -13,15 +13,23 @@ using Core.Services.MenuS;
 using Core.Services.OutletSer;
 using Core.Services.Orderser;
 using Order_API.Hubs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-// Register the HttpClient and set its base address
-builder.Services.AddHttpClient("namedClient", c => { c.BaseAddress = new Uri(configuration["ApiBaseUrl"]); });
+// Register the HttpClient, set its base address, and configure the timeout
+builder.Services.AddHttpClient("namedClient", c =>
+{
+    c.BaseAddress = new Uri(configuration["ApiBaseUrl"]);
+    c.Timeout = TimeSpan.FromSeconds(200); // Set the desired timeout here
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+});
 
 builder.Services.AddSignalR();
-
 
 builder.Services.AddScoped<IOutletService, OutletService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -31,8 +39,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
+
     .AddJwtBearer(options =>
     {
         options.Authority = "your-authority-here";  // e.g., https://your-auth-server.com/
@@ -47,6 +58,7 @@ builder.Services.AddAuthentication(options =>
         options.ClientId = configuration["Authentication:Google:ClientId"];
         options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
     });
+
 
 // Add DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -83,8 +95,8 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();
 }
@@ -99,13 +111,14 @@ app.UseCookiePolicy(new CookiePolicyOptions
     Secure = CookieSecurePolicy.Always
 });
 
-
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseCookiePolicy();
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
@@ -114,7 +127,6 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
-
 
 app.MapRazorPages();
 

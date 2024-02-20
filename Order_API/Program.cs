@@ -52,9 +52,11 @@ builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+  
 }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowMyOrigins");
 app.UseHttpsRedirection();

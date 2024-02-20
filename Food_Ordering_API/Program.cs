@@ -61,11 +61,13 @@ builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger(); // Enable middleware to serve generated Swagger as a JSON endpoint
-    app.UseSwaggerUI(); // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.)
+   
 }
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+//app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication(); // Important: place after UseRouting and before UseAuthorization

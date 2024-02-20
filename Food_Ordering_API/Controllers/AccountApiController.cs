@@ -48,13 +48,22 @@ namespace Food_Ordering_API.Controllers
             var (success, errors, user) = await _accountService.AddUserAsync(model.Username, model.Password, roleName);
             if (success)
             {
-                var token = await GenerateJwtToken(user);
-                return Ok(new
+                try
                 {
-                    Message = "Successfully logged in",
-                    user = new { user.Id, user.UserName, user.Email, user.NormalizedUserName /* other fields as required */ },
-                    Token = token
-                });
+                    var token = await GenerateJwtToken(user);
+                    return Ok(new
+                    {
+                        Message = "Successfully logged in",
+                        user = new { user.Id, user.UserName, user.Email, user.NormalizedUserName },
+                        Token = token
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to generate JWT token for user {UserId}", user.Id);
+                    // Return a generic error message to avoid exposing sensitive details
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An error occurred while processing your request." });
+                }
             }
             else
             {

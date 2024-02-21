@@ -385,11 +385,13 @@ namespace Food_Ordering_API.Controllers
             }
 
         }
-      
+
         public async Task<IActionResult> HandleLogin(ApplicationUser user, string token, int? outletId = null, int? tableId = null)
         {
             try
             {
+                _logger.LogInformation("Starting login process for user {UserName}", user.UserName);
+
                 // Decode JWT to get role
                 var handler = new JwtSecurityTokenHandler();
                 var tokenS = handler.ReadToken(token) as JwtSecurityToken;
@@ -398,11 +400,12 @@ namespace Food_Ordering_API.Controllers
                 var roleClaim = tokenS.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
                 if (roleClaim == null)
                 {
-                    _logger.LogError("Role claim not found in JWT.");
+                    _logger.LogError("Role claim not found in JWT for user {UserName}.", user.UserName);
                     return BadRequest("Role claim not found in JWT.");
                 }
 
                 var role = roleClaim.Value;
+                _logger.LogInformation("Role {Role} found in JWT for user {UserName}.", role, user.UserName);
 
                 // Create claims
                 var claims = new List<Claim>
@@ -415,8 +418,21 @@ namespace Food_Ordering_API.Controllers
                 // Create ClaimsIdentity
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                // Use SignInManager to sign in the user
+                _logger.LogInformation("Attempting to sign in user {UserName} with claims.", user.UserName);
                 await _signInManager.SignInWithClaimsAsync(user, isPersistent: true, claimsIdentity.Claims);
+                _logger.LogInformation("Sign in attempt for user {UserName} completed.", user.UserName);
+                _logger.LogInformation($"User {user.UserName} authenticated: {HttpContext.User.Identity.IsAuthenticated}");
+
+
+                // Check authentication status after SignInManager attempt
+                if (User.Identity.IsAuthenticated)
+                {
+                    _logger.LogInformation("User {UserName} is authenticated after sign in attempt.", user.UserName);
+                }
+                else
+                {
+                    _logger.LogWarning("User {UserName} is NOT authenticated after sign in attempt.", user.UserName);
+                }
 
                 // Set the JWT token in a cookie
                 Response.Cookies.Append("jwtCookie", token, new CookieOptions
@@ -427,7 +443,12 @@ namespace Food_Ordering_API.Controllers
                     Expires = DateTime.UtcNow.AddMinutes(30) // Set the same expiry as your JWT token
                 });
 
-                _logger.LogInformation("User logged in and cookie set successfully.");
+                _logger.LogInformation("JWT cookie set for user {UserName}.", user.UserName);
+                foreach (var claim in HttpContext.User.Claims)
+                {
+                    _logger.LogInformation($"Claim type: {claim.Type}, Claim value: {claim.Value}");
+                }
+
 
                 // Redirect based on role
                 if (outletId.HasValue && tableId.HasValue)
@@ -441,7 +462,7 @@ namespace Food_Ordering_API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred during the login process.");
+                _logger.LogError(ex, "An error occurred during the login process for user {UserName}.", user.UserName);
                 return View("Error"); // Ensure you have an Error view to handle exceptions gracefully
             }
         }

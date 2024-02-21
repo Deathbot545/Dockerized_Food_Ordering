@@ -14,11 +14,29 @@ using Core.Services.OutletSer;
 using Core.Services.Orderser;
 using Order_API.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
+
+WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+// Inside ConfigureKestrel method
+builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+{
+    serverOptions.ListenAnyIP(80); // Listen for HTTP
+    serverOptions.ListenAnyIP(443, listenOptions => // Listen for HTTPS
+    {
+        // Replace "your_password_here" with the actual password you used when creating the .pfx file
+        listenOptions.UseHttps("/etc/letsencrypt/certificate.pfx", "raaed");
+    });
+});
 
+// Inside ConfigureServices method or directly in the Program.cs
+var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys"; // Path inside the container
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
 // Register the HttpClient, set its base address, and configure the timeout
 builder.Services.AddHttpClient("namedClient", c =>
 {
@@ -122,7 +140,7 @@ else
     app.UseHsts();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCookiePolicy();

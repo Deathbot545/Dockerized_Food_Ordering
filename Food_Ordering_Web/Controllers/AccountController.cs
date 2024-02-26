@@ -22,7 +22,7 @@ using Azure;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.VisualStudio.Services.Users;
 
-namespace Food_Ordering_API.Controllers
+namespace Food_Ordering_Web.Controllers
 {
     
     public class AccountController : Controller
@@ -278,9 +278,7 @@ namespace Food_Ordering_API.Controllers
 
             if (!string.IsNullOrEmpty(role))
             {
-                // Your existing UserDto creation
                 UserDto userDto = new UserDto { Username = email, Password = "" };
-
                 var json = JsonConvert.SerializeObject(userDto);
                 _logger.LogInformation($"JSON Payload: {json}");
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -289,54 +287,38 @@ namespace Food_Ordering_API.Controllers
 
                 var apiResponse = await _httpClient.PostAsync(fullUrl, content);
 
-                if (apiResponse != null)
-                {
-                    var apiResponseContent = await apiResponse.Content.ReadAsStringAsync();
-                    if (apiResponse.IsSuccessStatusCode)
-                    {
-                        var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(apiResponseContent);
-                        if (responseObject != null)
-                        {
-                            // Create a new ApplicationUser object
-                            ApplicationUser user = new ApplicationUser
-                            {
-                                Id = responseObject.User.Id,
-                                UserName = responseObject.User.UserName,
-                                Email = responseObject.User.Email
-                                // Populate other necessary fields
-                            };
-
-                            return await HandleLogin(user, responseObject.Token, outletId, tableId);
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "Could not deserialize response.");
-                            return RedirectToAction("SuccessAction");
-                        }
-                    }
-                    else if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-                    {
-                        var error = await apiResponse.Content.ReadAsStringAsync();
-                        var errorObject = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(error);
-
-                        if (errorObject != null && errorObject.ContainsKey("message"))
-                        {
-                            TempData["ErrorMessage"] = errorObject["message"];
-                        }
-
-                        return RedirectToAction("Register");
-                    }
-                    else
-                    {
-                        _logger.LogError("API Response is unsuccessful");
-                        return StatusCode((int)HttpStatusCode.InternalServerError);
-                    }
-                }
-                else
+                if (apiResponse == null)
                 {
                     _logger.LogError("API Response is null");
                     return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
+
+                if (!apiResponse.IsSuccessStatusCode)
+                {
+                    var errorContent = await apiResponse.Content.ReadAsStringAsync();
+                    _logger.LogError($"API Response is unsuccessful. StatusCode: {apiResponse.StatusCode}, Content: {errorContent}");
+                    return StatusCode((int)apiResponse.StatusCode, errorContent);
+                }
+
+                var apiResponseContent = await apiResponse.Content.ReadAsStringAsync();
+                var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(apiResponseContent);
+
+                if (responseObject == null)
+                {
+                    _logger.LogError("Could not deserialize API response.");
+                    ModelState.AddModelError(string.Empty, "Could not deserialize response.");
+                    return RedirectToAction("SuccessAction");
+                }
+
+                ApplicationUser user = new ApplicationUser
+                {
+                    Id = responseObject.User.Id,
+                    UserName = responseObject.User.UserName,
+                    Email = responseObject.User.Email
+                    // Populate other necessary fields
+                };
+
+                return await HandleLogin(user, responseObject.Token, outletId, tableId);
 
 
             }
@@ -385,6 +367,12 @@ namespace Food_Ordering_API.Controllers
             }
 
         }
+        public IActionResult IntermediateRedirect(string returnUrl)
+        {
+            _logger.LogInformation("Intermediate redirect to ensure cookie is set.");
+            return Redirect(returnUrl);
+        }
+
 
         public async Task<IActionResult> HandleLogin(ApplicationUser user, string token, int? outletId = null, int? tableId = null)
         {
@@ -419,7 +407,7 @@ namespace Food_Ordering_API.Controllers
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                 _logger.LogInformation("Attempting to sign in user {UserName} with claims.", user.UserName);
-                await _signInManager.SignInWithClaimsAsync(user, isPersistent: true, claimsIdentity.Claims);
+                await _signInManager.SignInWithClaimsAsync(user, isPersistent: false, claimsIdentity.Claims);
                 _logger.LogInformation("Sign in attempt for user {UserName} completed.", user.UserName);
                 _logger.LogInformation($"User {user.UserName} authenticated: {HttpContext.User.Identity.IsAuthenticated}");
 
@@ -438,8 +426,8 @@ namespace Food_Ordering_API.Controllers
                 Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
                     HttpOnly = true, // Recommended for security
-                    Secure = false, // IMPORTANT: Set to false since you're using HTTP
-                    SameSite = SameSiteMode.Lax, // Adjusted for HTTP and cross-site access
+                    Secure = true, // Set to true to enforce the cookie to be sent over HTTPS
+                    SameSite = SameSiteMode.Lax, // Adjust based on your requirements
                     Expires = DateTime.UtcNow.AddMinutes(30) // Set the same expiry as your JWT token
                 });
 
@@ -457,7 +445,8 @@ namespace Food_Ordering_API.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Index", role); // Assuming you have an Index action for each role.
+                    string finalUrl = Url.Action("Index", role); // Or whatever your target URL is
+                    return RedirectToAction("IntermediateRedirect", new { returnUrl = finalUrl }); // Assuming you have an Index action for each role.
                 }
             }
             catch (Exception ex)

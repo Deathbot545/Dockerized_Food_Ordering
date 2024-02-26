@@ -11,12 +11,15 @@ namespace Restaurant_API.Controllers
     [Route("api/[controller]")]
     public class TablesApiController : Controller
     {
+        private readonly ILogger<TablesApiController> _logger;
         private readonly IOutletService _outletService;
 
-        public TablesApiController(IOutletService outletService)
+        public TablesApiController(IOutletService outletService, ILogger<TablesApiController> logger)
         {
             _outletService = outletService;
+            _logger = logger;
         }
+
         [HttpGet("GetTables")]
         public ActionResult<List<TableDto>> GetTablesByOutlet(int id)
         {
@@ -26,12 +29,14 @@ namespace Restaurant_API.Controllers
         }
 
         // Service remains the same
-
         [HttpPost("AddTable")]
         public IActionResult AddTable([FromBody] AddTableDto model)
         {
+            _logger.LogInformation("Attempting to add a new table with identifier: {TableIdentifier}", model.TableIdentifier);
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Model state is invalid. Model: {@Model}", model);
                 return BadRequest(ModelState);
             }
 
@@ -39,15 +44,16 @@ namespace Restaurant_API.Controllers
             {
                 var (newTable, qrCode) = _outletService.AddTableAndGenerateQRCode(model.OutletId, model.TableIdentifier);
 
+                _logger.LogInformation("Table and QR code added successfully. Table ID: {TableId}", newTable.Id);
                 return Ok(new { Message = "Table and QR code added successfully" });
             }
             catch (Exception ex)
             {
-                // Log the exception here for debugging
-                Console.WriteLine($"Exception: {ex}");
+                _logger.LogError(ex, "An error occurred while adding a new table. Model: {@Model}", model);
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
 
 
         [HttpDelete("RemoveQRCode")]

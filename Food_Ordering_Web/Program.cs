@@ -23,13 +23,23 @@ WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Inside ConfigureKestrel method
+var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); // Listen for HTTP
-    serverOptions.ListenAnyIP(443, listenOptions => // Listen for HTTPS
+    serverOptions.ListenAnyIP(443, listenOptions =>
     {
-        // Replace "your_password_here" with the actual password you used when creating the .pfx file
-        listenOptions.UseHttps("/etc/letsencrypt/certificate.pfx", "raaed");
+        try
+        {
+            listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
+            logger.LogInformation("HTTPS setup was successful.");
+        }
+        catch (Exception ex)
+        {
+            // Log detailed information about the exception
+            logger.LogError(ex, "An error occurred while setting up HTTPS.");
+        }
     });
 });
 
@@ -65,19 +75,8 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie(options =>
-{
-    options.Cookie.HttpOnly = true;
-    options.LoginPath = "/Account/Login"; // Adjust if necessary
-    options.LogoutPath = "/Account/Logout"; // Adjust if necessary
-    options.Cookie.SameSite = SameSiteMode.Lax; // Adjust based on your requirements
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Important for HTTP
-})
-
     .AddJwtBearer(options =>
     {
         options.Authority = "your-authority-here";  // e.g., https://your-auth-server.com/
@@ -153,6 +152,7 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
+
 
 app.MapRazorPages();
 

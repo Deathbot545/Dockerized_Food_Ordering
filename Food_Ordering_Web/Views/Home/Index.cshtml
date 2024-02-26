@@ -65,21 +65,21 @@
         }
 
 </style>
-@if (User.Identity.IsAuthenticated)
-{
-    <div>Authenticated as @User.Identity.Name</div>
-}
-else
-{
-    <div>Not Authenticated</div>
-}
 <!-- QR Code Scanner Modal -->
-<div id="qrScannerModal" class="qr-scanner-modal">
-    <div class="qr-scanner-modal-content">
-        <span class="close-button">&times;</span>
-        <div id="qr-reader" style="width:100%"></div>
+<div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrScannerModalLabel">QR Code Scanner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="qr-reader" style="width:100%"></div>
+            </div>
+        </div>
     </div>
 </div>
+
 
 
 <div class="p-5 mb-4 jumbotron-custom rounded-3">
@@ -115,34 +115,39 @@ else
 <script>
     document.getElementById('orderButton').addEventListener('click', function () {
         // Show the modal
-        document.getElementById('qrScannerModal').style.display = "block";
-
-        function onScanSuccess(decodedText, decodedResult) {
-            // Handle the decoded text as needed, for example, redirect to a URL
-            console.log(`Code matched = ${decodedText}`, decodedResult);
-            html5QrcodeScanner.clear(); // Optionally close the scanner after a successful scan
-            document.getElementById('qrScannerModal').style.display = "none"; // Hide the modal on successful scan
-        }
-
-        function onScanError(errorMessage) {
-            // handle scan error
-        }
+        var myModal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
+        myModal.show();
 
         var config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
         var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
         html5QrcodeScanner.render(onScanSuccess, onScanError);
+
+        // Attempt to modify the button styles after a delay to ensure they've been rendered
+        setTimeout(() => {
+            // Select the buttons created by the library
+            let buttons = document.querySelectorAll('#qr-reader button');
+            buttons.forEach(button => {
+                // Add Bootstrap button classes
+                button.classList.remove('button-class'); // Remove the library's default class if necessary
+                button.classList.add('btn', 'btn-primary'); // Add Bootstrap classes
+
+                // Specific class additions based on button functionality, if possible
+                if (button.textContent.includes('Start')) {
+                    button.classList.add('btn-success'); // Example for a "Start" button
+                } else if (button.textContent.includes('Stop')) {
+                    button.classList.add('btn-danger'); // Example for a "Stop" button
+                }
+            });
+        }, 1000); // Adjust the delay as needed to ensure the buttons are rendered
     });
 
-    // When the user clicks on <span> (x), close the modal
-    document.getElementsByClassName("close-button")[0].onclick = function () {
-        document.getElementById('qrScannerModal').style.display = "none";
+    function onScanSuccess(decodedText, decodedResult) {
+        // Handle the decoded text
+        console.log(`Code matched = ${decodedText}`, decodedResult);
     }
 
-    // Close the modal if the user clicks anywhere outside of it
-    window.onclick = function (event) {
-        if (event.target == document.getElementById('qrScannerModal')) {
-            document.getElementById('qrScannerModal').style.display = "none";
-        }
+    function onScanError(errorMessage) {
+        // Handle scan error
+        console.log(`Scan error: ${errorMessage}`);
     }
-
 </script>

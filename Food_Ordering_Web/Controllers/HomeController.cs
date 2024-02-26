@@ -18,14 +18,12 @@ namespace Food_Ordering_Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly HttpClient _httpClient;
         private readonly IOutletService _outletService;
         private readonly IOrderService _orderService; // 
 
-        public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpClientFactory,IOutletService outletService,IOrderService orderService)
+        public HomeController(ILogger<HomeController> logger,IOutletService outletService,IOrderService orderService)
         {
             _logger = logger;
-            _httpClient = httpClientFactory.CreateClient("API");
             _outletService = outletService;
             _orderService = orderService;
         }

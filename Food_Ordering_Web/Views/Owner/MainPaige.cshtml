@@ -10,6 +10,8 @@
                             Action
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="actionDropdown">
+                            <li><a class="dropdown-item" id="editLink" asp-area="" asp-controller="Restaurant" asp-action="Edit">Edit</a></li>
+
                             <li><a class="dropdown-item" id="manageLink" asp-area="" asp-controller="Restaurant" asp-action="Manage">Manage</a></li>
 
                             <li><a class="dropdown-item" id="tablesLink" asp-area="" asp-controller="Restaurant" asp-action="Tables">Tables</a></li>
@@ -129,6 +131,17 @@
                     <p id="timestamps"></p>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Logo:</h5>
+                    <img id="logoImage" src="" alt="Outlet Logo" style="width: 100px; height: auto;">
+                </div>
+                <div class="col-md-6">
+                    <h5>Restaurant Image:</h5>
+                    <img id="restaurantImage" src="" alt="Restaurant" style="width: 100px; height: auto;">
+                </div>
+            </div>
+
         </div>
         <div class="row">
             <div class="col-md-9">
@@ -187,7 +200,9 @@
             const description = $row.data('description');
             const zip = $row.data('zip');
             const postalCode = $row.data('postal-code');
-
+            const logoImage = $row.data('logo'); // Assuming you have a way to get this data (URL or Base64)
+            const restaurantImage = $row.data('restaurant-image'); // Same assumption as above
+           
             // Update the displayed information
             $("#internalOutletName").text($row.data('internal-outlet-name'));
             $("#customerFacingName").text(customerFacingName);
@@ -202,10 +217,17 @@
             $("#streetAddress").text(streetAddress);
             $("#description").text(description);
             $("#zipAndPostalCode").text(`${zip} / ${postalCode}`);
+            $("#logoImage").attr('src', logoImage ? `data:image/png;base64,${logoImage}` : '/path/to/default/logo.png'); // Handle null case appropriately
+            $("#restaurantImage").attr('src', restaurantImage ? `data:image/png;base64,${restaurantImage}` : '/path/to/default/restaurant.png');
 
+          
             // Update the "Tables" link to include the selectedOutletId and the additional parameters
             $('#tablesLink').attr('href', `/Restaurant/Tables?id=${outletId}&customerFacingName=${encodeURIComponent(customerFacingName)}&internalOutletName=${encodeURIComponent(internalOutletName)}`);
             $('#manageLink').attr('href', `/Restaurant/Manage?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}`);
+            // Construct the URL with outlet information as parameters
+            let editUrl = `/Restaurant/Edit?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}&customerFacingName=${encodeURIComponent(customerFacingName)}&businessType=${encodeURIComponent(businessType)}&countryStateCity=${encodeURIComponent(countryStateCity)}&streetAddress=${encodeURIComponent(streetAddress)}&description=${encodeURIComponent(description)}&zip=${zip}&postalCode=${postalCode}&dateOpened=${encodeURIComponent(dateOpened)}&employeeCount=${employeeCount}&operatingHoursStart=${encodeURIComponent(operatingHours.split(' - ')[0])}&operatingHoursEnd=${encodeURIComponent(operatingHours.split(' - ')[1])}&contact=${encodeURIComponent(contact)}&createdAt=${encodeURIComponent(createdAt)}&updatedAt=${encodeURIComponent(updatedAt)}`;
+            // Update the "Edit" link to include the selected outlet's information as URL parameters
+            $('#editLink').attr('href', editUrl);
         });
     });
 </script>

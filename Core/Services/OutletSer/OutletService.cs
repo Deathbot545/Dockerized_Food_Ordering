@@ -248,14 +248,17 @@ namespace Core.Services.OutletSer
 
             var outlet = await _context.Outlets
                         .Where(o => o.Id == outletId && !o.IsDeleted)
-                        .Select(o => new
+                        .Select(o => new OutletInfoDTO // Directly project to OutletInfoDTO
                         {
-                            o.CustomerFacingName,
-                            o.Logo,
-                            o.RestaurantImage,
-                            o.OperatingHoursStart,
-                            o.OperatingHoursEnd,
-                            o.Contact
+                            CustomerFacingName = o.CustomerFacingName,
+                            Logo = o.Logo,
+                            RestaurantImage = o.RestaurantImage,
+                            OperatingHoursStart = o.OperatingHoursStart,
+                            OperatingHoursEnd = o.OperatingHoursEnd,
+                            Contact = o.Contact,
+                            Country = o.Country,
+                            City = o.City,
+                            // Add any other fields you need
                         })
                         .FirstOrDefaultAsync();
 
@@ -264,15 +267,29 @@ namespace Core.Services.OutletSer
                 throw new InvalidOperationException($"Outlet with ID {outletId} not found.");
             }
 
-            return new OutletInfoDTO
+            return outlet;
+        }
+
+        public async Task<OutletImagesDTO> GetOutletImagesAsync(int outletId)
+        {
+            var outlet = await _context.Outlets
+                .Where(o => o.Id == outletId && !o.IsDeleted)
+                .Select(o => new { o.Logo, o.RestaurantImage })
+                .FirstOrDefaultAsync();
+
+            if (outlet == null)
             {
-                CustomerFacingName = outlet.CustomerFacingName,
-                Logo = outlet.Logo,
-                RestaurantImage = outlet.RestaurantImage,
-                OperatingHoursStart = outlet.OperatingHoursStart,
-                OperatingHoursEnd = outlet.OperatingHoursEnd,
-                Contact = outlet.Contact
+                throw new InvalidOperationException($"Outlet with ID {outletId} not found.");
+            }
+
+            // Convert byte array image data to Base64 strings
+            var imagesDto = new OutletImagesDTO
+            {
+                LogoBase64 = outlet.Logo != null ? Convert.ToBase64String(outlet.Logo) : null,
+                RestaurantImageBase64 = outlet.RestaurantImage != null ? Convert.ToBase64String(outlet.RestaurantImage) : null,
             };
+
+            return imagesDto;
         }
 
         public async Task<Outlet> GetOutletBySubdomain(string subdomain)

@@ -58,6 +58,30 @@ namespace Restaurant_API.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
+        [HttpGet("GetOutletImages/{outletId}")]
+        public async Task<IActionResult> GetOutletImages(int outletId)
+        {
+            try
+            {
+                var imagesDto = await _outletService.GetOutletImagesAsync(outletId);
+                if (imagesDto != null)
+                {
+                    return Ok(imagesDto);
+                }
+                else
+                {
+                    return NotFound(new { Message = "Outlet images not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception, consider using a logging framework
+                return StatusCode(500, new { Message = "Internal server error", Details = ex.Message });
+            }
+        }
+
+
         [HttpPost("RegisterOutlet")]
         public async Task<IActionResult> RegisterOutlet([FromBody] Outlet model, [FromQuery] string currentUserId)
         {

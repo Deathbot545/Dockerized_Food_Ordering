@@ -1,10 +1,6 @@
 ﻿using Food_Ordering_Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Text.Json;
 using System.Text;
-using System.Threading.Tasks;
-using Core.Utilities;
 using Core.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Serialization;
@@ -13,14 +9,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Infrastructure.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Google;
-using System.Net.Http.Json;
 using Newtonsoft.Json;
 using System.Net;
-using Azure;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.VisualStudio.Services.Users;
 
 namespace Food_Ordering_Web.Controllers
 {

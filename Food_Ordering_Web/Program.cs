@@ -9,13 +9,9 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Constraints;
-using Core.Services.MenuS;
 using Core.Services.OutletSer;
 using Core.Services.Orderser;
-using Order_API.Hubs;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
-using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 

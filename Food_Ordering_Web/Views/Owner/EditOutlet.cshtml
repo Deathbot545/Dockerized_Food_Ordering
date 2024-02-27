@@ -1,0 +1,239 @@
+﻿<style>
+    .changed-input {
+        background-color: #ffff99; /* Light yellow background */
+        color: #000; /* Optional: Change text color if needed */
+    }
+
+</style>
+<main class="container mt-5">
+    <h1 class="display-4 fst mb-3">Edit Outlet</h1>
+    <form class="row g-3" id="editOutletForm" enctype="multipart/form-data">
+        <!-- Outlet Name (Internal) -->
+        <div class="col-md-4">
+            <label for="outletInternalName" class="form-label">Outlet Name (Internal)</label>
+            <input type="text" class="form-control modified" id="internalOutletName" name="InternalOutletName" placeholder="Enter Internal Name" value="Preloaded Internal Name" required>
+        </div>
+
+        <!-- Customer-Facing Name -->
+        <div class="col-md-4">
+            <label for="outletCustomerName" class="form-label">Customer-Facing Name</label>
+            <input type="text" class="form-control" id="customerFacingName" name="CustomerFacingName" placeholder="Enter Customer-Facing Name" value="Preloaded Customer Name" required>
+        </div>
+
+        <!-- Business Type -->
+        <div class="col-md-4">
+            <label for="businessTypeSelect" class="form-label">Business Type</label>
+            <select class="form-select" id="businessType" name="BusinessType" required>
+                <option value="">Choose...</option>
+                <option value="fine-dining" selected>Preloaded Business Type</option>
+                <!-- Add other options here -->
+            </select>
+        </div>
+
+        <!-- Country -->
+        <div class="col-md-6">
+            <label for="countrySelect" class="form-label">Country</label>
+            <select class="form-select" id="countryStateCity" name="Country" required>
+                <option value="">Choose...</option>
+                <option value="usa" selected>Preloaded Country</option>
+                <!-- Add other options here -->
+            </select>
+        </div>
+
+        <!-- City -->
+        <div class="col-md-6">
+            <label for="cityInput" class="form-label">City</label>
+            <input type="text" class="form-control" id="cityInput" name="City" required value="Preloaded City">
+        </div>
+
+        <!-- State -->
+        <div class="col-md-3">
+            <label for="stateSelect" class="form-label">State</label>
+            <select class="form-select" id="stateSelect" name="State" required>
+                <option value="">Choose...</option>
+                <option value="stateValue" selected>Preloaded State</option>
+                <!-- Add other options here -->
+            </select>
+        </div>
+
+        <!-- ZIP Code -->
+        <div class="col-md-3">
+            <label for="zipInput" class="form-label">Zip</label>
+            <input type="text" class="form-control" id="zipInput" name="Zip" required value="Preloaded ZIP">
+        </div>
+
+        <!-- Street Address -->
+        <div class="col-md-6">
+            <label for="streetAddressInput" class="form-label">Street Address</label>
+            <input type="text" class="form-control" id="streetAddress" name="StreetAddress" required value="Preloaded Address">
+        </div>
+
+        <!-- Postal Code -->
+        <div class="col-md-6">
+            <label for="postalCodeInput" class="form-label">Postal/ZIP Code</label>
+            <input type="text" class="form-control" id="postalCode" name="PostalCode" required value="Preloaded Postal Code">
+        </div>
+
+        <div class="col-md-6">
+            <label for="dateOpened" class="form-label">Date Opened</label>
+            <input type="date" class="form-control" id="dateOpened" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+        <div class="mb-3">
+            <label for="validationTextarea" class="form-label">Discription</label>
+            <textarea class="form-control" id="description" placeholder="Required example textarea" required></textarea>
+            <div class="invalid-feedback">
+                Please enter a Description about the Outlet.
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label for="employeeCount" class="form-label">Employee Count</label>
+            <input type="number" class="form-control" id="employeeCount" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+        <div class="col-md-3">
+            <label for="operatingHoursStart" class="form-label">Operating Hours Start</label>
+            <input type="time" class="form-control" id="operatingHoursStart" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+        <div class="col-md-3">
+            <label for="operatingHoursEnd" class="form-label">Operating Hours End</label>
+            <input type="time" class="form-control" id="operatingHoursEnd" required>
+            <div class="valid-feedback">Looks good!</div>
+        </div>
+
+        <!-- Add this section to your HTML -->
+
+        <div class="col-md-3">
+            <label for="Contact" class="form-label">Contact</label>
+            <input type="number" class="form-control" id="contact" name="Contact" placeholder="Contact number for outlet">
+        </div>
+
+        <div class="mb-3">
+
+            <!-- Business Logo Preview and Upload -->
+            <div class="col-md-6 mb-3">
+                <label for="bussinesslogo" class="form-label">Business Logo</label>
+                <div class="image-preview" id="businessLogoPreview">
+                    <img src="path/to/current/logo.jpg" alt="Business Logo" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
+                    <button type="button" class="btn btn-danger btn-sm" id="removeBusinessLogo">Remove</button>
+                </div>
+                <input type="file" class="form-control" aria-label="file example" id="bussinesslogo" name="Logo" hidden>
+                <button type="button" class="btn btn-primary btn-sm" id="changeBusinessLogo">Change Logo</button>
+            </div>
+
+            <!-- Restaurant Image Preview and Upload -->
+            <div class="col-md-6 mb-3">
+                <label for="restaurentimage" class="form-label">Restaurant Image</label>
+                <div class="image-preview" id="restaurantImagePreview">
+                    <img src="path/to/current/restaurant-image.jpg" alt="Restaurant Image" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
+                    <button type="button" class="btn btn-danger btn-sm" id="removeRestaurantImage">Remove</button>
+                </div>
+                <input type="file" class="form-control" aria-label="file example" id="restaurentimage" name="RestaurantImage" hidden>
+                <button type="button" class="btn btn-primary btn-sm" id="changeRestaurantImage">Change Image</button>
+            </div>
+        </div>
+        <!-- Changes Summary Section -->
+        <div class="col-12 summary" id="editSummary">
+            <h4>Changes Summary</h4>
+            <p>No changes made yet.</p>
+        </div>
+
+        <div class="col-12">
+            <button class="btn btn-success" type="submit">Update Outlet</button>
+        </div>
+    </form>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split('&');
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split('=');
+                if (decodeURIComponent(pair[0]) == variable) {
+                    console.log(variable + ': ' + decodeURIComponent(pair[1])); // Debugging output
+                    return decodeURIComponent(pair[1]);
+                }
+            }
+            console.log('Query variable %s not found', variable);
+        }
+
+        // Function to apply change detection on each input field
+        function applyChangeDetection(selector) {
+            $(selector).each(function () {
+                const initialValue = $(this).val();
+                $(this).on('change input', function () {
+                    if ($(this).val() !== initialValue) {
+                        $(this).addClass('changed-input');
+                    } else {
+                        $(this).removeClass('changed-input');
+                    }
+                });
+            });
+        }
+
+        // Populate fields and apply change detection
+        const fieldsToQueryVariables = {
+            '#internalOutletName': 'internalOutletName',
+            '#customerFacingName': 'customerFacingName',
+            '#businessType': 'businessType',
+            '#countryStateCity': 'country', // Note: This seems to represent only the country part; adjust if incorrect
+            '#cityInput': 'city',
+            '#stateSelect': 'state',
+            '#zipInput': 'zip',
+            '#streetAddress': 'streetAddress',
+            '#postalCode': 'postalCode',
+            '#dateOpened': 'dateOpened',
+            '#description': 'description',
+            '#employeeCount': 'employeeCount',
+            '#operatingHoursStart': 'operatingHoursStart',
+            '#operatingHoursEnd': 'operatingHoursEnd',
+            '#contact': 'contact'
+        };
+
+        Object.entries(fieldsToQueryVariables).forEach(([fieldId, queryVariable]) => {
+            const value = getQueryVariable(queryVariable);
+            if (value !== undefined) {
+                $(fieldId).val(value);
+                applyChangeDetection(fieldId);
+            }
+        });
+    });
+</script>
+
+
+<script>
+    // JavaScript to highlight changes and update summary
+    $(document).ready(function () {
+        let initialFormData = new FormData($('#editOutletForm')[0]);
+        let editSummary = $('#editSummary p');
+
+        $('input, select, textarea').on('change input', function () {
+            $(this).addClass('modified');
+            updateEditSummary();
+        });
+
+        function updateEditSummary() {
+            let currentFormData = new FormData($('#editOutletForm')[0]);
+            let message = "<ul>";
+            let hasChanges = false;
+
+            for (let key of initialFormData.keys()) {
+                if (initialFormData.get(key) !== currentFormData.get(key)) {
+                    message += `<li><strong>${key}:</strong> Changed</li>`;
+                    hasChanges = true;
+                }
+            }
+
+            message += "</ul>";
+            editSummary.html(hasChanges ? message : "No changes made yet.");
+        }
+
+        $("#editOutletForm").on("submit", function (event) {
+            event.preventDefault();
+            // Implement AJAX submission here
+        });
+    });
+</script>

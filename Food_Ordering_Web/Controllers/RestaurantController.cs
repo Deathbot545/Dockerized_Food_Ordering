@@ -1,13 +1,9 @@
 ﻿using Infrastructure.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.Data;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using ZXing.QrCode.Internal;
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -62,6 +58,10 @@ namespace Food_Ordering_Web.Controllers
             return View("~/Views/Owner/AddOutlet.cshtml");
         }
 
+        public IActionResult Edit()
+        {
+            return View("~/Views/Owner/EditOutlet.cshtml");
+        }
         public IActionResult Manage(int id, string internalOutletName)
         {
             ViewBag.OutletId = id;

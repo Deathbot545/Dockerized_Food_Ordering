@@ -14,5 +14,7 @@ namespace Core.DTO
         public TimeSpan OperatingHoursStart { get; set; }
         public TimeSpan OperatingHoursEnd { get; set; }
         public string Contact { get; set; }
+        public string Country { get; set; }
+        public string City { get; set; }
     }
 }

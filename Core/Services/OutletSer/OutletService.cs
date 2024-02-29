@@ -87,6 +87,55 @@ namespace Core.Services.OutletSer
             }
         }
 
+        public async Task<Outlet> UpdateOutletAsync(OutletUpdateDTO updateDTO, byte[]? logoImage = null, byte[]? restaurantImage = null)
+        {
+            var outlet = await _context.Outlets.FirstOrDefaultAsync(o => o.Id == updateDTO.Id);
+            if (outlet == null)
+            {
+                // Throw a custom exception if the outlet is not found
+                throw new KeyNotFoundException($"Outlet with ID {updateDTO.Id} not found.");
+            }
+
+
+            // Update fields based on DTO
+            outlet.InternalOutletName = updateDTO.InternalOutletName ?? outlet.InternalOutletName;
+            outlet.CustomerFacingName = updateDTO.CustomerFacingName ?? outlet.CustomerFacingName;
+            outlet.BusinessType = updateDTO.BusinessType ?? outlet.BusinessType;
+            outlet.Country = updateDTO.Country ?? outlet.Country;
+            outlet.City = updateDTO.City ?? outlet.City;
+            outlet.State = updateDTO.State ?? outlet.State;
+            outlet.Zip = updateDTO.Zip ?? outlet.Zip;
+            outlet.StreetAddress = updateDTO.StreetAddress ?? outlet.StreetAddress;
+            outlet.PostalCode = updateDTO.PostalCode ?? outlet.PostalCode;
+            outlet.DateOpened = updateDTO.DateOpened ?? outlet.DateOpened;
+            outlet.Description = updateDTO.Description ?? outlet.Description;
+            outlet.EmployeeCount = updateDTO.EmployeeCount ?? outlet.EmployeeCount;
+            outlet.OperatingHoursStart = updateDTO.OperatingHoursStart ?? outlet.OperatingHoursStart;
+            outlet.OperatingHoursEnd = updateDTO.OperatingHoursEnd ?? outlet.OperatingHoursEnd;
+            outlet.Contact = updateDTO.Contact ?? outlet.Contact;
+
+            // Update images if new images are provided
+            if (logoImage != null && logoImage.Length > 0)
+            {
+                outlet.Logo = logoImage;
+            }
+            if (restaurantImage != null && restaurantImage.Length > 0)
+            {
+                outlet.RestaurantImage = restaurantImage;
+            }
+
+            SetDateTimePropertiesToUtc(outlet);
+            outlet.UpdatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
+
+            _context.Outlets.Update(outlet);
+            await _context.SaveChangesAsync();
+
+            return outlet;
+        }
+
+
+
+
         public async Task<bool> DeleteOutletByIdAsync(int id)
         {
             // Find the outlet first

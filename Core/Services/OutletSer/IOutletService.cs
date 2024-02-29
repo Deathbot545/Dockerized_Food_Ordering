@@ -17,6 +17,7 @@ namespace Core.Services.OutletSer
         bool RemoveQRCode(int tableId);
         Task<bool> DeleteOutletByIdAsync(int id);
        Task<OutletInfoDTO> GetSpecificOutletInfoByOutletIdAsync(int outletId);
+        Task<Outlet> UpdateOutletAsync(OutletUpdateDTO updateDTO, byte[]? logoImage = null, byte[]? restaurantImage = null);
         Task<OutletImagesDTO> GetOutletImagesAsync(int outletId);
         Task<Outlet> GetOutletBySubdomain(string subdomain);
 

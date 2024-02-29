@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Cors;
 using Core.DTO;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Restaurant_API.Controllers
 {
@@ -43,6 +44,77 @@ namespace Restaurant_API.Controllers
                 return BadRequest(new { Message = "An error occurred", Details = ex.Message });
             }
         }
+
+        [HttpPut("update/{id}"), Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateOutlet(int id)
+        {
+            try
+            {
+                var updateDTOJson = Request.Form["updateDTO"];
+                if (string.IsNullOrWhiteSpace(updateDTOJson))
+                {
+                    return BadRequest("Invalid update data. The 'updateDTO' form field is required.");
+                }
+
+                var updateDTO = JsonConvert.DeserializeObject<OutletUpdateDTO>(updateDTOJson);
+                if (updateDTO == null)
+                {
+                    return BadRequest("Failed to deserialize 'updateDTO'. Please ensure it contains valid JSON.");
+                }
+
+                if (id != updateDTO.Id)
+                {
+                    return BadRequest($"Invalid or mismatched ID. URL ID: {id}, DTO ID: {updateDTO.Id}");
+                }
+
+                // Optional file handling
+                byte[] logoBytes = null;
+                byte[] restaurantImageBytes = null;
+                var logoImage = Request.Form.Files["logoImage"];
+                var restaurantImage = Request.Form.Files["restaurantImage"];
+
+                if (logoImage != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await logoImage.CopyToAsync(memoryStream);
+                        logoBytes = memoryStream.ToArray();
+                    }
+                }
+                if (restaurantImage != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await restaurantImage.CopyToAsync(memoryStream);
+                        restaurantImageBytes = memoryStream.ToArray();
+                    }
+                }
+
+                // Pass the DTO and optionally the images to the service layer for processing
+                var updatedOutlet = await _outletService.UpdateOutletAsync(updateDTO, logoBytes, restaurantImageBytes);
+
+                if (updatedOutlet == null)
+                {
+                    return NotFound(new { Message = "Outlet not found. Unable to update the outlet with ID: " + id });
+                }
+
+                return Ok(updatedOutlet);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Return a NotFound response with the custom error message
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and return a BadRequest with a more generic error message
+                return BadRequest($"An error occurred while updating the outlet. Error: {ex.Message}");
+            }
+        }
+
+
+
+
 
         [HttpGet("GetOutletsByOwner/{ownerId}")]
         public async Task<IActionResult> GetOutletsByOwner(Guid ownerId)

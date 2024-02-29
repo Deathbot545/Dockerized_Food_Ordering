@@ -152,6 +152,49 @@
     </script>
 <script>
     $(document).ready(function () {
+
+        document.getElementById('bussinesslogo').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size (in bytes)
+                if (file.size > 500 * 1024) { // 500 KB limit
+                    alert("File size should be less than 500 KB.");
+                    this.value = ''; // Clears the file input
+                } else {
+                    // Optionally, check image dimensions
+                    const img = new Image();
+                    img.onload = function () {
+                        if (this.width > 1920 || this.height > 1080) {
+                            alert("Image dimensions should be 1920x1080 or smaller.");
+                            document.getElementById('bussinesslogo').value = ''; // Clears the file input
+                        }
+                    };
+                    img.src = URL.createObjectURL(file);
+                }
+            }
+        });
+
+        document.getElementById('restaurentimage').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size (in bytes)
+                if (file.size > 500 * 1024) { // 500 KB limit
+                    alert("File size should be less than 500 KB.");
+                    this.value = ''; // Clears the file input
+                } else {
+                    // Optionally, check image dimensions
+                    const img = new Image();
+                    img.onload = function () {
+                        if (this.width > 1920 || this.height > 1080) {
+                            alert("Image dimensions should be 1920x1080 or smaller.");
+                            document.getElementById('restaurentimage').value = ''; // Clears the file input
+                        }
+                    };
+                    img.src = URL.createObjectURL(file);
+                }
+            }
+        });
+
         $("#addOutletForm").on("submit", function (event) {
             event.preventDefault(); // Stop the default form submit action
 

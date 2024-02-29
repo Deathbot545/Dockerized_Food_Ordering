@@ -1,4 +1,5 @@
-﻿<style>
+﻿
+<style>
     .changed-input {
         background-color: #ffff99; /* Light yellow background */
         color: #000; /* Optional: Change text color if needed */
@@ -25,7 +26,10 @@
             <label for="businessTypeSelect" class="form-label">Business Type</label>
             <select class="form-select" id="businessType" name="BusinessType" required>
                 <option value="">Choose...</option>
-                <option value="fine-dining" selected>Preloaded Business Type</option>
+                <option value="fine-dining">Fine Dining Restaurant</option>
+                <option value="fast-food">Fast-Food Chain</option>
+                <option value="cafe">Cafe</option>
+                <option value="other">Other</option>
                 <!-- Add other options here -->
             </select>
         </div>
@@ -33,9 +37,11 @@
         <!-- Country -->
         <div class="col-md-6">
             <label for="countrySelect" class="form-label">Country</label>
-            <select class="form-select" id="countryStateCity" name="Country" required>
+            <select class="form-select" id="country" name="Country" required>
                 <option value="">Choose...</option>
-                <option value="usa" selected>Preloaded Country</option>
+                <option value="usa">United States</option>
+                <option value="canada">Canada</option>
+                <option value="uk">United Kingdom</option>
                 <!-- Add other options here -->
             </select>
         </div>
@@ -43,15 +49,16 @@
         <!-- City -->
         <div class="col-md-6">
             <label for="cityInput" class="form-label">City</label>
-            <input type="text" class="form-control" id="cityInput" name="City" required value="Preloaded City">
+            <input type="text" class="form-control" id="city" name="City" required value="Preloaded City">
         </div>
 
         <!-- State -->
         <div class="col-md-3">
             <label for="stateSelect" class="form-label">State</label>
-            <select class="form-select" id="stateSelect" name="State" required>
-                <option value="">Choose...</option>
-                <option value="stateValue" selected>Preloaded State</option>
+            <select class="form-select" id="state" name="State" required>
+                <option selected disabled value="">Choose...</option>
+                <option value="usa">United States</option>
+                <option value="canada">Canada</option>
                 <!-- Add other options here -->
             </select>
         </div>
@@ -116,7 +123,7 @@
             <div class="col-md-6 mb-3">
                 <label for="bussinesslogo" class="form-label">Business Logo</label>
                 <div class="image-preview" id="businessLogoPreview">
-                    <img src="path/to/current/logo.jpg" alt="Business Logo" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
+                    <img id="logoImage" src="" alt="Business Logo" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
                     <button type="button" class="btn btn-danger btn-sm" id="removeBusinessLogo">Remove</button>
                 </div>
                 <input type="file" class="form-control" aria-label="file example" id="bussinesslogo" name="Logo" hidden>
@@ -127,7 +134,7 @@
             <div class="col-md-6 mb-3">
                 <label for="restaurentimage" class="form-label">Restaurant Image</label>
                 <div class="image-preview" id="restaurantImagePreview">
-                    <img src="path/to/current/restaurant-image.jpg" alt="Restaurant Image" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
+                    <img id="restaurantImage" src="" alt="Restaurant Image" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
                     <button type="button" class="btn btn-danger btn-sm" id="removeRestaurantImage">Remove</button>
                 </div>
                 <input type="file" class="form-control" aria-label="file example" id="restaurentimage" name="RestaurantImage" hidden>
@@ -147,41 +154,29 @@
 </main>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        function getQueryVariable(variable) {
-            var query = window.location.search.substring(1);
-            var vars = query.split('&');
-            for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split('=');
-                if (decodeURIComponent(pair[0]) == variable) {
-                    console.log(variable + ': ' + decodeURIComponent(pair[1])); // Debugging output
-                    return decodeURIComponent(pair[1]);
-                }
-            }
-            console.log('Query variable %s not found', variable);
-        }
+        const outletId = getQueryVariable('id');
+        populateFormFields();
+        setupFormChangeDetection();
+        setupImageChangeHandlers();
+        setupFormSubmission(outletId);
+        fetchAndDisplayOutletImages(outletId);
+    });
 
-        // Function to apply change detection on each input field
-        function applyChangeDetection(selector) {
-            $(selector).each(function () {
-                const initialValue = $(this).val();
-                $(this).on('change input', function () {
-                    if ($(this).val() !== initialValue) {
-                        $(this).addClass('changed-input');
-                    } else {
-                        $(this).removeClass('changed-input');
-                    }
-                });
-            });
-        }
+    function getQueryVariable(variable) {
+        const query = window.location.search.substring(1);
+        const vars = query.split('&').map(v => {
+            const [key, value] = v.split('=');
+            return { key: decodeURIComponent(key), value: decodeURIComponent(value) };
+        });
+        const foundVar = vars.find(v => v.key === variable);
+        return foundVar ? foundVar.value : null;
+    }
 
-        // Populate fields and apply change detection
+    function populateFormFields() {
         const fieldsToQueryVariables = {
             '#internalOutletName': 'internalOutletName',
             '#customerFacingName': 'customerFacingName',
             '#businessType': 'businessType',
-            '#countryStateCity': 'country', // Note: This seems to represent only the country part; adjust if incorrect
-            '#cityInput': 'city',
-            '#stateSelect': 'state',
             '#zipInput': 'zip',
             '#streetAddress': 'streetAddress',
             '#postalCode': 'postalCode',
@@ -190,50 +185,147 @@
             '#employeeCount': 'employeeCount',
             '#operatingHoursStart': 'operatingHoursStart',
             '#operatingHoursEnd': 'operatingHoursEnd',
-            '#contact': 'contact'
+            '#contact': 'contact',
+            '#country': 'country',
+            '#state': 'state',
+            '#city': 'city'
         };
 
         Object.entries(fieldsToQueryVariables).forEach(([fieldId, queryVariable]) => {
-            const value = getQueryVariable(queryVariable);
-            if (value !== undefined) {
-                $(fieldId).val(value);
-                applyChangeDetection(fieldId);
-            }
-        });
-    });
-</script>
-
-
-<script>
-    // JavaScript to highlight changes and update summary
-    $(document).ready(function () {
-        let initialFormData = new FormData($('#editOutletForm')[0]);
-        let editSummary = $('#editSummary p');
-
-        $('input, select, textarea').on('change input', function () {
-            $(this).addClass('modified');
-            updateEditSummary();
-        });
-
-        function updateEditSummary() {
-            let currentFormData = new FormData($('#editOutletForm')[0]);
-            let message = "<ul>";
-            let hasChanges = false;
-
-            for (let key of initialFormData.keys()) {
-                if (initialFormData.get(key) !== currentFormData.get(key)) {
-                    message += `<li><strong>${key}:</strong> Changed</li>`;
-                    hasChanges = true;
+            let value = getQueryVariable(queryVariable);
+            if (value !== null) {
+                if (fieldId === '#dateOpened' && value) {
+                    value = formatDate(value);
                 }
+                $(fieldId).val(value);
             }
-
-            message += "</ul>";
-            editSummary.html(hasChanges ? message : "No changes made yet.");
-        }
-
-        $("#editOutletForm").on("submit", function (event) {
-            event.preventDefault();
-            // Implement AJAX submission here
         });
-    });
+
+ 
+    }
+
+    function formatDate(dateStr) {
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+            const [month, day, year] = parts;
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // Correct format for <input type="date">
+        } else {
+            // Return the original string if it doesn't match expected format
+            return dateStr;
+        }
+    }
+
+    function setupFormChangeDetection() {
+        $('input, select, textarea').not(':input[type=file]').on('change input', function () {
+            $(this).addClass('changed-input');
+            updateChangeSummary();
+        });
+    }
+
+    function setupImageChangeHandlers() {
+        $('input[type="file"]').change(function () {
+            const fileInput = $(this);
+            const reader = new FileReader();
+            const previewSelector = fileInput.data('preview');
+            reader.onload = function (e) {
+                $(previewSelector).attr('src', e.target.result).addClass('changed-input');
+                fileInput.addClass('changed-input');
+            };
+            if (this.files[0]) reader.readAsDataURL(this.files[0]);
+        });
+
+        $('.remove-image').click(function () {
+            const previewSelector = $(this).data('preview');
+            const inputSelector = $(this).data('input');
+            $(previewSelector).attr('src', '/path/to/default/image.png').removeClass('changed-input');
+            $(inputSelector).val('').removeClass('changed-input');
+        });
+    }
+    function updateChangeSummary() {
+        const changedElements = $('.changed-input');
+        const summaryContainer = $('#editSummary');
+
+        summaryContainer.empty().append('<h4>Changes Summary</h4>');
+
+        if (changedElements.length > 0) {
+            const list = $('<ul></ul>');
+            changedElements.each(function () {
+                let label = $("label[for='" + $(this).attr('id') + "']").text();
+                if (!label) {
+                    // Fallback to using a placeholder or name attribute if the label isn't found
+                    label = $(this).attr('placeholder') || $(this).attr('name') || 'Unnamed Field';
+                }
+                list.append($('<li></li>').text(`Changed ${label}`));
+            });
+            summaryContainer.append(list);
+        } else {
+            summaryContainer.append('<p>No changes made yet.</p>');
+        }
+    }
+
+
+
+
+
+    function setupFormSubmission(outletId) {
+        $('#editOutletForm').submit(async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const updateDTO = {};
+
+            $('.changed-input').not(':input[type=file]').each(function () {
+                updateDTO[this.name] = $(this).val();
+            });
+
+            $('.changed-input:input[type=file]').each(function () {
+                if (this.files[0]) {
+                    formData.append(this.name, this.files[0]);
+                }
+            });
+
+            formData.append('updateDTO', JSON.stringify(updateDTO));
+
+            try {
+                const response = await fetch(`https://restosolutionssaas.com:7115/api/OutletApi/update/${outletId}`, {
+                    method: 'PUT',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Update successful:", data);
+                    alert("Outlet updated successfully.");
+                    // Implement post-update actions here, e.g., redirecting or updating the UI
+                } else {
+                    // Handle non-OK responses from the server
+                    const errorData = await response.json();
+                    console.error("Update failed:", errorData);
+                    alert(`Failed to update outlet. Error: ${errorData.title || 'Please try again.'}`);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again.");
+            }
+        });
+    }
+
+    function fetchAndDisplayOutletImages(outletId) {
+        $.ajax({
+            url: `https://restosolutionssaas.com:7115/api/OutletApi/GetOutletImages/${outletId}`,
+            method: 'GET',
+            success: function (data) {
+                if (data.logoBase64) {
+                    $('#logoImage').attr('src', `data:image/png;base64,${data.logoBase64}`);
+                }
+                if (data.restaurantImageBase64) {
+                    $('#restaurantImage').attr('src', `data:image/png;base64,${data.restaurantImageBase64}`);
+                }
+            },
+            error: function (error) {
+                console.error("Error fetching images:", error);
+                // Handle error or set default images
+            }
+        });
+    }
 </script>

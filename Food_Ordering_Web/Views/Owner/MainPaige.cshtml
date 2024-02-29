@@ -200,8 +200,12 @@
             const description = $row.data('description');
             const zip = $row.data('zip');
             const postalCode = $row.data('postal-code');
-            const logoImage = $row.data('logo'); // Assuming you have a way to get this data (URL or Base64)
-            const restaurantImage = $row.data('restaurant-image'); // Same assumption as above
+            const countryStateCityParts = $row.data('country-state-city').split(', '); // Make sure this split pattern matches your actual data
+            const country = countryStateCityParts.length > 0 ? countryStateCityParts[0] : '';
+            const state = countryStateCityParts.length > 1 ? countryStateCityParts[1] : '';
+            const city = countryStateCityParts.length > 2 ? countryStateCityParts[2] : '';
+
+           
            
             // Update the displayed information
             $("#internalOutletName").text($row.data('internal-outlet-name'));
@@ -225,10 +229,32 @@
             $('#tablesLink').attr('href', `/Restaurant/Tables?id=${outletId}&customerFacingName=${encodeURIComponent(customerFacingName)}&internalOutletName=${encodeURIComponent(internalOutletName)}`);
             $('#manageLink').attr('href', `/Restaurant/Manage?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}`);
             // Construct the URL with outlet information as parameters
-            let editUrl = `/Restaurant/Edit?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}&customerFacingName=${encodeURIComponent(customerFacingName)}&businessType=${encodeURIComponent(businessType)}&countryStateCity=${encodeURIComponent(countryStateCity)}&streetAddress=${encodeURIComponent(streetAddress)}&description=${encodeURIComponent(description)}&zip=${zip}&postalCode=${postalCode}&dateOpened=${encodeURIComponent(dateOpened)}&employeeCount=${employeeCount}&operatingHoursStart=${encodeURIComponent(operatingHours.split(' - ')[0])}&operatingHoursEnd=${encodeURIComponent(operatingHours.split(' - ')[1])}&contact=${encodeURIComponent(contact)}&createdAt=${encodeURIComponent(createdAt)}&updatedAt=${encodeURIComponent(updatedAt)}`;
+            let editUrl = `/Restaurant/Edit?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}&customerFacingName=${encodeURIComponent(customerFacingName)}&businessType=${encodeURIComponent(businessType)}&country=${encodeURIComponent(country)}&state=${encodeURIComponent(state)}&city=${encodeURIComponent(city)}&streetAddress=${encodeURIComponent(streetAddress)}&description=${encodeURIComponent(description)}&zip=${zip}&postalCode=${postalCode}&dateOpened=${encodeURIComponent(dateOpened)}&employeeCount=${employeeCount}&operatingHoursStart=${encodeURIComponent(operatingHours.split(' - ')[0])}&operatingHoursEnd=${encodeURIComponent(operatingHours.split(' - ')[1])}&contact=${encodeURIComponent(contact)}&createdAt=${encodeURIComponent(createdAt)}&updatedAt=${encodeURIComponent(updatedAt)}`;
             // Update the "Edit" link to include the selected outlet's information as URL parameters
             $('#editLink').attr('href', editUrl);
+            fetchAndDisplayOutletImages(outletId);
         });
+
+        function fetchAndDisplayOutletImages(outletId) {
+            $.ajax({
+                url: `https://restosolutionssaas.com:7115/api/OutletApi/GetOutletImages/${outletId}`,
+                method: 'GET',
+                success: function (data) {
+                    const logoImageUrl = data.logoBase64 ? `data:image/png;base64,${data.logoBase64}` : '/path/to/default/logo.png';
+                    const restaurantImageUrl = data.restaurantImageBase64 ? `data:image/png;base64,${data.restaurantImageBase64}` : '/path/to/default/restaurant.png';
+
+                    $('#logoImage').attr('src', logoImageUrl);
+                    $('#restaurantImage').attr('src', restaurantImageUrl);
+                },
+                error: function (error) {
+                    console.error('Error fetching images:', error);
+                    // Optionally set default images in case of an error
+                    $('#logoImage').attr('src', '/path/to/default/logo.png');
+                    $('#restaurantImage').attr('src', '/path/to/default/restaurant.png');
+                }
+            });
+        }
+
     });
 </script>
 <script>

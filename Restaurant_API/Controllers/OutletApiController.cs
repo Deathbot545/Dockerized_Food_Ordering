@@ -45,7 +45,7 @@ namespace Restaurant_API.Controllers
             }
         }
 
-        [HttpPut("update/{id}"), Consumes("multipart/form-data")]
+        [HttpPatch("update/{id}"), Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateOutlet(int id)
         {
             try

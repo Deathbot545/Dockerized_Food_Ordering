@@ -264,51 +264,67 @@
     }
 
 
-
-
-
     function setupFormSubmission(outletId) {
         $('#editOutletForm').submit(async function (e) {
             e.preventDefault();
 
             const formData = new FormData();
-            const updateDTO = {};
+            // Initialize your updateDTO with the outletId to ensure the Id is set correctly
+            const updateDTO = {
+                Id: parseInt(outletId, 10) // Make sure Id is an integer
+            };
 
+            // Collect data from inputs that have changed, excluding file inputs
             $('.changed-input').not(':input[type=file]').each(function () {
                 updateDTO[this.name] = $(this).val();
             });
 
+            console.log("Collected update data:", updateDTO);
+
+            // Append the JSON data as a string.
+            formData.append('updateDTO', JSON.stringify(updateDTO));
+
+            // Append files to formData if any
             $('.changed-input:input[type=file]').each(function () {
                 if (this.files[0]) {
                     formData.append(this.name, this.files[0]);
                 }
             });
 
-            formData.append('updateDTO', JSON.stringify(updateDTO));
-
             try {
+                console.log("Sending PATCH request to update outlet with ID:", outletId);
+
                 const response = await fetch(`https://restosolutionssaas.com:7115/api/OutletApi/update/${outletId}`, {
-                    method: 'PUT',
-                    body: formData,
+                    method: 'PATCH',
+                    body: formData, // Do not set Content-Type header manually, let the browser handle it
                 });
+
+                console.log("Response status:", response.status);
 
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Update successful:", data);
                     alert("Outlet updated successfully.");
-                    // Implement post-update actions here, e.g., redirecting or updating the UI
                 } else {
-                    // Handle non-OK responses from the server
-                    const errorData = await response.json();
-                    console.error("Update failed:", errorData);
-                    alert(`Failed to update outlet. Error: ${errorData.title || 'Please try again.'}`);
+                    console.error("Update failed with status:", response.status);
+                    response.text().then(text => {
+                        console.error("Failed to update outlet. Error:", text);
+                        alert("Failed to update outlet. Please check the console for more information.");
+                    });
                 }
             } catch (error) {
-                console.error("Error:", error);
+                console.error("Error during fetch:", error);
                 alert("An error occurred. Please try again.");
             }
         });
     }
+
+
+
+
+
+
+
 
     function fetchAndDisplayOutletImages(outletId) {
         $.ajax({

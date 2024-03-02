@@ -126,7 +126,7 @@
                     <img id="logoImage" src="" alt="Business Logo" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
                     <button type="button" class="btn btn-danger btn-sm" id="removeBusinessLogo">Remove</button>
                 </div>
-                <input type="file" class="form-control" aria-label="file example" id="bussinesslogo" name="Logo" hidden>
+                <input type="file" class="form-control" id="bussinesslogo" name="logoImage" hidden>
                 <button type="button" class="btn btn-primary btn-sm" id="changeBusinessLogo">Change Logo</button>
             </div>
 
@@ -137,7 +137,7 @@
                     <img id="restaurantImage" src="" alt="Restaurant Image" class="img-thumbnail mb-2" style="width: 100px; height: auto;">
                     <button type="button" class="btn btn-danger btn-sm" id="removeRestaurantImage">Remove</button>
                 </div>
-                <input type="file" class="form-control" aria-label="file example" id="restaurentimage" name="RestaurantImage" hidden>
+                <input type="file" class="form-control" id="restaurentimage" name="restaurantImage" hidden>
                 <button type="button" class="btn btn-primary btn-sm" id="changeRestaurantImage">Change Image</button>
             </div>
         </div>
@@ -160,7 +160,9 @@
         setupImageChangeHandlers();
         setupFormSubmission(outletId);
         fetchAndDisplayOutletImages(outletId);
+      
     });
+  
 
     function getQueryVariable(variable) {
         const query = window.location.search.substring(1);
@@ -223,24 +225,45 @@
     }
 
     function setupImageChangeHandlers() {
+        // Trigger file input when the change button is clicked
+        $('#changeBusinessLogo, #changeRestaurantImage').click(function () {
+            // Determine which file input to trigger based on the clicked button
+            const targetInput = $(this).attr('id') === 'changeBusinessLogo' ? '#bussinesslogo' : '#restaurentimage';
+            $(targetInput).click();
+        });
+
+        // Handle file selection and update the image preview
         $('input[type="file"]').change(function () {
             const fileInput = $(this);
             const reader = new FileReader();
-            const previewSelector = fileInput.data('preview');
+
             reader.onload = function (e) {
-                $(previewSelector).attr('src', e.target.result).addClass('changed-input');
-                fileInput.addClass('changed-input');
+                // Use the file input's ID to find the corresponding preview image element
+                const previewId = fileInput.attr('id') === 'bussinesslogo' ? '#logoImage' : '#restaurantImage';
+                $(previewId).attr('src', e.target.result);
             };
-            if (this.files[0]) reader.readAsDataURL(this.files[0]);
+
+            if (this.files && this.files[0]) {
+                reader.readAsDataURL(this.files[0]);
+                $(this).addClass('changed-input'); // Mark the file input as changed
+            }
         });
 
-        $('.remove-image').click(function () {
-            const previewSelector = $(this).data('preview');
-            const inputSelector = $(this).data('input');
-            $(previewSelector).attr('src', '/path/to/default/image.png').removeClass('changed-input');
-            $(inputSelector).val('').removeClass('changed-input');
+        // Optional: Confirm before removing the current image
+        $('#removeBusinessLogo, #removeRestaurantImage').click(function () {
+            const confirmRemoval = confirm('Are you sure you want to remove this image?');
+            if (confirmRemoval) {
+                // Reset the preview to a default image or hide it
+                const previewId = $(this).attr('id') === 'removeBusinessLogo' ? '#logoImage' : '#restaurantImage';
+                $(previewId).attr('src', ''); // Consider setting this to a default placeholder image
+                // Optionally, clear the file input if necessary
+                const fileInputId = $(this).attr('id') === 'removeBusinessLogo' ? '#bussinesslogo' : '#restaurentimage';
+                $(fileInputId).val('');
+            }
         });
     }
+
+
     function updateChangeSummary() {
         const changedElements = $('.changed-input');
         const summaryContainer = $('#editSummary');
@@ -267,6 +290,9 @@
     function setupFormSubmission(outletId) {
         $('#editOutletForm').submit(async function (e) {
             e.preventDefault();
+
+            // Show loading animation
+            $('#loadingAnimation').show();
 
             const formData = new FormData();
             // Initialize your updateDTO with the outletId to ensure the Id is set correctly
@@ -315,15 +341,12 @@
             } catch (error) {
                 console.error("Error during fetch:", error);
                 alert("An error occurred. Please try again.");
+            } finally {
+                // Hide loading animation regardless of the outcome
+                $('#loadingAnimation').hide();
             }
         });
     }
-
-
-
-
-
-
 
 
     function fetchAndDisplayOutletImages(outletId) {

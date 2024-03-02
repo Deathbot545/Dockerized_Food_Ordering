@@ -176,12 +176,23 @@
 
 <script>
     $(document).ready(function () {
+        $('.form-check-input').prop('checked', false);
+
         // Initially disable the "Action" dropdown button
         $('#actionDropdown').prop('disabled', true);
-
+     
         $('.checkbox-item').click(function () {
+            $('#checkAll').prop('checked', false);
+
+            // Uncheck all checkboxes except the one that was clicked
+            $('.checkbox-item').not(this).prop('checked', false);
+
+            // Logic to handle the enabled state of the "Action" dropdown based on checkbox state
+            $('#actionDropdown').prop('disabled', !$('.checkbox-item:checked').length);
             // Enable the "Action" dropdown button when an outlet is selected
-            $('#actionDropdown').prop('disabled', false);
+         
+            // Check the clicked one
+            $(this).prop('checked', true);
 
             const $row = $(this).closest('tr');
             const outletId = $(this).data('outlet-id');
@@ -205,8 +216,6 @@
             const state = countryStateCityParts.length > 1 ? countryStateCityParts[1] : '';
             const city = countryStateCityParts.length > 2 ? countryStateCityParts[2] : '';
 
-           
-           
             // Update the displayed information
             $("#internalOutletName").text($row.data('internal-outlet-name'));
             $("#customerFacingName").text(customerFacingName);
@@ -233,6 +242,40 @@
             // Update the "Edit" link to include the selected outlet's information as URL parameters
             $('#editLink').attr('href', editUrl);
             fetchAndDisplayOutletImages(outletId);
+
+            // Listen for clicks on the "Select All" checkbox
+            $('#checkAll').click(function () {
+                // Check or uncheck all individual checkboxes based on the "Select All" state
+                $('.checkbox-item').prop('checked', this.checked);
+
+                // If "Select All" is checked, disable the "Action" dropdown since it's not specific to one item
+                $('#actionDropdown').prop('disabled', this.checked);
+
+                // If you want to clear the detailed information when "Select All" is checked, add logic here
+                if (this.checked) {
+                    // Clear displayed information or take any other necessary actions
+                    clearDisplayedInformation();
+                }
+            });
+
+            // Function to clear displayed information (implement as needed)
+            function clearDisplayedInformation() {
+                $("#internalOutletName").text('');
+                $("#customerFacingName").text('');
+                $("#businessType").text('');
+                $("#dateOpened").text('');
+                $("#employeeCount").text('');
+                $("#contact").text('');
+                $("#operatingHours").text('');
+                $("#timestamps").text('');
+                $("#countryStateCity").text('');
+                $("#streetAddress").text('');
+                $("#description").text('');
+                $("#zipAndPostalCode").text('');
+                $("#logoImage").attr('src', '/path/to/default/logo.png');
+                $("#restaurantImage").attr('src', '/path/to/default/restaurant.png');
+                // Any other fields that display selected outlet details
+            }
         });
 
         function fetchAndDisplayOutletImages(outletId) {

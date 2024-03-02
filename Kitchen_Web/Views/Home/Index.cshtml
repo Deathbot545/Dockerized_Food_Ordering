@@ -1,0 +1,133 @@
+﻿@model Core.ViewModels.OutletViewModel;
+@using Core.DTO;
+@using Infrastructure.Models;
+@functions {
+    public static DateTime ConvertToCorrectTimeZone(DateTime dateTimeWithOffset)
+    {
+        TimeZoneInfo istTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+        DateTime dateTimeInIST = TimeZoneInfo.ConvertTime(dateTimeWithOffset, istTimeZone);
+        return dateTimeInIST;
+    }
+}
+<!-- Order Panel -->
+<div class="row mt-4">
+    <div class="col-lg-9">
+
+        <!-- Filters -->
+        <div class="d-flex justify-content-between mb-3 align-items-center">
+            <div>
+                <label class="mr-2">Sort By:</label>
+                <select class="form-control d-inline-block w-auto">
+                    <option>Sort By Time</option>
+                    <!-- Other options -->
+                </select>
+            </div>
+            <!-- You can add a search bar or other filters here -->
+        </div>
+
+        @foreach (var order in Model.Orders ?? Enumerable.Empty<OrderDTO>())
+        {
+            string tableIdentifier = Model.Tables.FirstOrDefault(t => t.Id == order.TableId)?.TableIdentifier;
+
+            <div class="card mb-3 order-card bg-light" data-order-id="@order.Id">
+                <div class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
+                    <span>
+                        Order #@order.Id | Table: @tableIdentifier (@order.TableId) |
+                        <span style="font-weight: lighter;">Date: @ConvertToCorrectTimeZone(order.OrderTime).ToString("yyyy-MM-dd")</span>
+                        <span style="font-weight: bold; font-size: larger;">Time: @ConvertToCorrectTimeZone(order.OrderTime).ToString("HH:mm:ss")</span>
+                    </span>
+                    <span>STATUS: @order.Status.ToString().ToUpper()</span>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-3">
+                        @foreach (var detail in order.OrderDetails ?? Enumerable.Empty<OrderDetailDTO>())
+                        {
+                            <li>@detail.MenuItem?.Name <text>x</text>@detail.Quantity</li>
+                        }
+
+                    </ul>
+                    <div class="btn-group" role="group" aria-label="Order Status">
+                        <button type="button" class="btn btn-warning @(order.Status == OrderStatus.Pending ? "active" : "")" data-status="pending">Pending</button>
+                        <button type="button" class="btn btn-primary @(order.Status == OrderStatus.Preparing ? "active" : "")" data-status="in-progress">In Progress</button>
+                        <button type="button" class="btn btn-success @(order.Status == OrderStatus.Ready ? "active" : "")" data-status="completed">Completed</button>
+                    </div>
+                    <!-- Optionally, add an Alert Button and Timer here -->
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="col-lg-3">
+        <div class="sticky-top">
+            <h5 class="bg-secondary text-white p-2 rounded-top">Notifications</h5>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-danger">Table #3 requires urgent attention!</li>
+                <li class="list-group-item list-group-item-danger">Order #12347 from Table #6 has been cancelled!</li>
+                <li class="list-group-item list-group-item-success">Order #12345 from Table #5 is completed!</li>
+                <li class="list-group-item list-group-item-success">Order #12346 from Table #2 is completed!</li>
+                <!-- Other notifications -->
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer mt-auto py-3 bg-dark text-white">
+    <div class="container">
+        <span class="text-muted">Quick Actions:</span>
+        <!-- Quick action buttons, e.g., mark all orders as completed, print all pending orders, etc. -->
+    </div>
+</footer>
+<script>
+    $(document).ready(function () {
+        // Hook up click events for the order status buttons
+        $('.btn-group .btn').click(function () {
+            const $btn = $(this);
+            const $card = $btn.closest('.order-card');
+            const orderId = parseInt($card.data('order-id'));
+            const newStatus = $btn.data('status');
+
+            updateOrderStatus(orderId, newStatus);
+        });
+    });
+
+    function updateOrderStatus(orderId, newStatus) {
+        // Convert string status to your OrderStatus enum
+        let statusEnumValue;
+        switch (newStatus) {
+            case 'pending':
+                statusEnumValue = 0; // Assuming 0 corresponds to 'Pending' in your enum
+                break;
+            case 'in-progress':
+                statusEnumValue = 1; // Adjust these values based on your enum definition
+                break;
+            case 'completed':
+                statusEnumValue = 2;
+                break;
+        }
+
+        $.ajax({
+            url: 'https://restosolutionssaas.com:7268/api/OrderApi/UpdateOrderStatus',
+            type: 'POST',
+            data: JSON.stringify({
+                OrderId: orderId,
+                Status: statusEnumValue
+            }),
+            contentType: 'application/json',
+            crossDomain: true,  // Add this line
+            success: function (response) {
+                console.log("Order status updated successfully.");
+                // Update UI if necessary
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("AJAX Error:", textStatus);
+                console.error("Response Text:", jqXHR.responseText);
+                console.error("Error Thrown:", errorThrown);
+            }
+
+        });
+    }
+</script>

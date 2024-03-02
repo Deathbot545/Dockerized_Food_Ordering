@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Kitchen_Web.props" />
+</Project>

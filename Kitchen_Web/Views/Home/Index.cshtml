@@ -73,9 +73,6 @@
         @RenderOrders(Model.Orders.Where(o => o.Status == OrderStatus.Served))
     </section>
 </div>
-
-
-
 <!-- Footer -->
 <footer class="footer mt-auto py-3 bg-dark text-white">
     <div class="container">
@@ -85,7 +82,6 @@
 </footer>
 <script>
    
-
     $(document).ready(function () {
 
         // Establish SignalR connection
@@ -130,10 +126,10 @@
         let statusEnumValue;
         switch (newStatus) {
             case 'pending':
-                statusEnumValue = 0; // Assuming 0 corresponds to 'Pending' in your enum
+                statusEnumValue = 0;
                 break;
             case 'in-progress':
-                statusEnumValue = 1; // Adjust these values based on your enum definition
+                statusEnumValue = 1;
                 break;
             case 'completed':
                 statusEnumValue = 2;
@@ -151,17 +147,16 @@
                 Status: statusEnumValue
             }),
             contentType: 'application/json',
-            crossDomain: true,  // Add this line
+            crossDomain: true,
             success: function (response) {
                 console.log("Order status updated successfully.");
-                // Update UI if necessary
+                location.reload(); // Refresh page to reflect changes
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error("AJAX Error:", textStatus);
                 console.error("Response Text:", jqXHR.responseText);
                 console.error("Error Thrown:", errorThrown);
             }
-
         });
 
         $('.delete-order').click(function () {
@@ -171,7 +166,7 @@
 
         function updateOrderStatusToRejected(orderId) {
             if (confirm('Are you sure you want to reject this order?')) {
-                const rejectedStatus = 4; // Assuming 'Rejected' corresponds to 4 in your enum
+                const rejectedStatus = 4;
                 $.ajax({
                     headers: {
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
@@ -185,7 +180,7 @@
                     contentType: 'application/json',
                     success: function (response) {
                         console.log("Order status updated to rejected successfully.");
-                        location.reload(); // Optionally, reload or update UI dynamically here
+                        location.reload(); // Refresh page to reflect changes
                     },
                     error: function (error) {
                         console.error("Error updating order status to rejected:", error.responseText);
@@ -194,6 +189,7 @@
                 });
             }
         }
+
 
     }
 </script>

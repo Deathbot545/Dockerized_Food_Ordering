@@ -12,13 +12,13 @@ namespace Kitchen_Web.Controllers
     {
         private readonly ILogger<KitchenController> _logger;
         private readonly IOutletService _outletService;
-        private readonly IOrderService _orderService; // 
+  
 
-        public KitchenController(ILogger<KitchenController> logger, IOutletService outletService, IOrderService orderService)
+        public KitchenController(ILogger<KitchenController> logger, IOutletService outletService)
         {
             _logger = logger;
             _outletService = outletService;
-            _orderService = orderService;
+           
         }
 
         public async Task<IActionResult> Index(int? outletId)
@@ -53,6 +53,8 @@ namespace Kitchen_Web.Controllers
                 // If no outletId is provided, just return the default view without additional data.
                 return View("~/Views/Home/Index.cshtml");
             }
+
         }
+
     }
 }

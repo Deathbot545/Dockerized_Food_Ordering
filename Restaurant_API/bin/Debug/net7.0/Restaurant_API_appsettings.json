@@ -1,7 +1,6 @@
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5433;Database=Food_OrderingDB;Username=postgres;Password=raaed"
-
+    "DefaultConnection": "Host=database-1.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=Food_Ordering;User Id=postgres;Password=NxPostgrsql;"
   },
   "StripeSettings": {
     "ApiKey": "sk_test_51NjhBQFU6tKdw4REQ4sdK5t4EUN3aNkvW7Z3v9e41eXjEgfHwcnFztdPvwrRIFeGgwuMpzvkrcn8CSghhoCbJS9S006L3W13JP",
@@ -15,8 +14,8 @@
   },
   "Authentication": {
     "Google": {
-      "ClientId": "720720527870-lgss8d497dl1cv4ce8bleuk2ei8fkihk.apps.googleusercontent.com",
-      "ClientSecret": "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"
+      "ClientId": "247244252156-cqtuh8m6k4s6mcumhkri2grnkf5g5a8d.apps.googleusercontent.com",
+      "ClientSecret": "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"
     }
   },
   "Logging": {

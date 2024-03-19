@@ -109,5 +109,14 @@ namespace Food_Ordering_Web.Controllers
             var model = new OutletViewModel { OutletInfo = outlet, Tables = tables, Orders = orders };
             return View("Views/Kitchen/kitchenView.cshtml", model);
         }
+
+        public IActionResult Regiser_Bussiness() 
+        { 
+            return View("Views/Account/Regiser_Bussiness.cshtml"); 
+        }
+        public IActionResult AddStaff()
+        {
+            return View("Views/Kitchen/AddStaff.cshtml");
+        }
     }
 }

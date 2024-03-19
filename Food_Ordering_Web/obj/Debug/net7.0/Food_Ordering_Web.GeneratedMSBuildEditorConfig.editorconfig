@@ -24,6 +24,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Account/Regiser_Bussiness.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc2VyX0J1c3NpbmVzcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Dockerize/dockerize/Food_Ordering_Web/Views/Account/Signup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxTaWdudXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -60,36 +64,36 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZXN0YXVyYW50LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Kitchen/AddStaff.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2l0Y2hlblxBZGRTdGFmZi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Dockerize/dockerize/Food_Ordering_Web/Views/Kitchen/kitchenView.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS2l0Y2hlblxraXRjaGVuVmlldy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/AuthCheckOut.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxBdXRoQ2hlY2tPdXQuY3NodG1s
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/CheckOut.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxDaGVja091dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/AuthenticatedMenu.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxBdXRoZW50aWNhdGVkTWVudS5jc2h0bWw=
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/FoodItem.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxGb29kSXRlbS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/AuthFoodItem.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxBdXRoRm9vZEl0ZW0uY3NodG1s
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/Menu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxNZW51LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/CheckOutGuest.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxDaGVja091dEd1ZXN0LmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/FoodItemGuest.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxGb29kSXRlbUd1ZXN0LmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/GuestMenu.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxHdWVzdE1lbnUuY3NodG1s
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Menu/Order.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudVxPcmRlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Dockerize/dockerize/Food_Ordering_Web/Views/Owner/AddOutlet.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcQWRkT3V0bGV0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Owner/EditOutlet.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcRWRpdE91dGxldC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Dockerize/dockerize/Food_Ordering_Web/Views/Owner/MainPaige.cshtml]
@@ -114,6 +118,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/Dockerize/dockerize/Food_Ordering_Web/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Stripe/canceled.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RyaXBlXGNhbmNlbGVkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Dockerize/dockerize/Food_Ordering_Web/Views/Stripe/successful.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RyaXBlXHN1Y2Nlc3NmdWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Dockerize/dockerize/Food_Ordering_Web/Views/_ViewImports.cshtml]

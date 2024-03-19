@@ -1,4 +1,5 @@
-﻿using Core.ViewModels;
+﻿using Core.DTO;
+using Core.ViewModels;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -36,21 +37,33 @@ namespace Core.Services.User
             };
         }
 
-        public async Task<bool> UpdateUserProfileAsync(string userId, UserProfileModel model)
+        public async Task<bool> UpdateUserProfileAsync(string userId, UserProfileUpdateDTO model)
         {
             var user = await _userManager.FindByIdAsync(userId);
-
             if (user == null)
             {
                 return false;
             }
 
-            user.UserName = model.UserName;
-            user.Email = model.Email;
+            // Apply changes if the fields are not null
+            if (model.UserName != null)
+            {
+                user.UserName = model.UserName;
+            }
+            if (model.Email != null)
+            {
+                user.Email = model.Email;
+            }
+            if (model.PhoneNumber != null)
+            {
+                user.PhoneNumber = model.PhoneNumber;
+            }
+            // Continue for other fields...
 
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
+
 
     }
 }

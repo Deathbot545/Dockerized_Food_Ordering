@@ -1,6 +1,8 @@
 ﻿@model Core.ViewModels.OutletViewModel;
 @using Core.DTO;
 @using Infrastructure.Models;
+@using Microsoft.AspNetCore.Html;
+@using System.Text;
 @functions {
     public static DateTime ConvertToCorrectTimeZone(DateTime dateTimeWithOffset)
     {
@@ -9,70 +11,70 @@
         return dateTimeInIST;
     }
 }
-<!-- Order Panel -->
-<div class="row mt-4">
-    <div class="col-lg-9">
 
-        <!-- Filters -->
-        <div class="d-flex justify-content-between mb-3 align-items-center">
-            <div>
-                <label class="mr-2">Sort By:</label>
-                <select class="form-control d-inline-block w-auto">
-                    <option>Sort By Time</option>
-                    <!-- Other options -->
-                </select>
-            </div>
-            <!-- You can add a search bar or other filters here -->
-        </div>
-
-        @foreach (var order in Model.Orders ?? Enumerable.Empty<OrderDTO>())
+@{
+    var pendingOrders = Model.Orders?.Where(o => o.Status == OrderStatus.Pending) ?? Enumerable.Empty<OrderDTO>();
+    var preparingOrders = Model.Orders?.Where(o => o.Status == OrderStatus.Preparing) ?? Enumerable.Empty<OrderDTO>();
+    var readyOrders = Model.Orders?.Where(o => o.Status == OrderStatus.Ready) ?? Enumerable.Empty<OrderDTO>();
+    var servedOrders = Model.Orders?.Where(o => o.Status == OrderStatus.Served) ?? Enumerable.Empty<OrderDTO>();
+}
+@{
+    Func<IEnumerable<OrderDTO>, IHtmlContent> RenderOrders = (orders) =>
         {
-            string tableIdentifier = Model.Tables.FirstOrDefault(t => t.Id == order.TableId)?.TableIdentifier;
+    var html = new StringBuilder();
+    foreach (var order in orders)
+    {
+        var tableIdentifier = Model.Tables.FirstOrDefault(t => t.Id == order.TableId)?.TableIdentifier ?? "Unknown";
+        var orderTimeInIST = ConvertToCorrectTimeZone(order.OrderTime).ToString("yyyy-MM-dd HH:mm:ss");
 
-            <div class="card mb-3 order-card bg-light" data-order-id="@order.Id">
-                <div class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
-                    <span>
-                        Order #@order.Id | Table: @tableIdentifier (@order.TableId) |
-                        <span style="font-weight: lighter;">Date: @ConvertToCorrectTimeZone(order.OrderTime).ToString("yyyy-MM-dd")</span>
-                        <span style="font-weight: bold; font-size: larger;">Time: @ConvertToCorrectTimeZone(order.OrderTime).ToString("HH:mm:ss")</span>
-                    </span>
-                    <span>STATUS: @order.Status.ToString().ToUpper()</span>
-                </div>
-                <div class="card-body">
-                    <ul class="mb-3">
-                        @foreach (var detail in order.OrderDetails ?? Enumerable.Empty<OrderDetailDTO>())
-                        {
-                            <li>@detail.MenuItem?.Name <text>x</text>@detail.Quantity</li>
-                        }
+        html.Append($"<div class=\"card mb-3 order-card bg-light\" data-order-id=\"{order.Id}\">");
+        html.Append($"<div class=\"card-header d-flex justify-content-between align-items-center bg-warning text-dark\">");
+        html.Append($"<span>Order #{order.Id} | Table: {tableIdentifier} | <span style=\"font-weight: lighter;\">Date: {orderTimeInIST}</span></span>");
+        html.Append($"<span>STATUS: {order.Status.ToString().ToUpper()}</span>");
+        html.Append("</div><div class=\"card-body\"><ul class=\"mb-3\">");
 
-                    </ul>
-                    <div class="btn-group" role="group" aria-label="Order Status">
-                        <button type="button" class="btn btn-warning @(order.Status == OrderStatus.Pending ? "active" : "")" data-status="pending">Pending</button>
-                        <button type="button" class="btn btn-primary @(order.Status == OrderStatus.Preparing ? "active" : "")" data-status="in-progress">In Progress</button>
-                        <button type="button" class="btn btn-success @(order.Status == OrderStatus.Ready ? "active" : "")" data-status="completed">Completed</button>
-                    </div>
-                    <!-- Optionally, add an Alert Button and Timer here -->
-                </div>
-            </div>
+        foreach (var detail in order.OrderDetails)
+        {
+            html.Append($"<li>{detail.MenuItem?.Name} x {detail.Quantity}</li>");
         }
 
-    </div>
+        // Include the status update buttons
+        html.Append("</ul>");
+        html.Append("<div class=\"btn-group\" role=\"group\" aria-label=\"Order Status\">");
+        html.Append($"<button type=\"button\" class=\"btn btn-warning {(order.Status == OrderStatus.Pending ? "active" : "")}\" data-status=\"pending\">Pending</button>");
+        html.Append($"<button type=\"button\" class=\"btn btn-primary {(order.Status == OrderStatus.Preparing ? "active" : "")}\" data-status=\"in-progress\">In Progress</button>");
+        html.Append($"<button type=\"button\" class=\"btn btn-success {(order.Status == OrderStatus.Ready ? "active" : "")}\" data-status=\"completed\">Completed</button>");
+        html.Append($"<button type=\"button\" class=\"btn btn-danger delete-order\" data-order-id=\"{order.Id}\">Delete Order</button>");
+        html.Append("</div></div></div>");
+    }
+    return new HtmlString(html.ToString());
+        };
 
-    <!-- Notification Panel -->
-    <div class="col-lg-3">
-        <div class="sticky-top">
-            <h5 class="bg-secondary text-white p-2 rounded-top">Notifications</h5>
-            <ul class="list-group">
-                <li class="list-group-item list-group-item-danger">Table #3 requires urgent attention!</li>
-                <li class="list-group-item list-group-item-danger">Order #12347 from Table #6 has been cancelled!</li>
-                <li class="list-group-item list-group-item-success">Order #12345 from Table #5 is completed!</li>
-                <li class="list-group-item list-group-item-success">Order #12346 from Table #2 is completed!</li>
-                <!-- Other notifications -->
-            </ul>
-        </div>
-    </div>
+}
 
+<div class="container mt-5">
+    <section id="pendingOrders">
+        <h2>Pending Orders</h2>
+        @RenderOrders(Model.Orders.Where(o => o.Status == OrderStatus.Pending))
+    </section>
+
+    <section id="preparingOrders">
+        <h2>Preparing Orders</h2>
+        @RenderOrders(Model.Orders.Where(o => o.Status == OrderStatus.Preparing))
+    </section>
+
+    <section id="readyOrders">
+        <h2>Ready Orders</h2>
+        @RenderOrders(Model.Orders.Where(o => o.Status == OrderStatus.Ready))
+    </section>
+
+    <section id="servedOrders">
+        <h2>Served Orders</h2>
+        @RenderOrders(Model.Orders.Where(o => o.Status == OrderStatus.Served))
+    </section>
 </div>
+
+
 
 <!-- Footer -->
 <footer class="footer mt-auto py-3 bg-dark text-white">
@@ -82,7 +84,36 @@
     </div>
 </footer>
 <script>
+   
+
     $(document).ready(function () {
+
+        // Establish SignalR connection
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://restosolutionssaas.com:7268/orderStatusHub")
+            .configureLogging(signalR.LogLevel.Information)
+            .withAutomaticReconnect() // Enable automatic reconnect
+            .build();
+
+        // Listen for new orders
+        connection.on("NewOrderPlaced", function (order) {
+            console.log("New order received", order);
+            // Dynamically add the new order to the DOM
+            addNewOrderToDOM(order);
+        });
+
+        // Listen for order updates
+        connection.on("ReceiveOrderUpdate", function (order) {
+            console.log("Order status update received", order);
+            updateOrderStatusUI(order);
+            updateKitchenOrderStatusUI(order);
+        });
+
+        // Start the connection
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+
         // Hook up click events for the order status buttons
         $('.btn-group .btn').click(function () {
             const $btn = $(this);
@@ -110,6 +141,9 @@
         }
 
         $.ajax({
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
             url: 'https://restosolutionssaas.com:7268/api/OrderApi/UpdateOrderStatus',
             type: 'POST',
             data: JSON.stringify({
@@ -129,5 +163,37 @@
             }
 
         });
+
+        $('.delete-order').click(function () {
+            const orderId = $(this).data('order-id');
+            updateOrderStatusToRejected(orderId);
+        });
+
+        function updateOrderStatusToRejected(orderId) {
+            if (confirm('Are you sure you want to reject this order?')) {
+                const rejectedStatus = 4; // Assuming 'Rejected' corresponds to 4 in your enum
+                $.ajax({
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    url: 'https://restosolutionssaas.com:7268/api/OrderApi/UpdateOrderStatus',
+                    type: 'POST',
+                    data: JSON.stringify({
+                        OrderId: orderId,
+                        Status: rejectedStatus
+                    }),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        console.log("Order status updated to rejected successfully.");
+                        location.reload(); // Optionally, reload or update UI dynamically here
+                    },
+                    error: function (error) {
+                        console.error("Error updating order status to rejected:", error.responseText);
+                        alert('Error updating order status. Please try again.');
+                    }
+                });
+            }
+        }
+
     }
 </script>

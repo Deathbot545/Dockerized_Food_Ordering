@@ -1,4 +1,13 @@
-﻿function mapEnumToStatusText(statusValue) {
+﻿function getStatusColor(status) {
+    switch (status) {
+        case "Pending": return "orange";
+        case "Preparing": return "blue";
+        case "Ready": return "green";
+        case "Served": return "grey";
+        default: return "black"; // Unknown status or the default color
+    }
+}
+function mapEnumToStatusText(statusValue) {
     switch (statusValue) {
         case 0:
             return "Pending";
@@ -11,84 +20,102 @@
         default:
             return "Unknown";
     }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-
+}document.addEventListener("DOMContentLoaded", async function () {
     let currentOrder = JSON.parse(localStorage.getItem('currentOrder'));
-    if (currentOrder && typeof currentOrder.status === "number") {
-        currentOrder.status = mapEnumToStatusText(currentOrder.status);
-        localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
-    }
-    if (currentOrder) {
-        // If 'currentOrder' exists in local storage, establish a SignalR connection.
 
+    // Function to check and update the order status
+    async function checkAndUpdateOrderStatus() {
+        if (currentOrder) {
+            try {
+                const currentStatus = await fetchCurrentOrderStatus(currentOrder.orderId);
+                if (currentStatus !== undefined) {
+                    updateUIWithCurrentStatus(currentStatus);
+                }
+            } catch (error) {
+                console.error("Error updating order status:", error);
+            }
+        }
+    }
+
+    // Immediately check and update order status
+    await checkAndUpdateOrderStatus();
+
+    // Setup SignalR connection if there is a current order
+    if (currentOrder) {
+        console.log("Establishing SignalR connection for order status updates.");
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com:7268/orderStatusHub?orderId=" + currentOrder.orderId)
+            .withUrl(`https://restosolutionssaas.com:7268/orderStatusHub?orderId=${currentOrder.orderId}`)
             .configureLogging(signalR.LogLevel.Information)
+            .withAutomaticReconnect()
             .build();
 
-
         connection.on("NewOrderPlaced", function (order) {
-            // Notify kitchen UI about the new order
-            updateKitchenUIWithNewOrder(order);
+            console.log("SignalR: New order placed", order);
         });
 
         connection.on("ReceiveOrderUpdate", function (order) {
-            // Use camelCase for accessing properties
+            console.log("SignalR: Order status update received", order);
             updateOrderStatusUI(order);
-            updateKitchenOrderStatusUI(order);
         });
 
-        // Handle reconnection events
         connection.onreconnecting(error => {
-            console.warn(`Connection lost due to error "${error}". Reconnecting.`);
+            console.warn("SignalR connection lost, attempting to reconnect...", error);
         });
 
         connection.onreconnected(connectionId => {
-            console.log(`Connection reestablished. Connected with connectionId "${connectionId}".`);
+            console.log("SignalR connection reestablished, connectionId:", connectionId);
         });
 
-        connection.start().catch(function (err) {
-            return console.error(err.toString());
+        // Start the SignalR connection
+        await connection.start().catch(err => console.error("SignalR connection error:", err));
+
+        // Make the order status element clickable
+        document.addEventListener("click", function (event) {
+            if (event.target.closest("#orderStatus")) {
+                navigateToOrderPage(currentOrder);
+            }
         });
+    }
+});
 
-        // Since 'currentOrder' exists, show the indicator to the user.
-        let statusText = getOrderStatusText(currentOrder.status);
-
-        let orderStatusElement = document.getElementById("orderStatus");
-        if (orderStatusElement) {
-            orderStatusElement.innerText = statusText;
-        } else {
-            console.warn("Element with ID 'orderStatus' not found.");
+// Function to fetch the current order status from the API
+async function fetchCurrentOrderStatus(orderId) {
+    try {
+        const response = await fetch(`https://restosolutionssaas.com:7268/api/OrderApi/GetOrderStatus/${orderId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch current order status');
         }
+        const data = await response.json();
+        return mapEnumToStatusText(data.status);
+    } catch (error) {
+        console.error('Error fetching order status:', error);
     }
+}
 
-    function updateOrderStatusUI(order) {
-        let currentOrder = JSON.parse(localStorage.getItem('currentOrder')) || {};
-        currentOrder.status = order.status;  // Store the numeric value
-        localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+// Function to update the UI with the current status
+function updateUIWithCurrentStatus(status) {
+    let statusText = getOrderStatusText(status);
+    let color = getStatusColor(status);
 
-        let statusText = getOrderStatusText(mapEnumToStatusText(order.status));  // Map the status to its string representation here
-        let orderStatusElement = document.getElementById("orderStatus");
-        if (orderStatusElement) {
-            orderStatusElement.innerText = statusText;
-        }
+    let orderStatusElement = document.getElementById("orderStatus");
+    if (orderStatusElement) {
+        orderStatusElement.innerHTML = `<i class="fas fa-truck mr-2"></i><span class="badge" style="background-color: ${color}; font-size: 1.25em;">${statusText}</span>`;
     }
+}
 
-    function updateKitchenOrderStatusUI(order) {
-        let orderStatusText = mapEnumToStatusText(order.Status);
+// Function to handle updates received via SignalR
+function updateOrderStatusUI(order) {
+    let status = mapEnumToStatusText(order.status);
+    updateUIWithCurrentStatus(status);
+}
 
-        // Find the order card that corresponds to the updated order.
-        let $orderCard = $(`.order-card[data-order-id="${order.OrderId}"]`);
-
-        if (!$orderCard.length) return;
-
-        $orderCard.find('.btn').removeClass('active');
-        $orderCard.find(`.btn[data-status="${orderStatusText.toLowerCase()}"]`).addClass('active');
-
-        $orderCard.find('.card-header span:last-child').text(`STATUS: ${orderStatusText.toUpperCase()}`);
+function navigateToOrderPage(currentOrder) {
+    if (currentOrder && currentOrder.orderId) {
+        window.location.href = "/Order/Orderpaige";
+    } else {
+        console.error("Order ID not found in local storage.");
     }
+}
 
     function getOrderStatusText(status) {
         switch (status) {
@@ -100,5 +127,3 @@ document.addEventListener("DOMContentLoaded", function () {
             default: return "Order status: " + status;
         }
     }
-
-});

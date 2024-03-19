@@ -61,6 +61,20 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMyOrigins", builder =>
+    {
+        builder.WithOrigins(
+                 "https://restosolutionssaas.com:8443", // The first web application origin
+                 "https://restosolutionssaas.com" // The second web application origin
+               )
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
+    });
+});
+
 var app = builder.Build();
 
 builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);
@@ -77,6 +91,8 @@ app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseCors("AllowMyOrigins");
 
 app.UseAuthentication(); // Important: place after UseRouting and before UseAuthorization
 app.UseAuthorization();

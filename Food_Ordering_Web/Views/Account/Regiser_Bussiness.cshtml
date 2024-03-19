@@ -1,0 +1,50 @@
+﻿<div id="ownerForm" class="hidden">
+    <div class="text-center mb-4">
+        <h2>Join Our Platform as a Restaurant Owner</h2>
+        <p>Sign up now and start showcasing your outlets to a wider audience. Manage your outlets easily and effectively.</p>
+    </div>
+    <!-- Display Model Errors -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+    <form id="signupFormRestaurant" method="post" action="/Account/AddUser" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Enter Your Business Email" required>
+            <div class="form-text">Your business email will be used for all communications.</div>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Create a Password" required>
+        </div>
+        <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Your Password" required>
+        </div>
+        <input type="hidden" name="roleName" value="Restaurant" />
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+        </div>
+    </form>
+    <div class="text-center mt-4">
+        <p>Or join using:</p>
+        <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
+            <input type="hidden" name="provider" value="Google" />
+            <input type="hidden" name="role" value="Restaurant" />
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="fab fa-google"></i> Google
+            </button>
+        </form>
+    </div>
+    <div class="text-center mt-4">
+        <p>After signing up, don't forget to register your outlets and start reaching more customers today!</p>
+    </div>
+</div>

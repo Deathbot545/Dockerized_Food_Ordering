@@ -1,4 +1,5 @@
-﻿using Core.ViewModels;
+﻿using Core.DTO;
+using Core.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,6 @@ namespace Core.Services.User
     public interface IUserService
     {
         Task<UserProfileModel> GetUserProfileAsync(string userId);
-        Task<bool> UpdateUserProfileAsync(string userId, UserProfileModel model);
+        Task<bool> UpdateUserProfileAsync(string userId, UserProfileUpdateDTO model);
     }
 }

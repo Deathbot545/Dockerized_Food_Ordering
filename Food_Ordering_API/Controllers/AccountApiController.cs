@@ -36,12 +36,41 @@ namespace Food_Ordering_API.Controllers
             _logger = logger;
         }
 
+        [HttpPost("UpdateSubscriptionStatus")]
+        public async Task<IActionResult> UpdateSubscriptionStatus([FromBody] UpdateSubscriptionStatusDto model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            user.IsSubscribed = model.IsSubscribed;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return Ok(new { message = "Subscription status updated successfully." });
+            }
+            else
+            {
+                return BadRequest(new { message = "Failed to update subscription status." });
+            }
+        }
+
+        public class UpdateSubscriptionStatusDto
+        {
+            public string UserId { get; set; }
+            public bool IsSubscribed { get; set; }
+        }
+
         [HttpPost("Register/{roleName}")]
         public async Task<IActionResult> AddUser(string roleName, [FromBody] UserDto model)
         {
             var existingUser = await _accountService.FindUserAsync(model.Username);
             if (existingUser != null)
             {
+                // User already exists
                 return BadRequest(new { Message = "User already exists" });
             }
 
@@ -61,15 +90,16 @@ namespace Food_Ordering_API.Controllers
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to generate JWT token for user {UserId}", user.Id);
-                    // Return a generic error message to avoid exposing sensitive details
                     return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An error occurred while processing your request." });
                 }
             }
             else
             {
-                return BadRequest(new { Message = "Failed to create user", Errors = errors });
+                // Registration failed due to validation errors
+                return BadRequest(new { Errors = errors });
             }
         }
+
 
 
         // Your API
@@ -135,10 +165,11 @@ namespace Food_Ordering_API.Controllers
             var roles = await _userManager.GetRolesAsync(user);
 
             var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email)
-        };
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim("IsSubscribed", user.IsSubscribed.ToString()) // Add subscription status as a claim
+    };
 
             foreach (var role in roles)
             {
@@ -152,12 +183,13 @@ namespace Food_Ordering_API.Controllers
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(30), // Customize the expiry as needed
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
         // API controller
         [HttpPost("Logout")]

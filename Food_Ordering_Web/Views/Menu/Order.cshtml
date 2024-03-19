@@ -1,0 +1,77 @@
+﻿<div class="container my-5">
+    <h2 class="mb-4">Your Order Details</h2>
+    <div id="orderDetails" class="mb-3">
+        <!-- Order details will be loaded here -->
+    </div>
+    <button id="cancelOrderButton" class="btn btn-danger">Cancel Order</button>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const orderId = JSON.parse(localStorage.getItem('currentOrder')).orderId;
+        if (!orderId) {
+            console.error("No current order found in localStorage.");
+            return; // Handle case where no order is present
+        }
+        loadOrderDetails(orderId);
+
+        document.getElementById("cancelOrderButton").addEventListener("click", function () {
+            cancelOrder(orderId);
+        });
+    });
+
+    async function loadOrderDetails(orderId) {
+        try {
+            const response = await fetch(`https://restosolutionssaas.com:7268/api/OrderApi/GetOrderDetails/${orderId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch order details');
+            }
+            const orderDetails = await response.json();
+            displayOrderDetails(orderDetails);
+        } catch (error) {
+            console.error('Error fetching order details:', error);
+        }
+    }
+
+    function displayOrderDetails(orderDetails) {
+        const orderDetailsElement = document.getElementById("orderDetails");
+        let htmlContent = `
+            <div class="card">
+                <div class="card-header">
+                    Order ID: ${orderDetails.id} - Status: ${mapEnumToStatusText(orderDetails.status)}
+                </div>
+                <ul class="list-group list-group-flush">`;
+
+        orderDetails.orderDetails.forEach(item => {
+            htmlContent += `
+                <li class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <img src="data:image/png;base64,${item.menuItem.image}" class="img-fluid rounded" alt="${item.menuItem.name}" style="max-width: 100px;"> <!-- Adjust image size as needed -->
+                        </div>
+                        <div class="col-md-8">
+                            <h5 class="mb-1">${item.menuItem.name}</h5>
+                            <p class="mb-1">${item.menuItem.description}</p>
+                            <p class="mb-1">Quantity: ${item.quantity}</p>
+                            <p class="mb-0">Price: LKR ${item.menuItem.price}</p>
+                        </div>
+                    </div>
+                </li>`;
+        });
+        htmlContent += `</ul></div>`;
+        orderDetailsElement.innerHTML = htmlContent;
+    }
+
+    async function cancelOrder(orderId) {
+        try {
+            const response = await fetch(`https://restosolutionssaas.com:7268/api/OrderApi/CancelOrder/${orderId}`, { method: 'POST' });
+            if (!response.ok) {
+                throw new Error('Failed to cancel the order');
+            }
+            alert('Order cancelled successfully.');
+            // Redirect or update UI as needed
+        } catch (error) {
+            console.error('Error cancelling order:', error);
+        }
+    }
+</script>

@@ -1,0 +1,257 @@
+﻿<style>
+    .compact-card .card-body {
+        padding: 0.5rem; /* Reduces padding inside the card */
+    }
+
+    .compact-card h5 {
+        font-size: 1rem; /* Smaller title font size */
+    }
+
+    .compact-card p {
+        margin-bottom: 0.25rem; /* Reduces space below paragraphs */
+        font-size: 0.875rem; /* Smaller text */
+    }
+
+    .compact-card .btn {
+        padding: 0.25rem 0.5rem; /* Smaller button padding */
+        font-size: 0.875rem; /* Smaller button text */
+    }
+</style>
+<div class="container mt-5">
+    <div class="mb-3">
+        <select class="form-select" name="outletId">
+            @foreach (var outlet in Model)
+            {
+                <option value="@outlet.Id">@outlet.InternalOutletName</option>
+            }
+        </select>
+    </div>
+    <h2 class="mb-4">Kitchen Staff Management</h2>
+
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addEditMemberModal">
+        Add Member
+    </button>
+
+    <div class="container mt-5">
+       
+        <div id="staffMembersList" class="row">
+            <!-- Bootstrap Cards for Staff Members will be loaded here via AJAX -->
+        </div>
+       
+    </div>
+
+
+    <div class="modal fade" id="addEditMemberModal" tabindex="-1" aria-labelledby="addEditMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEditMemberModalLabel">Add/Edit Member</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEditMemberForm">
+                        <input type="hidden" id="memberId" value="0">
+                        <div class="mb-3">
+                            <label for="memberName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="memberName" name="name" placeholder="Enter member's name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberEmail" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="memberEmail" name="email" placeholder="Enter member's email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="memberRole" class="form-label">Role</label>
+                            <select class="form-select" id="memberRole" name="role" required>
+                                <option value="">Select a role</option>
+                                <option value="Chef">Chef</option>
+                                <option value="Assistant Chef">Assistant Chef</option>
+                                <option value="Kitchen Porter">Kitchen Porter</option>
+                                <option value="Waiter">Waiter</option>
+                                <option value="Manager">Manager</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" form="addEditMemberForm">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            // Load staff members when a new outlet is selected
+            $('select[name="outletId"]').change(function () {
+                var outletId = $(this).val();
+                loadStaffMembers(outletId);
+            });
+            // Function to load staff members for a specific outlet
+            function loadStaffMembers(outletId) {
+                console.log("Attempting to load staff for Outlet ID:", outletId);
+                $.ajax({
+                    url: `https://restosolutionssaas.com:7115/api/KitchenApi/GetStaffByOutlet/${outletId}`,
+                    type: 'GET',
+                    success: function (response) {
+                        $('#staffMembersList').empty(); // Clear existing staff members
+                        if (response && response.length > 0) {
+                            response.forEach(function (staffMember) {
+                                var staffMemberHtml = `
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm" data-id="${staffMember.id}"> <!-- Add data-id attribute here -->
+
+                <div class="card-body">
+                    <div class="card-text" data-role="name-display">${staffMember.name}</div>
+                    <input type="text" class="form-control d-none" data-role="name-edit" value="${staffMember.name}">
+
+                    <div class="card-text" data-role="email-display">${staffMember.email}</div>
+                    <input type="email" class="form-control d-none" data-role="email-edit" value="${staffMember.email}">
+
+                    <div class="card-text" data-role="role-display">${staffMember.role}</div>
+                    <select class="form-select d-none" data-role="role-edit">
+                        <option value="Chef" ${staffMember.role === 'Chef' ? 'selected' : ''}>Chef</option>
+                        <option value="Assistant Chef" ${staffMember.role === 'Assistant Chef' ? 'selected' : ''}>Assistant Chef</option>
+                        <option value="Kitchen Porter" ${staffMember.role === 'Kitchen Porter' ? 'selected' : ''}>Kitchen Porter</option>
+                        <option value="Waiter" ${staffMember.role === 'Waiter' ? 'selected' : ''}>Waiter</option>
+                        <option value="Manager" ${staffMember.role === 'Manager' ? 'selected' : ''}>Manager</option>
+                        <!-- Ensure you add all roles here -->
+                    </select>
+                </div>
+
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                    <button class="btn btn-outline-primary btn-sm" data-action="edit">Edit</button>
+                    <button class="btn btn-outline-success btn-sm d-none" data-action="save">Save</button>
+                    <button class="btn btn-outline-danger btn-sm" data-action="delete">Delete</button>
+                </div>
+
+            </div>
+        </div>`;
+
+                                $('#staffMembersList').append(staffMemberHtml);
+                            });
+                        } else {
+                            // Show a message in #staffMembersList when no staff members are found
+                            $('#staffMembersList').html('<p class="text-center w-100">No staff members found for this outlet. Please add staff members.</p>');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Error loading staff members:", xhr.statusText);
+                        // Show error message in #staffMembersList
+                        $('#staffMembersList').html('<p class="text-center w-100">Error loading staff members. Please try again later.</p>');
+                    }
+                });
+            }
+
+            // Initial load for default selected outlet
+            var initialOutletId = $('select[name="outletId"]').val();
+            if (initialOutletId) {
+                loadStaffMembers(initialOutletId);
+            }
+
+            // Handle the form submission
+            $('#addEditMemberForm').submit(function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                formData.append('outletId', $('select[name="outletId"]').val()); // Ensure outletId is included
+
+                $.ajax({
+                    type: "POST",
+                    url: "https://restosolutionssaas.com:7115/api/KitchenApi/AddKitchenStaff",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log("Staff member added successfully:", response);
+                        $('#addEditMemberModal').modal('hide');
+                        alert(response.message);
+                        loadStaffMembers($('select[name="outletId"]').val()); // Reload staff members list
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.error("Error:", textStatus + ": " + errorThrown);
+                        alert("An error occurred: " + xhr.responseText);
+                    }
+                });
+            });
+
+            $('#staffMembersList').on('click', 'button[data-action="delete"]', function () {
+                // Use .closest() to find the nearest parent with the class .card
+                var card = $(this).closest('.card');
+                // Retrieve the data-id attribute from the card
+                var id = card.data('id');
+
+                if (typeof id !== 'undefined' && id !== null) {
+                    deleteStaffMember(id);
+                } else {
+                    console.error("Staff member ID is undefined or null.");
+                }
+            });
+
+
+            $('#staffMembersList').on('click', 'button[data-action="edit"]', function () {
+                var $card = $(this).closest('.card');
+                $card.find('[data-role$="-display"]').addClass('d-none'); // Hide display elements
+                $card.find('[data-role$="-edit"]').removeClass('d-none'); // Show edit inputs
+
+                $(this).addClass('d-none'); // Hide edit button
+                $card.find('button[data-action="save"]').removeClass('d-none'); // Show save button
+            });
+
+            $('#staffMembersList').on('click', 'button[data-action="save"]', function () {
+                var $card = $(this).closest('.card');
+                var id = $card.data('id'); // Ensure this data attribute is correctly set on the card
+                console.log("Saving staff member with ID: ", id); // Debugging log
+
+                // Ensure the rest of the data is correctly captured
+                var name = $card.find('[data-role="name-edit"]').val();
+                var email = $card.find('[data-role="email-edit"]').val();
+                var role = $card.find('[data-role="role-edit"]').val();
+                console.log("Data to update: ", { id, name, email, role }); // Debugging log
+
+                // AJAX call to update the staff member
+                $.ajax({
+                    url: `https://restosolutionssaas.com:7115/api/KitchenApi/UpdateStaffMember`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id, name, email, role }),
+                    success: function (response) {
+                        console.log("Update success response: ", response);
+                        alert('Staff member updated successfully.');
+                        // Further actions
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Update failed: ", xhr.responseText);
+                        alert('An error occurred while updating the staff member.');
+                    }
+                });
+            });
+
+            function deleteStaffMember(id) {
+                if (confirm('Are you sure you want to delete this staff member?')) {
+                    $.ajax({
+                        url: `https://restosolutionssaas.com:7115/api/KitchenApi/DeleteStaffMember/${id}`,
+                        type: 'DELETE',
+                        success: function (response) {
+                            alert(response.message);
+                            // Reload staff members to reflect the deletion
+                            var selectedOutletId = $('select[name="outletId"]').val();
+                            loadStaffMembers(selectedOutletId);
+                        },
+                        error: function (xhr) {
+                            console.error("Error deleting staff member:", xhr.statusText);
+                            alert("An error occurred: " + xhr.responseText);
+                        }
+                    });
+                }
+            }
+
+
+        });
+    </script>
+}

@@ -43,7 +43,7 @@ namespace Infrastructure.Models
         public byte[] Logo { get; set; }
         public byte[] RestaurantImage { get; set; }
         public ICollection<Table> Tables { get; set; } // one-to-many with Table
-            public int MenuId { get; set; }  // Foreign key for Menu
+        public int MenuId { get; set; }  // Foreign key for Menu
 
         public string Subdomain { get; set; }
     }

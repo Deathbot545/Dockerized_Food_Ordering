@@ -138,6 +138,10 @@
               "target": "Package",
               "version": "[7.0.5, )"
             },
+            "Microsoft.AspNetCore.JsonPatch": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.5, )"
@@ -278,6 +282,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
+            },
+            "Stripe.net": {
+              "target": "Package",
+              "version": "[43.17.0, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",

@@ -152,3 +152,5 @@ D:\Dockerize\dockerize\Food_Ordering_API\obj\Debug\net7.0\refint\Food_Ordering_A
 D:\Dockerize\dockerize\Food_Ordering_API\obj\Debug\net7.0\Food_Ordering_API.pdb
 D:\Dockerize\dockerize\Food_Ordering_API\obj\Debug\net7.0\Food_Ordering_API.genruntimeconfig.cache
 D:\Dockerize\dockerize\Food_Ordering_API\obj\Debug\net7.0\ref\Food_Ordering_API.dll
+D:\Dockerize\dockerize\Food_Ordering_API\bin\Debug\net7.0\Microsoft.AspNetCore.JsonPatch.dll
+D:\Dockerize\dockerize\Food_Ordering_API\bin\Debug\net7.0\Newtonsoft.Json.dll

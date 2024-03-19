@@ -8,10 +8,11 @@ namespace Infrastructure.Models
 {
     public enum OrderStatus
     {
-        Pending, // Just placed the order
-        Preparing, // Kitchen is working on it
-        Ready, // Ready to be served
-        Served // Delivered to the table
+        Pending,    // Just placed the order
+        Preparing,  // Kitchen is working on it
+        Ready,      // Ready to be served
+        Served,     // Delivered to the table
+        Cancelled,  // Order cancelled by the customer or the staff
+        Rejected    // Order rejected by the kitchen for some reason
     }
-
 }

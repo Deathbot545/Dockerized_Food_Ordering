@@ -1,11 +1,23 @@
 {
   "Version": 1,
-  "Hash": "Agx8lU1lcHYDQKf1HdVCP8fGHf1i2AeU4vIX5+XLUS4=",
+  "Hash": "bkNkBir9Z6wvSf6LXBZUlQWP7GG9ndlmcCBhXJ5AeUg=",
   "Source": "Order_API",
   "BasePath": "_content/Order_API",
   "Mode": "Default",
   "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj",
+      "Version": 2,
+      "Source": "Restaurant_API",
+      "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
+    }
+  ],
   "DiscoveryPatterns": [],
   "Assets": []
 }

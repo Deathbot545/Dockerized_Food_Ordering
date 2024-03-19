@@ -12,6 +12,8 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication.Google;
 using Newtonsoft.Json;
 using System.Net;
+using Core.ViewModels;
+using System.Net.Http.Headers;
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -21,14 +23,16 @@ namespace Food_Ordering_Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _apiBaseUrl;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, ILogger<AccountController> logger)
+        public AccountController(UserManager<ApplicationUser> userManager, IHttpClientFactory httpClientFactory, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _httpClient = new HttpClient(); // Or however you get your HttpClient
+            _httpClientFactory = httpClientFactory;
             _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api/AccountApi";  // Modify it here
             _logger = logger;
         }
@@ -71,54 +75,75 @@ namespace Food_Ordering_Web.Controllers
             try
             {
                 var userDto = new { Username = username, Password = password };
-            var response = await _httpClient.PostAsync($"{_apiBaseUrl}/{apiEndpoint}",
-                new StringContent(System.Text.Json.JsonSerializer.Serialize(userDto), Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/{apiEndpoint}",
+                    new StringContent(System.Text.Json.JsonSerializer.Serialize(userDto), Encoding.UTF8, "application/json"));
 
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
-                if (responseObject != null)
+                if (response.IsSuccessStatusCode)
                 {
-                    // Create a new ApplicationUser object
-                    ApplicationUser user = new ApplicationUser
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
+                    if (responseObject != null)
                     {
-                        Id = responseObject.User.Id,
-                        UserName = responseObject.User.UserName,
-                        Email = responseObject.User.Email
-                        // Populate other necessary fields
-                    };
+                        ApplicationUser user = new ApplicationUser
+                        {
+                            Id = responseObject.User.Id,
+                            UserName = responseObject.User.UserName,
+                            Email = responseObject.User.Email
+                            // Populate other necessary fields
+                        };
 
-                    return await HandleLogin(user, responseObject.Token);
+                        return await HandleLogin(user, responseObject.Token);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Token was not provided.");
+                        return RedirectToCurrentView(actionName, controllerName, roleName);
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Token was not provided.");
-                    return Content("An error occurred.");
-                }
-            }
-            else
-            {
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                var errorResult = System.Text.Json.JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
-                if (errorResult != null && errorResult.Errors != null)
-                {
-                    foreach (var error in errorResult.Errors)
+                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    var errorResult = System.Text.Json.JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
+                    if (errorResult != null && errorResult.Errors != null)
                     {
-                        ModelState.AddModelError(string.Empty, error);
+                        foreach (var error in errorResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error);
+                        }
                     }
+                    else if (!string.IsNullOrEmpty(errorResponse))
+                    {
+                        // If the error is not in the expected format, still show a generic message
+                        ModelState.AddModelError(string.Empty, "User already exists or other registration error.");
+                    }
+                    return RedirectToCurrentView(actionName, controllerName, roleName);
                 }
-                // Return the view directly with the model errors
-                return View("Signup"); // Assuming "Register" is the name of your view
-            }
+
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred in MyAction");
-                throw; // Rethrow the exception or handle it as needed
+                _logger.LogError(ex, "An error occurred");
+                throw;
             }
-
         }
+
+        private IActionResult RedirectToCurrentView(string actionName, string controllerName, string roleName)
+        {
+            // Adjust the logic based on roleName and how you've set up your view paths
+            if (roleName == "Restaurant")
+            {
+                // Directly returning the view as per the action method that loads the restaurant owner page
+                return View("Regiser_Bussiness"); // Assuming the view file is in /Views/Home/Regiser_Bussiness.cshtml
+            }
+            else
+            {
+                // Directly returning the view as per the action method that loads the customer signup page
+                return View("Signup"); // Assuming the view file is in /Views/Account/Register.cshtml or /Views/Account/Signup.cshtml based on your setup
+            }
+        }
+
+
+
 
         public IActionResult Login()
         {
@@ -288,8 +313,26 @@ namespace Food_Ordering_Web.Controllers
                 {
                     var errorContent = await apiResponse.Content.ReadAsStringAsync();
                     _logger.LogError($"API Response is unsuccessful. StatusCode: {apiResponse.StatusCode}, Content: {errorContent}");
-                    return StatusCode((int)apiResponse.StatusCode, errorContent);
+
+                    // Deserialize the error response to get error messages
+                    var errorResult = System.Text.Json.JsonSerializer.Deserialize<ErrorResponse>(errorContent);
+                    if (errorResult != null && errorResult.Errors != null)
+                    {
+                        foreach (var error in errorResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error);
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "User already exists or other registration error.");
+                    }
+
+           
+                    string viewName = role == "Restaurant" ? "Regiser_Bussiness" : "Signup"; // Adjust based on your setup
+                    return View(viewName); // Directly return to the view, keeping the error messages in ModelState
                 }
+
 
                 var apiResponseContent = await apiResponse.Content.ReadAsStringAsync();
                 var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(apiResponseContent);
@@ -369,29 +412,34 @@ namespace Food_Ordering_Web.Controllers
         {
             try
             {
-                _logger.LogInformation("Starting login process for user {UserName}", user.UserName);
+                _logger.LogInformation($"Starting login process for user {user.UserName}");
 
-                // Decode JWT to get role
+                // Decode JWT to get role and subscription status
                 var handler = new JwtSecurityTokenHandler();
-                var tokenS = handler.ReadToken(token) as JwtSecurityToken;
+                var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
 
-                // Check for role claim safely
-                var roleClaim = tokenS.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
+                var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
+                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed"); // Get the IsSubscribed claim from the JWT
+
                 if (roleClaim == null)
                 {
-                    _logger.LogError("Role claim not found in JWT for user {UserName}.", user.UserName);
+                    _logger.LogError($"Role claim not found in JWT for user {user.UserName}");
                     return BadRequest("Role claim not found in JWT.");
                 }
 
-                var role = roleClaim.Value;
-                _logger.LogInformation("Role {Role} found in JWT for user {UserName}.", role, user.UserName);
+                // Ensure you convert the IsSubscribed string to a boolean, and handle null cases
+                bool isSubscribed = isSubscribedClaim != null && bool.Parse(isSubscribedClaim.Value);
 
-                // Create claims
+                var role = roleClaim.Value;
+                _logger.LogInformation($"Role {role} found in JWT for user {user.UserName}");
+
+                // Create claims, including the IsSubscribed claim
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Role, role),
-            new Claim("UserId", user.Id)
+            new Claim("UserId", user.Id),
+            new Claim("IsSubscribed", isSubscribed.ToString()) // Add IsSubscribed claim
         };
 
                 // Create ClaimsIdentity
@@ -481,6 +529,56 @@ namespace Food_Ordering_Web.Controllers
             public string Message { get; set; }
             public IEnumerable<string> Errors { get; set; }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateUserProfile(UserProfileModel model)
+        {
+            // Extract user ID from the claims
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+            var userId = userIdClaim.Value;
+
+            // Construct the request to the API
+            var requestUrl = "https://restosolutionssaas.com:7248/api/UserProfileApi/UpdateUserProfile";
+            var httpClient = _httpClientFactory.CreateClient(); // Assuming you have HttpClientFactory injected
+
+            // Retrieve the JWT token from the cookie named "jwtCookie"
+            var token = HttpContext.Request.Cookies["jwtCookie"];
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized("JWT token is missing.");
+            }
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
+            var updateModel = new
+            {
+                UserId = userId, // Make sure your API expects a UserId in the body
+                Email = model.Email,
+                UserName = model.UserName,
+                PhoneNumber = model.PhoneNumber
+            };
+
+            var response = await httpClient.PatchAsync(requestUrl, new StringContent(JsonConvert.SerializeObject(updateModel), Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Handle success
+                // Handle success
+                return RedirectToAction("Index", "UserProfile"); // Adjust "Index" and "UserProfile" as necessary
+            }
+            else
+            {
+                // Handle failure
+                var errorContent = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError(string.Empty, $"Failed to update profile: {errorContent}");
+                return View(model); // Return back to the edit profile view with error message
+            }
+        }
+
 
 
     }

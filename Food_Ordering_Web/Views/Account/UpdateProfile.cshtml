@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <h1 class="text-center mb-4">Update Profile</h1>
-            <form method="post" action="/path-to-your-update-method">
+            <form id="profileForm" method="post" >
                 <div class="mb-3">
                     <label for="email" class="form-label">Email:</label>
                     <input type="email" class="form-control" id="email" name="email" required>
@@ -26,3 +26,37 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('profileForm').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Construct the PATCH document
+        var patchDocument = [
+            { "op": "replace", "path": "/Email", "value": document.getElementById('email').value },
+            { "op": "replace", "path": "/Username", "value": document.getElementById('username').value },
+            { "op": "replace", "path": "/PhoneNumber", "value": document.getElementById('phoneNumber').value },
+            // Add other fields as necessary
+        ];
+
+        // Send the PATCH request
+        fetch('https://restosolutionssaas.com:7248/api/UserProfile', { // Update this URL to your actual API endpoint
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                // Include other headers as required, like authorization tokens
+            },
+            body: JSON.stringify(patchDocument),
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Profile updated successfully.");
+                    // Optionally, redirect or update the UI upon successful update
+                } else {
+                    console.error("Failed to update profile.");
+                    // Handle errors, such as by displaying a message to the user
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+</script>

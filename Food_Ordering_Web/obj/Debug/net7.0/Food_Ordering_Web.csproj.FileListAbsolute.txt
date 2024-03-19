@@ -233,8 +233,6 @@ D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\unix\lib\nets
 D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Data.SqlClient.dll
 D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
 D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
-D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\Core.dll
 D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\Food_Ordering_API.dll
 D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\Infrastructure.dll
@@ -270,3 +268,7 @@ D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\refint\Food_Ordering_W
 D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\Food_Ordering_Web.pdb
 D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\Food_Ordering_Web.genruntimeconfig.cache
 D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\ref\Food_Ordering_Web.dll
+D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\Stripe.net.dll
+D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
+D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\Microsoft.AspNetCore.JsonPatch.dll

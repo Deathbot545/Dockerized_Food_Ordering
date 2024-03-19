@@ -1,26 +1,24 @@
 ﻿@model Core.ViewModels.UserProfileModel
 
-<!-- Your HTML layout -->
-<div class="container mt-4">
-    <h4 class="mb-3">Personal Details</h4>
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <strong>Username:</strong> @Model.UserName
-                </div>
-                <div class="col-md-6">
-                    <strong>Email:</strong> @Model.Email
-                </div>
-                <div class="col-md-6">
-                    <strong>PhoneNumber:</strong> @Model.PhoneNumber
-                </div>
-            </div>
-        </div>
-    </div>
+@{
+    ViewData["Title"] = "Edit Profile";
+}
 
-    <div class="text-right mt-3">
-        <a href="@Url.Action("EditProfile", "UserProfile")" class="btn btn-primary">Edit Profile</a>
-        <a href="@Url.Action("ChangePassword", "UserProfile")" class="btn btn-secondary">Change Password</a>
-    </div>
+<div class="container mt-4">
+    <h4 class="mb-3">Edit Personal Details</h4>
+    <form id="editProfileForm" method="post" action="@Url.Action("UpdateUserProfile", "Account")">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="@Model.Email" required>
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" value="@Model.UserName" required>
+        </div>
+        <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="@Model.PhoneNumber">
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
 </div>

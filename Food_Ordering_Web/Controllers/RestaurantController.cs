@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Food_Ordering_Web.Controllers
 {
- 
+
     public class RestaurantController : Controller
     {
         private readonly HttpClient _httpClient;
@@ -29,8 +29,7 @@ namespace Food_Ordering_Web.Controllers
             _logger.LogInformation($"_apiBaseUrl: {_apiBaseUrl}");
             _logger.LogInformation($"HttpClient Base Address: {_httpClient.BaseAddress}");
         }
-
-
+      
         public async Task<IActionResult> Index()
         {
             string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -55,25 +54,66 @@ namespace Food_Ordering_Web.Controllers
         }
         public IActionResult Add()
         {
-            return View("~/Views/Owner/AddOutlet.cshtml");
+            var isSubscribed = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;
+
+            if (isSubscribed != null && bool.Parse(isSubscribed))
+            {
+                return View("~/Views/Owner/AddOutlet.cshtml");
+            }
+            else
+            {
+                TempData["SubscriptionMessage"] = "You need to be subscribed to access this feature.";
+                return RedirectToAction("Index", "Restaurant"); // Redirect to the action that shows the main page.
+            }
         }
+
 
         public IActionResult Edit()
         {
-            return View("~/Views/Owner/EditOutlet.cshtml");
+            var isSubscribed = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;
+
+            if (isSubscribed != null && bool.Parse(isSubscribed))
+            {
+                return View("~/Views/Owner/EditOutlet.cshtml");
+            }
+            else
+            {
+                TempData["SubscriptionMessage"] = "You need to be subscribed to access this feature.";
+                return RedirectToAction("Index", "Restaurant"); // Redirect to the action that shows the main page.
+            }
         }
         public IActionResult Manage(int id, string internalOutletName)
         {
-            ViewBag.OutletId = id;
-            ViewBag.InternalOutletName = internalOutletName;
-            return View("~/Views/Owner/Manage.cshtml");
+            var isSubscribed = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;
+
+            if (isSubscribed != null && bool.Parse(isSubscribed))
+            {
+                ViewBag.OutletId = id;
+                ViewBag.InternalOutletName = internalOutletName;
+                return View("~/Views/Owner/Manage.cshtml");
+            }
+            else
+            {
+                TempData["SubscriptionMessage"] = "You need to be subscribed to access this feature.";
+                return RedirectToAction("Index", "Restaurant"); // Redirect to the action that shows the main page.
+            }
         }
         public IActionResult Tables(int id, string customerFacingName, string internalOutletName)
         {
-            ViewBag.OutletId = id;
+            var isSubscribed = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;
+
+            if (isSubscribed != null && bool.Parse(isSubscribed))
+            {
+                ViewBag.OutletId = id;
             ViewBag.CustomerFacingName = customerFacingName;
             ViewBag.InternalOutletName = internalOutletName;
             return View("~/Views/Owner/Tables.cshtml");
+            }
+            else
+            {
+                TempData["SubscriptionMessage"] = "You need to be subscribed to access this feature.";
+                return RedirectToAction("Index", "Restaurant"); // Redirect to the action that shows the main page.
+            }
         }
 
         private List<Table> FetchTablesByOutletId(int id)
@@ -89,7 +129,7 @@ namespace Food_Ordering_Web.Controllers
             {
                 return Json(new { success = false, message = "User is not authenticated" });
             }
-
+           
             outlet.OwnerId = Guid.Parse(currentUserId);
 
             if (Logo != null && Logo.Length > 0)
@@ -158,6 +198,27 @@ namespace Food_Ordering_Web.Controllers
             // For now, this just converts the name to lowercase and removes spaces. 
             // Depending on your needs, you might add more complex sanitizing here.
             return internalOutletName.ToLower().Replace(" ", "");
+        }
+        public async Task<IActionResult> AddStaff()
+        {
+            string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            
+            Guid ownerId = new Guid(currentUserId);
+            // You might want to fetch the outlets here to let the user select one if needed
+            var response = await _httpClient.GetAsync($"api/OutletApi/GetOutletsByOwner/{ownerId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var outlets = JsonConvert.DeserializeObject<List<Outlet>>(await response.Content.ReadAsStringAsync());
+                // You can pass these outlets to the view to let the user select an outlet for the kitchen staff
+                return View("Views/Kitchen/AddStaff.cshtml",outlets);
+            }
+
+            return View("Error"); // Or handle errors differently
         }
 
     }

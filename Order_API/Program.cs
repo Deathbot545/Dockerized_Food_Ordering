@@ -3,10 +3,7 @@ using Core.Services.MenuS;
 using Core.Services.Orderser;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Order_API.Hubs;
-using System;
-using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,59 +16,77 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
     });
 });
-// Add DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+// Add DbContext using the existing configuration
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Dependency Injection for services
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+// SignalR for real-time web functionality
 builder.Services.AddSignalR();
+
+// Controllers
+builder.Services.AddControllers();
+
+ConfigureSwagger(builder);
+ConfigureControllers(builder);
+
+// CORS policy setup
+// Modify your existing CORS policy setup in the Program.cs file
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowMyOrigins",
-    builder =>
+    options.AddPolicy("AllowMyOrigins", builder =>
     {
-        builder
-               .SetIsOriginAllowed(origin => IsOriginAllowed(origin))
+        builder.WithOrigins(
+                 "https://restosolutionssaas.com:8443", // The first web application origin
+                 "https://restosolutionssaas.com" // The second web application origin
+               )
                .AllowAnyMethod()
                .AllowAnyHeader()
-               .AllowCredentials();
+               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
     });
 });
 
-bool IsOriginAllowed(string origin)
-{
-    var allowedRegex = new Regex(@"^(https:\/\/)([\w-]+\.)*restosolutionssaas.com:7257$");
-    return allowedRegex.IsMatch(origin);
-}
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
 builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-  
+    app.UseSwagger();
+    app.UseSwaggerUI(); // By default, this will serve the Swagger UI at /swagger
 }
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowMyOrigins");
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("AllowMyOrigins");
+
 
 app.UseAuthorization();
 
+app.MapControllers();
 app.MapHub<OrderStatusHub>("/orderStatusHub");
 
-app.MapControllers();
-
 app.Run();
+
+void ConfigureSwagger(WebApplicationBuilder builder)
+{
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+}
+
+void ConfigureControllers(WebApplicationBuilder builder)
+{
+    builder.Services.AddControllers();
+}

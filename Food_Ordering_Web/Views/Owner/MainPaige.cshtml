@@ -1,10 +1,17 @@
-﻿<main class="container">
+﻿@if (TempData["SubscriptionMessage"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["SubscriptionMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<main class="container">
     <div class="p-3 p-md-4 mb-3 rounded text-body-emphasis bg-body-secondary">
         <div class="col-lg-12 px-0">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="display-4 fst">List of Outlets</h1>
                 <div>
-                    <buton id="kitchen">kitchen</buton>
                     <button type="button" class="btn btn-primary"><a class="dropdown-item" asp-area="" asp-controller="Restaurant" asp-action="Add">Add</a></button>
                     <div class="dropdown d-inline">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -12,12 +19,12 @@
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="actionDropdown">
                             <li><a class="dropdown-item" id="editLink" asp-area="" asp-controller="Restaurant" asp-action="Edit">Edit</a></li>
-
                             <li><a class="dropdown-item" id="manageLink" asp-area="" asp-controller="Restaurant" asp-action="Manage">Manage</a></li>
-
                             <li><a class="dropdown-item" id="tablesLink" asp-area="" asp-controller="Restaurant" asp-action="Tables">Tables</a></li>
                             <li><a class="dropdown-item" id="deleteButton">Delete</a></li>
+                            <li><a class="dropdown-item" id="kitchenLink" href="#">Kitchen</a></li> <!-- Kitchen link -->
                         </ul>
+
                     </div>
                 </div>
             </div>
@@ -277,8 +284,16 @@
                 $("#restaurantImage").attr('src', '/path/to/default/restaurant.png');
                 // Any other fields that display selected outlet details
             }
+            updateKitchenLink(outletId);
         });
-
+        function updateKitchenLink(outletId) {
+            if (outletId) {
+                const kitchenUrl = `https://restosolutionssaas.com:8443/Kitchen?outletId=${outletId}`;
+                $('#kitchenLink').attr('href', kitchenUrl);
+            } else {
+                $('#kitchenLink').attr('href', '#'); // Reset or handle appropriately if no outlet is selected
+            }
+        }
         function fetchAndDisplayOutletImages(outletId) {
             $.ajax({
                 url: `https://restosolutionssaas.com:7115/api/OutletApi/GetOutletImages/${outletId}`,
@@ -335,13 +350,6 @@
         });
         // Close the modal
         $('#deleteConfirmationModal').modal('hide');
-    });
-
-    $("#kitchen").click(function () {
-        const outletId = $(this).data('outlet-id');
-        // Construct the URL for the kitchen application with the outletId as a query parameter
-        var kitchenUrl = `https://restosolutionssaas.com:8443/Kitchen?outletId=${outletId}`;
-        window.location.href = kitchenUrl; // Redirect the user to the kitchen application
     });
 
 </script>

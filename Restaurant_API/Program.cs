@@ -3,11 +3,11 @@ using Core.Services.MenuS;
 using Core.Services.OutletSer;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
 
+
+// Kestrel configuration for HTTPS
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(443, listenOptions =>
@@ -16,45 +16,42 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
-// Add services to the container.
-
+// Add services to the container
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IOutletService, OutletService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
-// Add DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowMyOrigins",
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
+    options.AddPolicy("AllowMyOrigins", builder =>
+    {
+        builder.WithOrigins(
+                 "https://restosolutionssaas.com:8443", // The first web application origin
+                 "https://restosolutionssaas.com" // The second web application origin
+               )
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
+    });
 });
 
-var app = builder.Build();
 
+var app = builder.Build();
 builder.Configuration.AddJsonFile("Restaurant_API_appsettings.json", optional: true, reloadOnChange: true);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-  
+    // These should be outside of the IsDevelopment check if you want them available in production as well
 }
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowMyOrigins");
 //app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

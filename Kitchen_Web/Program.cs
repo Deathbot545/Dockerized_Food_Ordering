@@ -1,4 +1,4 @@
-using Core.Services.Orderser;
+
 using Core.Services.OutletSer;
 using Infrastructure.Data;
 using Infrastructure.Models;
@@ -52,8 +52,9 @@ builder.Services.AddHttpClient("namedClient", c =>
 
 builder.Services.AddSignalR();
 
+
 builder.Services.AddScoped<IOutletService, OutletService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -89,6 +90,17 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMyOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 var app = builder.Build();
 
 builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true, reloadOnChange: true);
@@ -107,6 +119,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors("AllowMyOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();

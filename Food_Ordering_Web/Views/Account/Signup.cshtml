@@ -51,25 +51,17 @@
         display: none;
     }
 
-    .customer-theme {
-        background-image: url('/Images/jason-leung-UMncYEfO9-U-unsplash.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center center;
-    }
-
-    .owner-theme {
-        background-image: url('/Images/omar-flores-lQT_bOWtysE-unsplash.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center center;
-    }
+ 
 </style>
-<link rel="preload" href="/Images/jason-leung-UMncYEfO9-U-unsplash.jpg" as="image">
-
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
+            <div class="login-header text-center mb-4">
+                <img src="/path/to/your/logo.png" alt="Your Logo" class="logo">
+                <h2>Welcome to Our Service!</h2>
+                <p>Sign up to get started.</p>
+            </div>
+            <!-- Display Model Errors -->
             @if (!ViewData.ModelState.IsValid)
             {
                 <div class="alert alert-danger">
@@ -81,128 +73,36 @@
                     </ul>
                 </div>
             }
-
-
-            <div class="card">
-                <div class="card-header text-center">
-                    <h4>Sign Up</h4>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-primary toggle-button" id="showCustomer">Customer</button>
-                        <button type="button" class="btn btn-secondary toggle-button" id="showOwner">Shop Owner</button>
+            <div id="customerForm">
+                <form id="signupFormCustomer" method="post" action="/Account/AddUser" class="needs-validation" novalidate>
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username" required>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div id="customerForm">
-                        <form id="signupFormCustomer" method="post" action="/Account/AddUser">
-
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
-
-
-                            </div><div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
-
-                            </div><div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password">
-                            </div>
-                            <input type="hidden" name="roleName" value="Customer" />
-                            <div class="center-button">
-                                <button type="submit" class="btn btn-primary">Sign Up</button>
-                            </div>
-                        </form>
-                        <div class="form-group text-center mt-4">
-                            <p class="mb-2">Or join using:</p>
-                            <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
-                                <input type="hidden" name="provider" value="Google" />
-                                <input type="hidden" name="role" value="Customer" />
-                                <button type="submit" class="btn btn-outline-danger">
-                                    <i class="fab fa-google"></i> Google
-                                </button>
-                            </form>
-                        </div>
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required>
                     </div>
-                    <div id="ownerForm" class="hidden">
-                        <form id="signupFormRestaurant" method="post" action="/Account/AddUser">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username">
-
-
-                            </div><div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
-
-                            </div><div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password">
-                            </div>
-                            <input type="hidden" name="roleName" value="Restaurant" />
-                            <div class="center-button">
-                                <button type="submit" class="btn btn-primary">Sign Up</button>
-                            </div>
-
-                        </form>
-                        <div class="form-group text-center mt-4">
-                            <p class="mb-2">Or join using:</p>
-                            <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
-                                <input type="hidden" name="provider" value="Google" />
-                                <input type="hidden" name="role" value="Restaurant" />
-                                <button type="submit" class="btn btn-outline-danger">
-                                    <i class="fab fa-google"></i> Google
-                                </button>
-                            </form>
-                        </div>
+                    <div class="form-group mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
                     </div>
+                    <input type="hidden" name="roleName" value="Customer" />
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                    </div>
+                </form>
+                <div class="social-login text-center mt-4">
+                    <p class="mb-2">Or join using:</p>
+                    <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
+                        <input type="hidden" name="provider" value="Google" />
+                        <input type="hidden" name="role" value="Customer" />
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-    // Preload image during window load, not DOMContentLoaded
-    window.addEventListener("load", function () {
-        const image = new Image();
-        image.src = '/Images/jason-leung-UMncYEfO9-U-unsplash.jpg';
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const customerForm = document.getElementById("customerForm");
-        const ownerForm = document.getElementById("ownerForm");
-        const body = document.body;
-
-        document.getElementById("showCustomer").addEventListener("click", function () {
-            customerForm.classList.remove("hidden");
-            ownerForm.classList.add("hidden");
-            body.classList.add("customer-theme");
-            body.classList.remove("owner-theme");
-        });
-
-        document.getElementById("showOwner").addEventListener("click", function () {
-            ownerForm.classList.remove("hidden");
-            customerForm.classList.add("hidden");
-            body.classList.add("owner-theme");
-            body.classList.remove("customer-theme");
-        });
-        document.getElementById("signupFormCustomer").addEventListener("submit", validatePassword);
-        document.getElementById("signupFormRestaurant").addEventListener("submit", validatePassword);
-    });
-
-   
-
-    function displayErrors(errors) {
-        const errorDiv = document.createElement("div");
-        errorDiv.className = "alert alert-danger";
-        errorDiv.innerHTML = "<ul>";
-
-        errors.forEach(function (error) {
-            errorDiv.innerHTML += "<li>" + error + "</li>";
-        });
-
-        errorDiv.innerHTML += "</ul>";
-        const container = document.querySelector(".container");
-        container.prepend(errorDiv);
-    }
-</script>

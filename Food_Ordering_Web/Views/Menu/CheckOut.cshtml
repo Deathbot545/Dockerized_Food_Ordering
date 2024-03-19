@@ -1,0 +1,270 @@
+﻿<style>
+    body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+}
+
+.container {
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+h5 {
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.form-check-label {
+    font-size: 16px;
+}
+
+.input-group {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+}
+
+.btn-outline-secondary {
+    border-color: #007bff;
+    color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+h3 {
+    border-top: 2px solid #e0e0e0;
+    padding-top: 20px;
+}
+
+span.float-end {
+    font-weight: bold;
+}
+
+    .remove-item {
+        margin-left: 10px;
+        border: none;
+        background-color: transparent;
+        font-size: 18px;
+        color: red;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+        .remove-item:hover {
+            transform: scale(1.1);
+        }
+</style>
+<div id="orderStatus">Your order status will appear here.</div>
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Delivery Estimate Section -->
+        <div class="col-md-6">
+            <h5>Delivery estimate</h5>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="delivery" id="priority" checked>
+                <label class="form-check-label" for="priority">
+                    Priority - Delivered directly to you (+LKR 129.00)
+                </label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="delivery" id="standard">
+                <label class="form-check-label" for="standard">
+                    Standard
+                </label>
+            </div>
+
+            <!-- Payment Section -->
+            <h5 class="mt-4">Payment</h5>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Promo code">
+                <button class="btn btn-outline-secondary" type="button" id="addPromoCode">Add</button>
+            </div>
+
+            <!-- Order Summary Section -->
+            <h5 class="mt-4">Order summary</h5>
+            <div id="order-summary-section">
+                <!-- Items will be populated here -->
+            </div>
+            <a href="#" class="text-decoration-none">See all</a>
+        </div>
+
+        <!-- Order Total Section -->
+        <div class="col-md-6">
+            <h5>Order total</h5>
+            <div class="mb-3">
+                <span>Subtotal</span>
+                <span class="float-end subtotal">LKR 0.00</span>
+            </div>
+            <div class="mb-3">
+                <span>Delivery Fee</span>
+                <span class="float-end delivery-fee">LKR 0.00</span>
+            </div>
+            <div class="mb-3">
+                <span>Taxes</span>
+                <span class="float-end taxes">LKR 0.00</span>
+            </div>
+            <div class="mb-3">
+                <span>Add a tip</span>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-outline-secondary btn-sm mx-1">
+                        <!-- Tip Buttons -->
+                        <button class="btn btn-outline-secondary btn-sm mx-1">Not now</button>
+                        <button class="btn btn-outline-secondary btn-sm mx-1">5%</button>
+                        <button class="btn btn-outline-secondary btn-sm mx-1">10%</button>
+                        <button class="btn btn-outline-secondary btn-sm mx-1">15%</button>
+                        <button class="btn btn-outline-secondary btn-sm mx-1">20%</button>
+                        <button class="btn btn-outline-secondary btn-sm mx-1">Other</button>
+                </div>
+                <p class="mt-2">100% of your tip goes to your courier. Tips are based on your order total of LKR 1,222.50 before any discounts or promotions.</p>
+            </div>
+            <!-- Total Price Display -->
+            <h3 class="mb-3">
+                <span>Total</span>
+                <span class="float-end total">LKR 0.00</span>
+            </h3>
+            <p>By proceeding to payment, you have reviewed and agree to the Terms of Use and acknowledge the Privacy Notice. You are at least 18 years of age.</p>
+            <!-- Payment Button -->
+            <button class="btn btn-primary mt-3" id="order-button">
+                Order
+
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Declare global variables to hold tableId and outletId
+    var globalTableId = '@ViewBag.TableId';
+    var globalOutletId = '@ViewBag.OutletId';
+</script>
+<!-- Include your external JS file here or inline your JS code below -->
+
+<script>
+    function loadCheckoutPage() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let itemsHtml = '';
+        let subTotal = 0;
+
+        console.log("Cart loaded from localStorage:", cart);
+
+        cart.forEach(item => {
+            let itemTotal = item.qty * item.price;
+            subTotal += itemTotal;
+
+            itemsHtml += `<div class="mb-3">
+    <span>${item.name} (x${item.qty})</span>
+    <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
+            <button class="btn btn-sm remove-item" data-item-id="${item.id.toString()}">&times;</button>
+    </div>`;
+        });
+
+        let deliveryFee = $("input[name='delivery']:checked").attr("id") === "priority" ? 129 : 0;
+        let taxes = subTotal * 0.15;
+
+        $("#order-summary-section").html(itemsHtml);
+        $(".subtotal").text(`LKR ${subTotal.toFixed(2)}`);
+        $(".delivery-fee").text(`LKR ${deliveryFee.toFixed(2)}`);
+        $(".taxes").text(`LKR ${taxes.toFixed(2)}`);
+        $(".total").text(`LKR ${(subTotal + deliveryFee + taxes).toFixed(2)}`);
+    }
+    $(document).ready(function () {
+        console.log("Document ready. Loading checkout page.");
+        loadCheckoutPage();
+
+        $(document).on('click', '.remove-item', function () {
+            const itemId = $(this).data('item-id');
+            console.log(`Attempting to remove item from cart: ${itemId}`);
+            removeItemFromCart(itemId);
+        });
+
+        $('#order-button').click(function () {
+            submitOrderForm();
+        });
+    });
+
+    function submitOrderForm() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (cart.length === 0) {
+            console.error("Attempted to submit order form with an empty cart.");
+            return; // Optionally show an error message to the user
+        }
+
+        const formData = new FormData();
+        formData.append('tableId', cart[0].tableId);
+        formData.append('outletId', cart[0].outletId);
+        cart.forEach((item, index) => {
+            formData.append(`items[${index}].id`, item.id);
+            formData.append(`items[${index}].qty`, item.qty);
+            formData.append(`items[${index}].price`, item.price);
+            formData.append(`items[${index}].name`, item.name);
+        });
+
+        fetch('/Order/CreateOrUpdateOrder', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.orderId) {
+               
+                    // Clear the existing cart
+                    localStorage.removeItem('cart');
+
+                    // Create a new local storage item for the current order
+                    localStorage.setItem('currentOrder', JSON.stringify({ orderId: data.orderId, status: 0 }));
+
+                    // Redirect or update UI as needed
+                    console.log("Order placed successfully with orderId: ", data.orderId);
+                    // Optional: Redirect to order confirmation page or update UI
+                } else {
+                    console.error("Order placement failed or orderId missing in response");
+                    // Handle error or missing orderId in response
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting order form:', error);
+                // Handle network or server error
+            });
+
+        // Prevent the default form submission behavior
+        return false;
+    }
+
+
+    function createHiddenInput(name, value) {
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        return input;
+    }
+
+
+    function removeItemFromCart(itemId) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        console.log(`Before removal, cart contains:`, cart);
+
+        cart = cart.filter(item => item.id !== itemId.toString());
+        console.log(`After removal, cart now contains:`, cart);
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+        loadCheckoutPage();
+    }
+</script>

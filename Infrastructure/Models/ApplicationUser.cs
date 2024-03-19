@@ -9,5 +9,6 @@ namespace Infrastructure.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        public bool IsSubscribed { get; set; }
     }
 }

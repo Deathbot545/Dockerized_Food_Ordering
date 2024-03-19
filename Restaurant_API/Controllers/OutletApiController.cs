@@ -113,9 +113,6 @@ namespace Restaurant_API.Controllers
         }
 
 
-
-
-
         [HttpGet("GetOutletsByOwner/{ownerId}")]
         public async Task<IActionResult> GetOutletsByOwner(Guid ownerId)
         {

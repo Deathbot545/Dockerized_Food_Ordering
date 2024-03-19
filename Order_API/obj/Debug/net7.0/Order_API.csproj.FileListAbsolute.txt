@@ -104,3 +104,11 @@ D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\refint\Order_API.dll
 D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\Order_API.pdb
 D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\Order_API.genruntimeconfig.cache
 D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\ref\Order_API.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Restaurant_API.deps.json
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Restaurant_API.runtimeconfig.json
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Restaurant_API_appsettings.Development.json
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Restaurant_API_appsettings.json
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Restaurant_API.exe
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Newtonsoft.Json.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Restaurant_API.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Restaurant_API.pdb

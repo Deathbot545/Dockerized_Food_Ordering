@@ -1,6 +1,8 @@
 ﻿using Core.DTO;
+using Core.ViewModels;
 using Infrastructure.Data;
 using Infrastructure.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -133,56 +135,48 @@ namespace Core.Services.OutletSer
             return outlet;
         }
 
-
-
-
         public async Task<bool> DeleteOutletByIdAsync(int id)
         {
-            // Find the outlet first
-            var outlet = await _context.Outlets.Include(o => o.Tables).FirstOrDefaultAsync(o => o.Id == id);
-
-            if (outlet == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return false;
-            }
+                var outlet = await _context.Outlets.Include(o => o.Tables).FirstOrDefaultAsync(o => o.Id == id);
+                if (outlet == null) return false;
 
-            // Get the Menu associated with the Outlet
-            var menu = await _context.Menu
-                .Include(m => m.MenuCategories)
-                .ThenInclude(mc => mc.MenuItems)
-                .FirstOrDefaultAsync(m => m.Id == outlet.MenuId);
+                var menu = await _context.Menu.Include(m => m.MenuCategories).ThenInclude(mc => mc.MenuItems)
+                    .FirstOrDefaultAsync(m => m.OutletId == outlet.Id);
 
-            if (menu != null)
-            {
-                // Remove MenuItems and MenuCategories
-                foreach (var menuCategory in menu.MenuCategories)
+                if (menu != null)
                 {
-                    // Removing MenuItems
-                    _context.RemoveRange(menuCategory.MenuItems);
+                    foreach (var menuCategory in menu.MenuCategories)
+                    {
+                        _context.MenuItem.RemoveRange(menuCategory.MenuItems);
+                    }
+                    _context.MenuCategories.RemoveRange(menu.MenuCategories);
+                    _context.Menu.Remove(menu);
                 }
 
-                // Removing MenuCategories
-                _context.RemoveRange(menu.MenuCategories);
+                foreach (var table in outlet.Tables)
+                {
+                    var qrCode = await _context.QRCodes.FirstOrDefaultAsync(q => q.TableId == table.Id);
+                    if (qrCode != null) _context.QRCodes.Remove(qrCode);
 
-                // Remove the menu itself
-                _context.Menu.Remove(menu);
+                    _context.Tables.Remove(table);
+                }
+
+                _context.Outlets.Remove(outlet);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return true;
             }
-
-            // Remove QRCode and tables
-            foreach (var table in outlet.Tables)
+            catch (Exception ex)
             {
-                RemoveQRCode(table.Id);
-                _context.Tables.Remove(table); // Assuming Tables are already loaded in the outlet entity
+                // Log the exception
+                await transaction.RollbackAsync();
+                throw; // Re-throw the exception to be handled by the caller or global exception handler
             }
-
-            // Now remove the outlet
-            _context.Outlets.Remove(outlet);
-
-            await _context.SaveChangesAsync();
-
-            return true;
         }
-
 
         public List<Table> GetTablesByOutlet(int outletId)
         {
@@ -273,7 +267,6 @@ namespace Core.Services.OutletSer
             return qrCode;
         }
        
-
         public static void SetDateTimePropertiesToUtc(object obj)
         {
             foreach (var property in obj.GetType().GetProperties())
@@ -344,6 +337,81 @@ namespace Core.Services.OutletSer
         public async Task<Outlet> GetOutletBySubdomain(string subdomain)
         {
             return await _context.Outlets.FirstOrDefaultAsync(o => o.Subdomain == subdomain);
+        }
+
+        public async Task<bool> AddKitchenStaffAsync(KitchenStaffViewModel model)
+        {
+            try
+            {
+                // Create an instance of PasswordHasher
+                var passwordHasher = new PasswordHasher<KitchenStaff>();
+
+                var newStaff = new KitchenStaff
+                {
+                    Name = model.Name,
+                    Email = model.Email,
+                    OutletId = model.OutletId, // Assuming you pass the OutletId from the form
+                    PasswordHash = passwordHasher.HashPassword(null, model.Password), // Hash the plain password
+                    Role = model.Role // Set the Role property
+                };
+
+                _context.KitchenStaff.Add(newStaff);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<KitchenStaffViewModel>> GetKitchenStaffByOutletAsync(int outletId)
+        {
+            return await _context.KitchenStaff
+                                 .Where(k => k.OutletId == outletId)
+                                 .Select(k => new KitchenStaffViewModel
+                                 {
+                                     Id = k.Id, // Include the ID here
+                                     Name = k.Name,
+                                     Email = k.Email,
+                                     Role = k.Role,
+                                     OutletId = outletId
+                                     // other properties as needed
+                                 })
+                                 .ToListAsync();
+        }
+
+        public async Task<bool> DeleteKitchenStaffAsync(int id)
+        {
+            var staffMember = await _context.KitchenStaff.FindAsync(id);
+            if (staffMember != null)
+            {
+                _context.KitchenStaff.Remove(staffMember);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> UpdateKitchenStaffAsync(KitchenStaffUpdateViewModel model)
+        {
+            var staffMember = await _context.KitchenStaff.FirstOrDefaultAsync(k => k.Id == model.Id);
+            if (staffMember == null)
+            {
+                return false;
+            }
+
+            staffMember.Name = model.Name;
+            staffMember.Email = model.Email;
+            // Assuming you have a method to handle roles, perhaps through an enum or separate entity
+            staffMember.Role = model.Role;
+
+            _context.KitchenStaff.Update(staffMember);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
 

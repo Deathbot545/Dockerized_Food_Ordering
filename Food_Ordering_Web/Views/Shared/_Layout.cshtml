@@ -21,6 +21,9 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="~/Images/logo.jpeg" type="image/jpeg">
+    <link rel="icon" href="~/Images/logo.jpeg" type="image/jpeg">
+
 
       <style>
         body {
@@ -66,10 +69,8 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div id="orderStatus" class="text-white d-flex align-items-center">
-                <!-- Example with a FontAwesome icon -->
-                <i class="fas fa-truck mr-2"></i>
-                <span>Your Order Status: <span class="badge badge-success"></span></span>
+            <div id="orderStatus" class="text-white d-flex align-items-center" style="cursor: pointer;">
+                <i class="fas fa-truck mr-2"></i><span></span>
             </div>
 
 
@@ -130,16 +131,37 @@
                         }
                         else if (User.IsInRole("Restaurant"))
                         {
-                            <!-- Restaurant-specific links -->
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Restaurant")">Outlets</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="@Url.Action("ManageOrders", "Restaurant")">Manage Orders</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="@Url.Action("Profile", "Home")">Restaurant Profile</a>
-                            </li>
+                            var isSubscribed = User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;
+                            var subscriptionNeeded = string.IsNullOrEmpty(isSubscribed) || bool.Parse(isSubscribed) == false;
+
+                            if (subscriptionNeeded)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("StartSubscription", "Stripe")">Subscribe Now</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <!-- Restaurant-specific links -->
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Restaurant")">Outlets</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="@Url.Action("ManageOrders", "Restaurant")">Manage Orders</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("Profile", "Home")">Restaurant Profile</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="kitchenManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Kitchen Management
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="kitchenManagementDropdown">
+                                        <li><a class="dropdown-item" href="@Url.Action("KitchenLinks", "Kitchen")">View Kitchen Links</a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("AddStaff", "Restaurant")">Add Kitchen Member</a></li>
+                                    </ul>
+                                </li>
+                            }
                         }
                         else if (User.IsInRole("Admin"))
                         {
@@ -153,6 +175,9 @@
                             <!-- Links for unauthenticated users or other roles -->
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="/Home/Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="@Url.Action("Regiser_Bussiness", "Home")">Register You're Business</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">About Us</a>

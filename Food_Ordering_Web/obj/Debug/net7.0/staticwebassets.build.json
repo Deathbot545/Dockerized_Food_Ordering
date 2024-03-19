@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "yEi12RyGwcpnDGXcdbgTUJt4MluSjkdiJDdPKQnufnM=",
+  "Hash": "Rg42vImQqtBmmMoeypo7U9HInIKSFDrXGq3r6lytdiA=",
   "Source": "Food_Ordering_Web",
   "BasePath": "_content/Food_Ordering_Web",
   "Mode": "Default",
@@ -1768,23 +1768,6 @@
       "OriginalItemSpec": "wwwroot\\Images\\background.jpg"
     },
     {
-      "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\Images\\jason-leung-UMncYEfO9-U-unsplash.jpg",
-      "SourceId": "Food_Ordering_Web",
-      "SourceType": "Discovered",
-      "ContentRoot": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\",
-      "BasePath": "_content/Food_Ordering_Web",
-      "RelativePath": "Images/jason-leung-UMncYEfO9-U-unsplash.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Images\\jason-leung-UMncYEfO9-U-unsplash.jpg"
-    },
-    {
       "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\Images\\logo.jpeg",
       "SourceId": "Food_Ordering_Web",
       "SourceType": "Discovered",
@@ -1800,23 +1783,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\Images\\logo.jpeg"
-    },
-    {
-      "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\Images\\omar-flores-lQT_bOWtysE-unsplash.jpg",
-      "SourceId": "Food_Ordering_Web",
-      "SourceType": "Discovered",
-      "ContentRoot": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\",
-      "BasePath": "_content/Food_Ordering_Web",
-      "RelativePath": "Images/omar-flores-lQT_bOWtysE-unsplash.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Images\\omar-flores-lQT_bOWtysE-unsplash.jpg"
     },
     {
       "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\bootstrap.bundle.js",

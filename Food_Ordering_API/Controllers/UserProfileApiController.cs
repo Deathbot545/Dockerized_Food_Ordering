@@ -1,7 +1,9 @@
-﻿using Core.Services.User;
+﻿using Core.DTO;
+using Core.Services.User;
 using Core.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Food_Ordering_API.Controllers
 {
@@ -38,19 +40,26 @@ namespace Food_Ordering_API.Controllers
             return Ok(userProfile);
         }
 
-        // PUT api/UserProfile
-        [HttpPut]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileModel model)
-        {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var isUpdated = await _userService.UpdateUserProfileAsync(userId, model);
 
-            if (!isUpdated)
+        [HttpPatch("UpdateUserProfile")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileUpdateDTO model)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User Id is missing");
+            }
+
+            var result = await _userService.UpdateUserProfileAsync(userId, model);
+            if (!result)
             {
                 return BadRequest("Could not update user profile.");
             }
 
             return Ok("User profile updated successfully.");
         }
+
+        // PUT api/UserProfile
+
     }
 }

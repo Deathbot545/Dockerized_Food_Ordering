@@ -12,6 +12,8 @@ using Infrastructure.Constraints;
 using Core.Services.OutletSer;
 using Core.Services.Orderser;
 using Microsoft.AspNetCore.DataProtection;
+using Core.Services.AccountService;
+using Core.Services.MenuS;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,11 +55,12 @@ builder.Services.AddHttpClient("namedClient", c =>
 {
     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
 });
-
+builder.Services.AddScoped<AccountService, AccountService>();
 builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IOutletService, OutletService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -123,8 +126,6 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
 }
-
-
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();
@@ -134,6 +135,7 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

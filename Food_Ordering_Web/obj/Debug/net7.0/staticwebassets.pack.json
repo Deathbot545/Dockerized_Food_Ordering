@@ -17,16 +17,8 @@
       "PackagePath": "staticwebassets\\Images\\background.jpg"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\Images\\jason-leung-UMncYEfO9-U-unsplash.jpg",
-      "PackagePath": "staticwebassets\\Images\\jason-leung-UMncYEfO9-U-unsplash.jpg"
-    },
-    {
       "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\Images\\logo.jpeg",
       "PackagePath": "staticwebassets\\Images\\logo.jpeg"
-    },
-    {
-      "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\Images\\omar-flores-lQT_bOWtysE-unsplash.jpg",
-      "PackagePath": "staticwebassets\\Images\\omar-flores-lQT_bOWtysE-unsplash.jpg"
     },
     {
       "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\css\\bootstrap-grid.css",

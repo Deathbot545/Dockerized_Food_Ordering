@@ -23,6 +23,49 @@ namespace Restaurant_API.Controllers
         {
             _outletService = outletService;
         }
+
+        [HttpGet("outletInfo/{id}")]
+        public async Task<IActionResult> GetOutletInfo(int id)
+        {
+            try
+            {
+                OutletInfoDTO result = await _outletService.GetSpecificOutletInfoByOutletIdAsync(id);
+                return Ok(result);
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
+            catch (InvalidOperationException invOpEx)
+            {
+                return NotFound(invOpEx.Message);
+            }
+            catch (Exception ex)
+            {
+                // Handle/log the exception as per your application's requirements
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("GetAllOutletsAsync")]
+        public async Task<IActionResult> GetAllOutletsAsync()
+        {
+            try
+            {
+                var outlets = await _outletService.GetAllOutletsAsync();
+                if (outlets == null || !outlets.Any())
+                {
+                    return NotFound(new { Message = "No outlets found." });
+                }
+
+                return Ok(outlets);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "An error occurred", Details = ex.Message });
+            }
+        }
+
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteOutlet(int id)
         {

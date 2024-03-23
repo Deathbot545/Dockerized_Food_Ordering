@@ -13,12 +13,11 @@ namespace Restaurant_API.Controllers
     public class MenuApiController : Controller
     {
         private readonly IMenuService _menuService;
-        private readonly IOutletService _outletService;
+        
 
-        public MenuApiController(IMenuService menuService,IOutletService outletService)
+        public MenuApiController(IMenuService menuService)
         {
             _menuService = menuService;
-            _outletService = outletService;
         }
 
         [HttpPost("AddCategory")]
@@ -126,28 +125,7 @@ namespace Restaurant_API.Controllers
             }
         }
 
-        [HttpGet("outletInfo/{id}")]
-        public async Task<IActionResult> GetOutletInfo(int id)
-        {
-            try
-            {
-                OutletInfoDTO result = await _outletService.GetSpecificOutletInfoByOutletIdAsync(id);
-                return Ok(result);
-            }
-            catch (ArgumentException argEx)
-            {
-                return BadRequest(argEx.Message);
-            }
-            catch (InvalidOperationException invOpEx)
-            {
-                return NotFound(invOpEx.Message);
-            }
-            catch (Exception ex)
-            {
-                // Handle/log the exception as per your application's requirements
-                return StatusCode(500, "Internal server error");
-            }
-        }
+       
         [HttpDelete("DeleteMenuItem/{itemId}")]
         public async Task<IActionResult> DeleteMenuItem(int itemId)
         {

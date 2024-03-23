@@ -284,6 +284,43 @@ namespace Core.Services.Orderser
             return orderDto;
         }
 
+        public async Task<IEnumerable<OrderDTO>> GetOrdersByUserId(string userId)
+        {
+            // Assuming ApplicationUser has an Id that can be compared to userId
+            var orders = _context.Orders
+                         .Where(o => o.Customer != null && o.Customer.Id == userId)
+                         .Include(o => o.OrderDetails)
+                             .ThenInclude(od => od.MenuItem)
+                         .Select(o => new OrderDTO
+                         {
+                             Id = o.Id,
+                             OrderTime = o.OrderTime,
+                             Customer = o.Customer, // Assuming direct assignment is suitable for your needs
+                             TableId = o.TableId,
+                             OutletId = o.OutletId,
+                             Status = o.Status,
+                             OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
+                             {
+                                 Id = od.Id,
+                                 OrderId = od.OrderId,
+                                 MenuItemId = od.MenuItemId,
+                                 MenuItem = new MenuItemData
+                                 {
+                                     Id = od.MenuItem.Id,
+                                     Name = od.MenuItem.Name,
+                                     Description = od.MenuItem.Description,
+                                     Price = (double)od.MenuItem.Price,
+                                     MenuCategoryId = od.MenuItem.MenuCategoryId,
+                                     Image = od.MenuItem.Image != null ? Convert.ToBase64String(od.MenuItem.Image) : null // Conversion applied here
+                                 },
+                                 Quantity = od.Quantity
+                             }).ToList()
+                         }).ToList();
+
+            return orders;
+        }
+
+
 
 
     }

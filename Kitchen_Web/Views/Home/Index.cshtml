@@ -11,7 +11,6 @@
         return dateTimeInIST;
     }
 }
-
 @{
     var pendingOrders = Model.Orders?.Where(o => o.Status == OrderStatus.Pending) ?? Enumerable.Empty<OrderDTO>();
     var preparingOrders = Model.Orders?.Where(o => o.Status == OrderStatus.Preparing) ?? Enumerable.Empty<OrderDTO>();
@@ -49,7 +48,6 @@
     }
     return new HtmlString(html.ToString());
         };
-
 }
 
 <div class="container mt-5">
@@ -81,44 +79,133 @@
     </div>
 </footer>
 <script>
-   
+    
     $(document).ready(function () {
+        console.log("Document ready function started.");
 
-        // Establish SignalR connection
+        // Defining the mapStatusToSectionId function within $(document).ready to ensure scope is correct
+        function mapStatusToSectionId(status) {
+            switch (status) {
+                case 0: return 'pendingOrders';
+                case 1: return 'preparingOrders';
+                case 2: return 'readyOrders';
+                case 3: return 'servedOrders';
+                default: return 'unknownOrders'; // Handle unknown or new statuses
+            }
+        }
+
+        // Ensuring mapEnumToStatusText is also within $(document).ready
+        function mapEnumToStatusText(status) {
+            console.log(`mapEnumToStatusText called with status: ${status}`);
+            switch (status) {
+                case 0: return 'Pending';
+                case 1: return 'Preparing';
+                case 2: return 'Ready';
+                case 3: return 'Served';
+                default: return 'Unknown'; // Handle cases where status is outside known values
+            }
+        }
+
+        console.log(mapEnumToStatusText(0)); // Testing the function
+
+        // Your existing SignalR connection setup
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("https://restosolutionssaas.com:7268/orderStatusHub")
             .configureLogging(signalR.LogLevel.Information)
-            .withAutomaticReconnect() // Enable automatic reconnect
+            .withAutomaticReconnect()
             .build();
 
-        // Listen for new orders
+        // Handlers for SignalR events
         connection.on("NewOrderPlaced", function (order) {
             console.log("New order received", order);
-            // Dynamically add the new order to the DOM
             addNewOrderToDOM(order);
         });
 
-        // Listen for order updates
         connection.on("ReceiveOrderUpdate", function (order) {
             console.log("Order status update received", order);
-            updateOrderStatusUI(order);
-            updateKitchenOrderStatusUI(order);
+            updateOrderInDOM(order);
         });
 
-        // Start the connection
         connection.start().catch(function (err) {
-            return console.error(err.toString());
+            console.error(err.toString());
         });
 
-        // Hook up click events for the order status buttons
         $('.btn-group .btn').click(function () {
             const $btn = $(this);
             const $card = $btn.closest('.order-card');
-            const orderId = parseInt($card.data('order-id'));
+            const orderId = $card.data('order-id');
             const newStatus = $btn.data('status');
 
             updateOrderStatus(orderId, newStatus);
         });
+
+        function addNewOrderToDOM(order) {
+            var sectionId = mapStatusToSectionId(order.status);
+            var orderHtml = createOrderHtml(order);
+            $('#' + sectionId).append(orderHtml);
+        }
+
+        function createOrderHtml(order) {
+            console.log("Creating HTML for order:", order);
+
+            // Date formatting
+            let orderDate = new Date(order.orderTime); // Adjust this based on the actual property name
+            let formattedDate = orderDate.toLocaleDateString('en-US') + ' ' + orderDate.toLocaleTimeString('en-US');
+
+            // Ensure details are structured as expected, similar to OrderDetailDTO
+            let detailsHtml = order.details.map(detail => `<li>${detail.name} x ${detail.qty}</li>`).join("");
+
+            return `
+            <div class="card mb-3 order-card bg-light" data-order-id="${order.orderId}">
+                <div class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
+                    <span>Order #${order.orderId} | Table: ${order.tableId} | Date: ${formattedDate}</span>
+                    <span>STATUS: ${mapEnumToStatusText(order.status)}</span>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-3">${detailsHtml}</ul>
+                    <div class="btn-group" role="group" aria-label="Order Status">
+                        <button type="button" class="btn btn-warning" data-status="pending" data-order-id="${order.orderId}">Pending</button>
+                        <button type="button" class="btn btn-primary" data-status="in-progress" data-order-id="${order.orderId}">In Progress</button>
+                        <button type="button" class="btn btn-success" data-status="completed" data-order-id="${order.orderId}">Completed</button>
+                        <button type="button" class="btn btn-danger delete-order" data-order-id="${order.orderId}">Delete Order</button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        // Use delegated events for dynamically added elements
+        $(document).on('click', '.btn-group .btn', function () {
+            const $btn = $(this);
+            const orderId = $btn.data('order-id');
+            const newStatus = $btn.data('status');
+            updateOrderStatus(orderId, newStatus);
+        });
+
+        function updateOrderInDOM(order) {
+            var orderCard = $(`.order-card[data-order-id="${order.id}"]`);
+            if (!orderCard.length) {
+                // If the order card doesn't exist, it might be a new order.
+                addNewOrderToDOM(order);
+                return;
+            }
+
+            // If it exists, update its contents or status.
+            updateOrderCard(order, orderCard);
+        }
+
+        function updateOrderCard(order, orderCard) {
+            // Update the status text. Assume a span with class 'order-status' displays the status.
+            orderCard.find('.order-status').text(mapEnumToStatusText(order.status));
+
+            // Check if the order needs to be moved to another section based on its new status.
+            var currentSectionId = mapStatusToSectionId(order.status);
+            if (!orderCard.closest(`#${currentSectionId}`).length) {
+                // If the order card is not in the correct section, move it.
+                orderCard.detach();
+                $(`#${currentSectionId}`).append(orderCard);
+            }
+        }
     });
 
     function updateOrderStatus(orderId, newStatus) {
@@ -159,14 +246,21 @@
             }
         });
 
-        $('.delete-order').click(function () {
-            const orderId = $(this).data('order-id');
-            updateOrderStatusToRejected(orderId);
+        $(document).on('click', '.delete-order', function () {
+            const $btn = $(this);
+            const orderId = $btn.data('order-id');
+            console.log(`Delete button clicked for order ID: ${orderId}`);
+
+            if (confirm('Are you sure you want to reject this order?')) {
+                updateOrderStatusToRejected(orderId);
+            }
         });
+
+
 
         function updateOrderStatusToRejected(orderId) {
             if (confirm('Are you sure you want to reject this order?')) {
-                const rejectedStatus = 4;
+                const rejectedStatus = 5;
                 $.ajax({
                     headers: {
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
@@ -189,7 +283,5 @@
                 });
             }
         }
-
-
     }
 </script>

@@ -59,10 +59,25 @@
         color: #007bff; /* Brand color on hover */
     }
     </style>
+
+    <script>
+        // Show Loading Overlay
+        function showLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'block';
+        }
+
+        // Hide Loading Overlay
+        function hideLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+    </script>
        
 </head>
 <body>
-   
+    <!-- Loading Overlay (Place this in your layout HTML file) -->
+    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.7) url('path_to_your_loading_spinner.gif') no-repeat center center; z-index:9999;">
+    </div>
+
     <nav class="navbar bg-body-tertiary fixed-top">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -113,8 +128,8 @@
                     {
                         <!-- Wide buttons for Log In and Sign Up -->
                         <div class="d-flex flex-column mb-3">
-                            <button type="button" class="btn btn-light text-dark mb-2 w-100">Log In</button>
-                            <button type="button" class="btn btn-primary w-100">Sign Up</button>
+                            <button type="button" class="btn btn-light text-dark mb-2 w-100" asp-area="" asp-controller="Account" asp-action="Login">Log In</button>
+                            <button type="button" class="btn btn-primary w-100" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</button>
                         </div>
                     }
 
@@ -123,7 +138,10 @@
                         {
                             <!-- Customer-specific links -->
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="@Url.Action("MyOrders", "User")">My Orders</a>
+                                <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Customer")">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="@Url.Action("MyOrders", "Customer")">My Orders</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="@Url.Action("UserProfile", "User")">Profile</a>
@@ -147,17 +165,16 @@
                                     <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Restaurant")">Outlets</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="@Url.Action("ManageOrders", "Restaurant")">Manage Orders</a>
+                                    <a class="nav-link active" aria-current="page" href="#">Manage Orders</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="@Url.Action("Profile", "Home")">Restaurant Profile</a>
+                                    <a class="nav-link" href="#">Restaurant Profile</a>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="kitchenManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Kitchen Management
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="kitchenManagementDropdown">
-                                        <li><a class="dropdown-item" href="@Url.Action("KitchenLinks", "Kitchen")">View Kitchen Links</a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("AddStaff", "Restaurant")">Add Kitchen Member</a></li>
                                     </ul>
                                 </li>

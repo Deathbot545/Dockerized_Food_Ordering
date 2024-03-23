@@ -19,6 +19,7 @@ namespace Core.Services.Orderser
         Task<bool> DeleteOrderAsync(int orderId);
         Task<int?> GetOrderStatusAsync(int orderId);
         Task<OrderDTO> GetOrderDetailsAsync(int orderId);
+        Task<IEnumerable<OrderDTO>> GetOrdersByUserId(string userId);
 
 
         // Add other order-related methods as needed

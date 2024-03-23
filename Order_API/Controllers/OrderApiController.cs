@@ -1,5 +1,6 @@
 ﻿using Core.DTO;
 using Core.Services.Orderser;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -23,18 +24,25 @@ namespace Order_API.Controllers
             _hubContext = hubContext;
             _logger = logger;
         }
-       
+
         // Add item to cart
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
-            _logger.LogInformation($"Received order data: {JsonSerializer.Serialize(request)}");
-
             try
             {
                 int orderId = await _orderService.ProcessOrderRequestAsync(request);
-                await _hubContext.Clients.All.SendAsync("NewOrderPlaced", request);
-                return Ok(new { orderId = orderId, message = "Order processed successfully." });
+                var orderDto = await _orderService.GetOrderDetailsAsync(orderId); // Assuming this returns the detailed order DTO
+
+                if (orderDto != null)
+                {
+                    await _hubContext.Clients.All.SendAsync("NewOrderPlaced", orderDto);
+                    return Ok(new { orderId = orderId, message = "Order processed successfully." });
+                }
+                else
+                {
+                    return NotFound(new { message = "Order not found after creation." });
+                }
             }
             catch (Exception ex)
             {
@@ -42,6 +50,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpPost("UpdateOrderStatus")]
         public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusDto updateOrderDto)
         {
@@ -134,6 +143,30 @@ namespace Order_API.Controllers
             {
                 _logger.LogError($"Error retrieving order details for orderId {orderId}: {ex.Message}");
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetOrdersByUser/{userId}")]
+        public async Task<IActionResult> GetOrdersByUser(string userId)
+        {
+            try
+            {
+                // Await the asynchronous call to get the orders
+                var orders = await _orderService.GetOrdersByUserId(userId);
+
+                // Since we're using async/await, orders should never be null (an awaitable task returns a result or throws)
+                // Therefore, it's safe to check for emptiness directly
+                if (!orders.Any())
+                {
+                    return NotFound(new { message = "No orders found for the specified user." });
+                }
+
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving orders for user {userId}: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
             }
         }
 

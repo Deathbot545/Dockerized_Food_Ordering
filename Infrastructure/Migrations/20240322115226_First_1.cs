@@ -31,6 +31,7 @@ namespace Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    IsSubscribed = table.Column<bool>(type: "boolean", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -80,7 +81,8 @@ namespace Infrastructure.Migrations
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Logo = table.Column<byte[]>(type: "bytea", nullable: false),
                     RestaurantImage = table.Column<byte[]>(type: "bytea", nullable: false),
-                    MenuId = table.Column<int>(type: "integer", nullable: false)
+                    MenuId = table.Column<int>(type: "integer", nullable: false),
+                    Subdomain = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -194,24 +196,67 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OrderTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CustomerId = table.Column<string>(type: "text", nullable: true),
+                    TableId = table.Column<int>(type: "integer", nullable: false),
+                    OutletId = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_AspNetUsers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "KitchenStaff",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    OutletId = table.Column<int>(type: "integer", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KitchenStaff", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_KitchenStaff_Outlets_OutletId",
+                        column: x => x.OutletId,
+                        principalTable: "Outlets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Menu",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    OutletId = table.Column<int>(type: "integer", nullable: true),
-                    OutletId1 = table.Column<int>(type: "integer", nullable: false)
+                    OutletId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Menu", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Menu_Outlets_OutletId1",
-                        column: x => x.OutletId1,
+                        name: "FK_Menu_Outlets_OutletId",
+                        column: x => x.OutletId,
                         principalTable: "Outlets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -284,7 +329,8 @@ namespace Infrastructure.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    MenuCategoryId = table.Column<int>(type: "integer", nullable: false)
+                    MenuCategoryId = table.Column<int>(type: "integer", nullable: false),
+                    Image = table.Column<byte[]>(type: "bytea", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -293,6 +339,33 @@ namespace Infrastructure.Migrations
                         name: "FK_MenuItem_MenuCategories_MenuCategoryId",
                         column: x => x.MenuCategoryId,
                         principalTable: "MenuCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OrderId = table.Column<int>(type: "integer", nullable: false),
+                    MenuItemId = table.Column<int>(type: "integer", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_MenuItem_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItem",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderDetails_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -335,9 +408,14 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Menu_OutletId1",
+                name: "IX_KitchenStaff_OutletId",
+                table: "KitchenStaff",
+                column: "OutletId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Menu_OutletId",
                 table: "Menu",
-                column: "OutletId1");
+                column: "OutletId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuCategories_MenuId",
@@ -348,6 +426,21 @@ namespace Infrastructure.Migrations
                 name: "IX_MenuItem_MenuCategoryId",
                 table: "MenuItem",
                 column: "MenuCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_MenuItemId",
+                table: "OrderDetails",
+                column: "MenuItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderDetails_OrderId",
+                table: "OrderDetails",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_CustomerId",
+                table: "Orders",
+                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QRCodes_TableId",
@@ -380,7 +473,10 @@ namespace Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "MenuItem");
+                name: "KitchenStaff");
+
+            migrationBuilder.DropTable(
+                name: "OrderDetails");
 
             migrationBuilder.DropTable(
                 name: "QRCodes");
@@ -389,13 +485,19 @@ namespace Infrastructure.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "MenuItem");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Tables");
 
             migrationBuilder.DropTable(
                 name: "MenuCategories");
 
             migrationBuilder.DropTable(
-                name: "Tables");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Menu");

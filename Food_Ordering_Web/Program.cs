@@ -121,11 +121,11 @@ app.UseDeveloperExceptionPage();
 
 
 // Apply migrations automatically (consider the implications in production environments)
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
-}
+}*/
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();

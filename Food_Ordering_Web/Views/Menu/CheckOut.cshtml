@@ -200,6 +200,9 @@ span.float-end {
     });
 
     function submitOrderForm() {
+
+        showLoadingOverlay();
+
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         if (cart.length === 0) {
             console.error("Attempted to submit order form with an empty cart.");
@@ -229,6 +232,9 @@ span.float-end {
 
                     // Create a new local storage item for the current order
                     localStorage.setItem('currentOrder', JSON.stringify({ orderId: data.orderId, status: 0 }));
+                    setupSignalRConnection(data.orderId);
+                    hideLoadingOverlay();
+                    checkAndUpdateOrderStatus();
 
                     // Redirect or update UI as needed
                     console.log("Order placed successfully with orderId: ", data.orderId);
@@ -240,6 +246,7 @@ span.float-end {
             })
             .catch(error => {
                 console.error('Error submitting order form:', error);
+                hideLoadingOverlay();
                 // Handle network or server error
             });
 
@@ -255,8 +262,6 @@ span.float-end {
         input.value = value;
         return input;
     }
-
-
     function removeItemFromCart(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         console.log(`Before removal, cart contains:`, cart);

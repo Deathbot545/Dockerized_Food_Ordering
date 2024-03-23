@@ -24,6 +24,23 @@ namespace Core.Services.OutletSer
         {
             _context = context;
         }
+
+        public async Task<List<OutletInfoDTO>> GetAllOutletsAsync()
+        {
+            // Assuming `_context.Outlets` is your DBSet<Outlet>
+            return await _context.Outlets.Select(o => new OutletInfoDTO
+            {
+                CustomerFacingName = o.CustomerFacingName,
+                Logo = o.Logo, // You'll likely need to convert this to a suitable format for JSON
+                RestaurantImage = o.RestaurantImage, // Same as above
+                OperatingHoursStart = o.OperatingHoursStart,
+                OperatingHoursEnd = o.OperatingHoursEnd,
+                Contact = o.Contact,
+                Country = o.Country,
+                City = o.City
+            }).ToListAsync();
+        }
+
         public async Task<List<Outlet>> GetOutletsByOwner(Guid ownerId)
         {
             return await _context.Outlets.Where(x => x.OwnerId == ownerId && !x.IsDeleted).ToListAsync();

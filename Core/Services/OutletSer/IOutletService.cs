@@ -25,6 +25,7 @@ namespace Core.Services.OutletSer
         Task<IEnumerable<KitchenStaffViewModel>> GetKitchenStaffByOutletAsync(int outletId);
         Task<bool> DeleteKitchenStaffAsync(int id);
         Task<bool> UpdateKitchenStaffAsync(KitchenStaffUpdateViewModel model);
+        Task<List<OutletInfoDTO>> GetAllOutletsAsync();
 
         // Add other methods related to Outlet management
     }

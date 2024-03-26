@@ -35,7 +35,7 @@ namespace Food_Ordering_Web.Controllers
             {
                 _logger.LogError(ex, "An error occurred while processing the request in {ControllerName}", nameof(HomeController));
                 Console.WriteLine($"An error occurred: {ex.Message}");
-                return View("Error"); // Make sure you have an Error view that can display a generic error message.
+                return View("Error"); 
             }
 
         }

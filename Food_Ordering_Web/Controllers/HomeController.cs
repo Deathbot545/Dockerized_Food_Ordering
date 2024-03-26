@@ -1,5 +1,4 @@
-﻿using Food_Ordering_API.DTO;
-using Food_Ordering_Web.Models;
+﻿using Food_Ordering_Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

@@ -1,7 +1,7 @@
-using Core.Services.AccountService;
-using Core.Services.User;
-using Infrastructure.Data;
-using Infrastructure.Models;
+
+using Food_Ordering_API.Data;
+using Food_Ordering_API.Services.AccountService;
+using Food_Ordering_API.Services.User;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -76,6 +76,14 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+// Ensure Database is Created and Migrations are Applied
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
+    dbContext.Database.Migrate();
+}
 
 builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);
 
@@ -106,15 +114,16 @@ app.Run();
 
 void ConfigureDatabase(WebApplicationBuilder builder)
 {
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
 }
+
 
 void ConfigureIdentity(WebApplicationBuilder builder)
 {
-    builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    /*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders();*/
 
     // Add Google authentication
     builder.Services.AddAuthentication().AddGoogle(options =>

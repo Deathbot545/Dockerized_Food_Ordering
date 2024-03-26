@@ -1,9 +1,5 @@
-﻿using Core.DTO;
-using Core.Services.Orderser;
-using Core.Services.OutletSer;
-using Core.ViewModels;
+﻿using Food_Ordering_API.DTO;
 using Food_Ordering_Web.Models;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +14,11 @@ namespace Food_Ordering_Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IOutletService _outletService;
-        private readonly IOrderService _orderService; // 
 
-        public HomeController(ILogger<HomeController> logger,IOutletService outletService,IOrderService orderService)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _outletService = outletService;
-            _orderService = orderService;
+            
         }
 
         public IActionResult Index()
@@ -76,39 +69,7 @@ namespace Food_Ordering_Web.Controllers
         }
 
 
-        public async Task<IActionResult> SubdomainRedirection(string subdomain)
-        {
-            var outlet = await _outletService.GetOutletBySubdomain(subdomain);
-            if (outlet == null) return View("Error", new ErrorViewModel { Message = "Subdomain not found" });
-
-            var tables = _outletService.GetTablesByOutlet(outlet.Id);
-
-            List<OrderDTO> orders;
-            using (var httpClient = new HttpClient())
-            {
-                var response = await httpClient.GetAsync($"https://restosolutionssaas.com:7268/api/OrderApi/GetOrdersForOutlet/{outlet.Id}");
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorResponse = await response.Content.ReadAsStringAsync();
-                    return View("Error", new ErrorViewModel { Message = $"API Error: {errorResponse}" });
-                }
-
-                try
-                {
-                    // Directly deserialize the response content to List<OrderDTO>
-                    orders = await response.Content.ReadAsAsync<List<OrderDTO>>();
-                }
-                catch (Exception ex)  // catch generic exception for unexpected issues
-                {
-                    _logger.LogError($"Error while processing the API response: {ex.Message}");
-                    return View("Error", new ErrorViewModel { Message = $"API Processing Error: {ex.Message}" });
-                }
-            }
-
-            var model = new OutletViewModel { OutletInfo = outlet, Tables = tables, Orders = orders };
-            return View("Views/Kitchen/kitchenView.cshtml", model);
-        }
+        
 
         public IActionResult Regiser_Bussiness() 
         { 

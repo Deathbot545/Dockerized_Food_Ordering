@@ -1,8 +1,6 @@
-using Core.Services.AccountService;
-using Core.Services.MenuS;
-using Core.Services.OutletSer;
-using Infrastructure.Data;
+using Restaurant_API.Data;
 using Microsoft.EntityFrameworkCore;
+using Restaurant_API.Services.OutletSer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,14 +14,16 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
+builder.Services.AddDbContext<OutletDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OutletDbConnection")));
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IOutletService, OutletService>();
-builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+/*builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));*/
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigins", builder =>
@@ -40,6 +40,14 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var dbContext = services.GetRequiredService<OutletDbContext>();
+    dbContext.Database.Migrate();
+}
 builder.Configuration.AddJsonFile("Restaurant_API_appsettings.json", optional: true, reloadOnChange: true);
 
 // Configure the HTTP request pipeline.

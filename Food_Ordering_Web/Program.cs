@@ -1,19 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using Infrastructure.Data;
 using Microsoft.AspNetCore.CookiePolicy;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using Infrastructure.Constraints;
-using Core.Services.OutletSer;
-using Core.Services.Orderser;
 using Microsoft.AspNetCore.DataProtection;
-using Core.Services.AccountService;
-using Core.Services.MenuS;
+using Food_Ordering_API.Models;
+using Food_Ordering_API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,24 +18,15 @@ var configuration = builder.Configuration;
 // Inside ConfigureKestrel method
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
 
+builder.Services.AddHttpClient("namedClient", c => { c.BaseAddress = new Uri(configuration["ApiBaseUrl"]); });
+
+builder.Services.AddSignalR();
+
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // Listen for HTTP
-    serverOptions.ListenAnyIP(443, listenOptions =>
-    {
-        try
-        {
-            listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
-            logger.LogInformation("HTTPS setup was successful.");
-        }
-        catch (Exception ex)
-        {
-            // Log detailed information about the exception
-            logger.LogError(ex, "An error occurred while setting up HTTPS.");
-        }
-    });
+    serverOptions.ListenAnyIP(80); // Listen for HTTP connections
+    // Removed the ListenAnyIP(443) block that configures HTTPS
 });
-
 // Inside ConfigureServices method or directly in the Program.cs
 var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys"; // Path inside the container
 builder.Services.AddDataProtection()
@@ -55,14 +41,11 @@ builder.Services.AddHttpClient("namedClient", c =>
 {
     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
 });
-builder.Services.AddScoped<AccountService, AccountService>();
+//builder.Services.AddScoped<AccountService, AccountService>();
 builder.Services.AddSignalR();
 
-builder.Services.AddScoped<IOutletService, OutletService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
+    .AddEntityFrameworkStores<ApplicationUserDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -92,15 +75,6 @@ builder.Services.AddAuthentication(options =>
     });
 
 
-// Add DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
-//SubDomain Stuff
-builder.Services.Configure<RouteOptions>(options =>
-{
-    options.ConstraintMap.Add("subdomain", typeof(SubdomainRouteConstraint));
-});
 
 // Add controllers and Razor pages
 builder.Services.AddControllers();
@@ -120,12 +94,7 @@ var app = builder.Build();
 app.UseDeveloperExceptionPage();
 
 
-// Apply migrations automatically (consider the implications in production environments)
-/*using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-}*/
+
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();

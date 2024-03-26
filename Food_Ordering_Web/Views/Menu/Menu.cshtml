@@ -123,7 +123,7 @@
         let outletId = '@ViewBag.OutletId';
 
         function fetchAndDisplayMenuItems() {
-            let apiEndpoint = `https://restosolutionssaas.com:7115/api/MenuApi/GetMenuItems/${outletId}`;
+            let apiEndpoint = `https://restosolutionssaas.com:7225/api/MenuApi/GetMenuItems/${outletId}`;
             $.get(apiEndpoint, function (menuItems) {
                 let categoryMap = {};
                 let navbarItems = '';

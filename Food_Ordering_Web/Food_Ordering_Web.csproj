@@ -83,9 +83,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Food_Ordering_API\Food_Ordering_API.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Order_API\Order_API.csproj" />
     <ProjectReference Include="..\Restaurant_API\Restaurant_API.csproj" />
   </ItemGroup>

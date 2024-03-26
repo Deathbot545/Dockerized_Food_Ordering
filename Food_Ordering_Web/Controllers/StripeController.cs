@@ -6,8 +6,8 @@ using static Food_Ordering_API.Controllers.AccountApiController;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Identity;
-using Infrastructure.Models;
 using System.Security.Claims;
+using Food_Ordering_API.Models;
 
 namespace Food_Ordering_Web.Controllers
 {

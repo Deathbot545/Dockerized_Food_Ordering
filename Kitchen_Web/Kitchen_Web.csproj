@@ -17,10 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Food_Ordering_API\Food_Ordering_API.csproj" />
     <ProjectReference Include="..\Food_Ordering_Web\Food_Ordering_Web.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Order_API\Order_API.csproj" />
     <ProjectReference Include="..\Restaurant_API\Restaurant_API.csproj" />
   </ItemGroup>
@@ -78,6 +76,10 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
   </ItemGroup>
 
 </Project>

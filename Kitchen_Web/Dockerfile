@@ -8,6 +8,10 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["Kitchen_Web/Kitchen_Web.csproj", "Kitchen_Web/"]
+COPY ["Food_Ordering_API/Food_Ordering_API.csproj", "Food_Ordering_API/"]
+COPY ["Food_Ordering_Web/Food_Ordering_Web.csproj", "Food_Ordering_Web/"]
+COPY ["Order_API/Order_API.csproj", "Order_API/"]
+COPY ["Restaurant_API/Restaurant_API.csproj", "Restaurant_API/"]
 RUN dotnet restore "Kitchen_Web/Kitchen_Web.csproj"
 COPY . .
 WORKDIR "/src/Kitchen_Web"

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33414.496
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{5A369CAF-20D1-4AA4-82E7-7FD0D469948E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Food_Ordering_API", "Food_Ordering_API\Food_Ordering_API.csproj", "{4F0F7E73-3DB6-4439-A1D6-2EDBD1436792}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{A372606F-46D8-4CDF-A149-F0EEFF3B0F2C}"
@@ -17,16 +15,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Food_Ordering_Web", "Food_O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kitchen_Web", "Kitchen_Web\Kitchen_Web.csproj", "{1B533317-39FB-4C19-A9C8-18B9C814B36C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Menu_API", "Menu_API\Menu_API.csproj", "{81A602FD-24C2-4FC4-ABD1-86DC9213C349}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5A369CAF-20D1-4AA4-82E7-7FD0D469948E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5A369CAF-20D1-4AA4-82E7-7FD0D469948E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5A369CAF-20D1-4AA4-82E7-7FD0D469948E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5A369CAF-20D1-4AA4-82E7-7FD0D469948E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4F0F7E73-3DB6-4439-A1D6-2EDBD1436792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F0F7E73-3DB6-4439-A1D6-2EDBD1436792}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F0F7E73-3DB6-4439-A1D6-2EDBD1436792}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +47,10 @@ Global
 		{1B533317-39FB-4C19-A9C8-18B9C814B36C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B533317-39FB-4C19-A9C8-18B9C814B36C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B533317-39FB-4C19-A9C8-18B9C814B36C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81A602FD-24C2-4FC4-ABD1-86DC9213C349}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81A602FD-24C2-4FC4-ABD1-86DC9213C349}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81A602FD-24C2-4FC4-ABD1-86DC9213C349}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81A602FD-24C2-4FC4-ABD1-86DC9213C349}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

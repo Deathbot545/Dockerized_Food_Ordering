@@ -1,11 +1,10 @@
-﻿using Core.DTO;
-using Core.Services.MenuS;
-using Core.Services.OutletSer;
-using Core.ViewModels;
-using Infrastructure.Models;
+﻿
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Restaurant_API.DTO;
+using Restaurant_API.Services.OutletSer;
+using Restaurant_API.ViewModels;
 
 namespace Restaurant_API.Controllers
 {

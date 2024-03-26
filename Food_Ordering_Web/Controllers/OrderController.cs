@@ -1,5 +1,4 @@
-﻿using Core.DTO;
-using Core.Services.Orderser;
+﻿
 using Food_Ordering_Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -8,6 +7,8 @@ using Stripe;
 using System.Diagnostics;
 using System.Security.Claims;
 using System.IO.Pipelines;
+using Order_API.Service.Orderser;
+using Food_Ordering_Web.DTO;
 
 namespace Food_Ordering_Web.Controllers
 {

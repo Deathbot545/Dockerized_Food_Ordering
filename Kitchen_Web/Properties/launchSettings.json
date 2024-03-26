@@ -7,7 +7,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5278"
+      "applicationUrl": "http://restosolutionssaas:5278"
     },
     "https": {
       "commandName": "Project",
@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7096;http://localhost:5278"
+      "applicationUrl": "https://restosolutionssaas:7096;http://restosolutionssaas:5278"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -37,7 +37,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:34911",
+      "applicationUrl": "http://restosolutionssaas:34911",
       "sslPort": 44373
     }
   }

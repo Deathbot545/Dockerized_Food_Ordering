@@ -1,6 +1,8 @@
-﻿using Core.DTO;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Order_API.DTO;
+using Restaurant_API.DTO;
 using System.Security.Claims;
 
 namespace Food_Ordering_Web.Controllers

@@ -1,6 +1,6 @@
-﻿using Core.DTO;
-using Core.Services.User;
-using Core.ViewModels;
+﻿
+using Food_Ordering_API.DTO;
+using Food_Ordering_API.Services.User;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Rg42vImQqtBmmMoeypo7U9HInIKSFDrXGq3r6lytdiA=",
+  "Hash": "C6r9hETTj1hjvm5HilZqW5e6xV0dQsq8mV7FfI0XCRs=",
   "Source": "Food_Ordering_Web",
   "BasePath": "_content/Food_Ordering_Web",
   "Mode": "Default",
@@ -10,6 +10,17 @@
       "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj",
       "Version": 2,
       "Source": "Food_Ordering_API",
+      "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
+    },
+    {
+      "Identity": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj",
+      "Version": 2,
+      "Source": "Menu_API",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
       "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
       "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",

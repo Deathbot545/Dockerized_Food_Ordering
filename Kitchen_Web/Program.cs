@@ -1,13 +1,11 @@
 
-using Core.Services.OutletSer;
-using Infrastructure.Data;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Restaurant_API.Services.OutletSer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,12 +51,11 @@ builder.Services.AddHttpClient("namedClient", c =>
 builder.Services.AddSignalR();
 
 
-builder.Services.AddScoped<IOutletService, OutletService>();
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+/*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
-
+*/
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.MinimumSameSitePolicy = SameSiteMode.Lax;
@@ -87,8 +84,8 @@ builder.Services.AddAuthentication(options =>
 
 
 // Add DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+/*builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));*/
 
 
 builder.Services.AddCors(options =>

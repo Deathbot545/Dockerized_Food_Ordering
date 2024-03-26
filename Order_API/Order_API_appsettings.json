@@ -6,7 +6,7 @@
     }
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Host=database-1.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=Food_Ordering;User Id=postgres;Password=NxPostgrsql;"
+    "OrderDbConnection": "Host=database-1.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=OrderDb;User Id=postgres;Password=NxPostgrsql;"
   },
   "AllowedHosts": "*"
 }

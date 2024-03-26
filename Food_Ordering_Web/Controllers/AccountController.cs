@@ -1,19 +1,19 @@
 ﻿using Food_Ordering_Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
-using Core.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Serialization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication.Google;
 using Newtonsoft.Json;
 using System.Net;
-using Core.ViewModels;
 using System.Net.Http.Headers;
+using Food_Ordering_API.Models;
+using Food_Ordering_API.ViewModels;
+using Food_Ordering_API.DTO;
 
 namespace Food_Ordering_Web.Controllers
 {

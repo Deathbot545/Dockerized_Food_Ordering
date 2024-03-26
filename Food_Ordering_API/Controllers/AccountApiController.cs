@@ -1,6 +1,7 @@
-﻿using Core.DTO;
-using Core.Services.AccountService;
-using Infrastructure.Models;
+﻿
+using Food_Ordering_API.DTO;
+using Food_Ordering_API.Models;
+using Food_Ordering_API.Services.AccountService;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -11,7 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using static Core.Services.AccountService.AccountService;
+using static Food_Ordering_API.Services.AccountService.AccountService;
 
 namespace Food_Ordering_API.Controllers
 {

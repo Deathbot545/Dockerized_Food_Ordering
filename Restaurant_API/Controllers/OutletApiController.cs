@@ -1,14 +1,15 @@
-﻿using Infrastructure.Data;
-using Infrastructure.Models;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using ZXing.QrCode.Internal;
-using Core.Services.OutletSer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Cors;
-using Core.DTO;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using Newtonsoft.Json;
+using System.Net.Http;
+using Restaurant_API.Services.OutletSer;
+using Restaurant_API.DTO;
+using Restaurant_API.Models;
 
 namespace Restaurant_API.Controllers
 {
@@ -18,11 +19,16 @@ namespace Restaurant_API.Controllers
     public class OutletApiController : ControllerBase
     {
         private readonly IOutletService _outletService;
+        private readonly ILogger<OutletApiController> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public OutletApiController(IOutletService outletService)
+        public OutletApiController(IOutletService outletService, ILogger<OutletApiController> logger, IHttpClientFactory httpClientFactory)
         {
             _outletService = outletService;
+            _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
+
 
         [HttpGet("outletInfo/{id}")]
         public async Task<IActionResult> GetOutletInfo(int id)
@@ -71,10 +77,21 @@ namespace Restaurant_API.Controllers
         {
             try
             {
+                var httpClient = _httpClientFactory.CreateClient();
+                var menuApiUrl = $"http://menu-api-service/api/menus/outlet/{id}";
+                var response = await httpClient.DeleteAsync(menuApiUrl);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning($"Failed to delete menus for outlet {id}.");
+                    // Handle failure as appropriate, possibly returning an error response
+                }
+
+                // Assuming _outletService.DeleteOutletByIdAsync(id) correctly deletes the outlet
                 var result = await _outletService.DeleteOutletByIdAsync(id);
                 if (result)
                 {
-                    return Ok(new { Message = "Outlet successfully deleted" });
+                    return Ok(new { Message = "Outlet and associated menus successfully deleted" });
                 }
                 else
                 {
@@ -83,10 +100,11 @@ namespace Restaurant_API.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception, consider using a logging framework
-                return BadRequest(new { Message = "An error occurred", Details = ex.Message });
+                _logger.LogError(ex, "An error occurred while deleting the outlet.");
+                return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
             }
         }
+
 
         [HttpPatch("update/{id}"), Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateOutlet(int id)
@@ -217,7 +235,28 @@ namespace Restaurant_API.Controllers
                 return StatusCode(500, new { Success = false, Message = ex.Message });
             }
         }
-     
+
+        [HttpGet("GetTablesByOutlet/{outletId}")]
+        public IActionResult GetTablesByOutlet(int outletId)
+        {
+            try
+            {
+                var tables = _outletService.GetTablesByOutlet(outletId);
+                var tableDTOs = tables.Select(t => new TableDto
+                {
+                    Id = t.Id,
+                    TableIdentifier = t.TableIdentifier
+                    // Map other properties as needed
+                }).ToList();
+
+                return Ok(tableDTOs);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while fetching tables for outlet {outletId}: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
     }
 }

@@ -1,9 +1,8 @@
-using Core.Services.CartSter;
-using Core.Services.MenuS;
-using Core.Services.Orderser;
-using Infrastructure.Data;
+
 using Microsoft.EntityFrameworkCore;
+using Order_API.Data;
 using Order_API.Hubs;
+using Order_API.Service.Orderser;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,13 +16,11 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
-// Add DbContext using the existing configuration
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<OrderDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OrderDbConnection")));
 
 // Dependency Injection for services
-builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 // SignalR for real-time web functionality
@@ -54,6 +51,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var dbContext = services.GetRequiredService<OrderDbContext>();
+    dbContext.Database.Migrate();
+}
 
 builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
 

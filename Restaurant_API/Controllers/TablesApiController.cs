@@ -1,9 +1,9 @@
-﻿using Core.DTO;
-using Core.Services.OutletSer;
-using Infrastructure.Models;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Restaurant_API.DTO;
+using Restaurant_API.Services.OutletSer;
 
 namespace Restaurant_API.Controllers
 {

@@ -1,9 +1,10 @@
-﻿using Core.DTO;
-using Core.Services.Orderser;
-using Core.Services.OutletSer;
-using Core.ViewModels;
+﻿
 using Kitchen_Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Order_API.DTO;
+using Order_API.Service.Orderser;
+using Restaurant_API.Services.OutletSer;
+using Restaurant_API.ViewModels;
 using System.Diagnostics;
 
 namespace Kitchen_Web.Controllers

@@ -98,7 +98,7 @@
     $(document).ready(function () {
         function fetchAndPopulateCategories() {
             let outletId = parseInt($('#outlet_id').val(), 10);
-            let apiEndpoint = `https://restosolutionssaas.com:7115/api/MenuApi/GetAllCategories/${outletId}`;
+            let apiEndpoint = `https://restosolutionssaas.com:7225/api/MenuApi/GetAllCategories/${outletId}`;
 
             $.get(apiEndpoint, function (categories) {
                 console.log("Fetched categories:", categories);
@@ -121,7 +121,7 @@
         // New function to fetch and populate menu items
         function fetchAndPopulateMenuItems() {
             let outletId = parseInt($('#outlet_id').val(), 10);
-            let apiEndpoint = `https://restosolutionssaas.com:7115/api/MenuApi/GetMenuItems/${outletId}`;
+            let apiEndpoint = `https://restosolutionssaas.com:7225/api/MenuApi/GetMenuItems/${outletId}`;
 
             $.get(apiEndpoint, function (menuItems) {
                 console.log("Fetched menu items:", menuItems);
@@ -161,7 +161,7 @@
             let internalOutletName = '@ViewBag.InternalOutletName';
 
             $.ajax({
-                url: 'https://restosolutionssaas.com:7115/api/MenuApi/AddCategory',
+                url: 'https://restosolutionssaas.com:7225/api/MenuApi/AddCategory',
                 method: 'POST',
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify({
@@ -202,7 +202,7 @@
 
             // Proceed with deletion if no menu items are found
             $.ajax({
-                url: `https://restosolutionssaas.com:7115/api/MenuApi/DeleteCategory/${categoryId}`,
+                url: `https://restosolutionssaas.com:7225/api/MenuApi/DeleteCategory/${categoryId}`,
                 method: 'DELETE',
                 success: function (response) {
                     console.log("Category deleted:", response);
@@ -227,7 +227,7 @@
 
             getBase64(foodImage, (base64Image) => {
                 $.ajax({
-                    url: 'https://restosolutionssaas.com:7115/api/MenuApi/AddMenuItem',
+                    url: 'https://restosolutionssaas.com:7225/api/MenuApi/AddMenuItem',
                     method: 'POST',
                     contentType: "application/json; charset=utf-8",
                     data: JSON.stringify({
@@ -256,7 +256,7 @@
         $(document).on('click', '.delete-button', function () {
             const row = $(this).closest('tr');
             const itemId = row.data('item-id');
-            const apiEndpoint = `https://restosolutionssaas.com:7115/api/MenuApi/DeleteMenuItem/${itemId}`;
+            const apiEndpoint = `https://restosolutionssaas.com:7225/api/MenuApi/DeleteMenuItem/${itemId}`;
 
             $.ajax({
                 url: apiEndpoint,

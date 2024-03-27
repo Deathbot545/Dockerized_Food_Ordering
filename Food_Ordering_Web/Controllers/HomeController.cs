@@ -67,9 +67,6 @@ namespace Food_Ordering_Web.Controllers
             public List<string> Roles { get; set; }
         }
 
-
-        
-
         public IActionResult Regiser_Bussiness() 
         { 
             return View("Views/Account/Regiser_Bussiness.cshtml"); 

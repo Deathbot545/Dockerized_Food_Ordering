@@ -44,9 +44,6 @@ builder.Services.AddHttpClient("namedClient", c =>
 //builder.Services.AddScoped<AccountService, AccountService>();
 builder.Services.AddSignalR();
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationUserDbContext>()
-    .AddDefaultTokenProviders();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {

@@ -37,12 +37,17 @@ jobs:
         push: true
         tags: deathbot545/foodorderingweb:latest
         
+    - name: Decode SSH Key
+      run: |
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 -d > $HOME/ssh_key.pem
+        chmod 600 $HOME/ssh_key.pem
+
     - name: Deploy to AWS EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.WEB_APP_EC2_HOST }}
         username: ${{ secrets.WEB_APP_EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        key_path: $HOME/ssh_key.pem
         port: 22
         script: |
           docker pull deathbot545/foodorderingweb:latest

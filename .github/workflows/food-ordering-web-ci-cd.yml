@@ -39,13 +39,11 @@ jobs:
         
     - name: Decode SSH Key
       run: |
-        echo "${{ secrets.EC2_SSH_PRIVATE_KEY_BASE64 }}" | base64 -d > $HOME/ssh_key.pem
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 -d > $HOME/ssh_key.pem
         chmod 600 $HOME/ssh_key.pem
 
     - name: Deploy to AWS EC2
       run: |
-        echo "${{ secrets.EC2_SSH_PRIVATE_KEY_BASE64 }}" | base64 -d > $HOME/ssh_key.pem
-        chmod 600 $HOME/ssh_key.pem
         ssh -o StrictHostKeyChecking=no -i $HOME/ssh_key.pem ${{ secrets.WEB_APP_EC2_USERNAME }}@${{ secrets.WEB_APP_EC2_HOST }} << 'EOF'
           docker pull deathbot545/foodorderingweb:latest
           docker stop web-container || true

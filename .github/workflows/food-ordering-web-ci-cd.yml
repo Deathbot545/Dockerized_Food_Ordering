@@ -32,7 +32,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
       with:
-        context: .  # Changed to root of the repository
+        context: .
         file: ./Food_Ordering_Web/Dockerfile
         push: true
         tags: deathbot545/foodorderingweb:latest
@@ -47,7 +47,7 @@ jobs:
       with:
         host: ${{ secrets.WEB_APP_EC2_HOST }}
         username: ${{ secrets.WEB_APP_EC2_USERNAME }}
-        key_path: $HOME/ssh_key.pem
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         port: 22
         script: |
           docker pull deathbot545/foodorderingweb:latest

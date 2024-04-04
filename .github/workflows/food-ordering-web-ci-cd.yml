@@ -49,7 +49,7 @@ jobs:
       with:
        host: ${{ secrets.WEB_APP_EC2_HOST }}
        username: ${{ secrets.WEB_APP_EC2_USERNAME }}
-       key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+       key: ${{ secrets.EC2_SSH_PRIVATE_KEY_BASE64 }}
        port: 22
        script: |
          docker pull deathbot545/foodorderingweb:latest

@@ -44,13 +44,15 @@ jobs:
 
     - name: Deploy to AWS EC2
       uses: appleboy/ssh-action@master
+      env:
+       SSH_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       with:
-        host: ${{ secrets.WEB_APP_EC2_HOST }}
-        username: ${{ secrets.WEB_APP_EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        port: 22
-        script: |
-          docker pull deathbot545/foodorderingweb:latest
-          docker stop web-container || true
-          docker rm web-container || true
-          docker run -d --name web-container -p 80:80 deathbot545/foodorderingweb:latest
+       host: ${{ secrets.WEB_APP_EC2_HOST }}
+       username: ${{ secrets.WEB_APP_EC2_USERNAME }}
+       key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+       port: 22
+       script: |
+         docker pull deathbot545/foodorderingweb:latest
+         docker stop web-container || true
+         docker rm web-container || true
+         docker run -d --name web-container -p 80:80 deathbot545/foodorderingweb:latest

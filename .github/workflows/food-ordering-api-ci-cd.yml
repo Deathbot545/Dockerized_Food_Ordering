@@ -3,16 +3,11 @@ name: CI/CD for Food_Ordering_API
 on:
   push:
     paths:
-      - 'Food_Ordering_Web/**'
       - 'Food_Ordering_API/**' # Add paths for any dependencies
-      - 'Order_API/**'         # Ensures workflow runs if dependencies change
-      - 'Restaurant_API/**'
+
   pull_request:
     paths:
-      - 'Food_Ordering_Web/**'
       - 'Food_Ordering_API/**' # Add paths for any dependencies
-      - 'Order_API/**'         # Similar for pull requests
-      - 'Restaurant_API/**'
 
 jobs:
   build-and-deploy:

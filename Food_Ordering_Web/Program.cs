@@ -43,7 +43,7 @@ builder.Services.AddHttpClient("namedClient", c =>
 });
 //builder.Services.AddScoped<AccountService, AccountService>();
 builder.Services.AddSignalR();
-//jk
+//j
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {

@@ -42,11 +42,13 @@ jobs:
         echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 -d > $HOME/restro.pem
         chmod 600 $HOME/restro.pem
 
+    - name: Create SSH Key File
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/restro.pem
+        chmod 600 $HOME/restro.pem
+
     - name: Deploy to AWS EC2
       run: |
-       ssh -vvv -o StrictHostKeyChecking=no -i $HOME/restro.pem ${{ secrets.WEB_APP_EC2_USERNAME }}@${{ secrets.WEB_APP_EC2_HOST }} << 'EOF'
-         docker pull deathbot545/foodorderingweb:latest
-         docker stop web-container || true
-         docker rm web-container || true
-         docker run -d --name web-container -p 80:80 deathbot545/foodorderingweb:latest
-       EOF
+        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ${{ secrets.WEB_APP_EC2_USERNAME }}@${{ secrets.WEB_APP_EC2_HOST }} << 'EOF'
+          # Your SSH commands
+        EOF

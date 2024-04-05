@@ -40,7 +40,7 @@ jobs:
     # Copy the SSH private key file from your repository to the runner's home directory and set permissions
     - name: Prepare SSH Key
       run: |
-        cp ./path/to/your/restro.pem $HOME/restro.pem
+        cp ./.github/workflows/restro.pem $HOME/restro.pem
         chmod 600 $HOME/restro.pem
 
     # Use the SSH key for deployment

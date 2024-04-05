@@ -101,6 +101,12 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+});
+
+// Place this middleware before calling UseAuthentication(), UseHttpsRedirection(), etc.
 
 
 app.UseHttpsRedirection();

@@ -44,14 +44,7 @@ jobs:
         # Pull the latest Docker image
         sudo docker pull deathbot545/foodorderingapi:latest
 
-        # Stop and remove any containers using port 80
-        sudo docker ps -q --filter "publish=80" | xargs -r sudo docker stop
-        sudo docker ps -aq --filter "publish=80" | xargs -r sudo docker rm
-
-        # Additionally, ensure the 'web-container' is stopped and removed, if it exists
-        sudo docker rm -f web-container || true
-
         # Finally, run a new container using the latest image
-        sudo docker run -d -p 80:80 --name web-container deathbot545/foodorderingapi:latest
+        sudo docker run -d -p 80:80 --name web-container deathbot545/foodorderingweb:latest
         EOF
 

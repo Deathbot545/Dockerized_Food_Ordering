@@ -37,16 +37,13 @@ jobs:
         push: true
         tags: deathbot545/foodorderingweb:latest
         
-    - name: Decode SSH Key
+    # Copy the SSH private key file from your repository to the runner's home directory and set permissions
+    - name: Prepare SSH Key
       run: |
-        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 -d > $HOME/restro.pem
+        cp ./path/to/your/restro.pem $HOME/restro.pem
         chmod 600 $HOME/restro.pem
 
-    - name: Create SSH Key File
-      run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/restro.pem
-        chmod 600 $HOME/restro.pem
-
+    # Use the SSH key for deployment
     - name: Deploy to AWS EC2
       run: |
         ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ${{ secrets.WEB_APP_EC2_USERNAME }}@${{ secrets.WEB_APP_EC2_HOST }} << 'EOF'

@@ -46,5 +46,16 @@ jobs:
     - name: Deploy to AWS EC2
       run: |
         ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-13-60-44-67.eu-north-1.compute.amazonaws.com << 'EOF'
-        # Your SSH commands
+        # Pull the latest Docker image
+        sudo docker pull deathbot545/foodorderingweb:latest
+    
+        # Stop the existing container (ignore errors if the container does not exist)
+        sudo docker stop web-container || true
+    
+        # Remove the existing container (ignore errors if the container does not exist)
+        sudo docker rm web-container || true
+    
+        # Run a new container using the latest image
+        sudo docker run -d -p 80:80 --name web-container deathbot545/foodorderingweb:latest
         EOF
+

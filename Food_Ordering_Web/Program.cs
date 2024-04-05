@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.DataProtection;
 using Food_Ordering_API.Models;
 using Food_Ordering_API.Data;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,20 +57,26 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer(options =>
+.AddJwtBearer(options =>
+{
+    // Since you're issuing the tokens yourself, you define the parameters for validating those tokens here
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.Authority = "your-authority-here";  // e.g., https://your-auth-server.com/
-        options.Audience = "your-audience-here";    // e.g., your-client-id
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            // Additional token validation parameters here
-        };
-    })
-    .AddGoogle(options =>
-    {
-        options.ClientId = configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = configuration["Jwt:Issuer"], // Your application's issuer name
+        ValidAudience = configuration["Jwt:Audience"], // Your application's audience name
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])), // The key used to sign the tokens
+    };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+});
+
 
 
 
@@ -90,8 +97,6 @@ var app = builder.Build();
 // Temporarily apply these for debugging purposes
 app.UseDeveloperExceptionPage();
 
-
-
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();
@@ -105,9 +110,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
 });
-
-// Place this middleware before calling UseAuthentication(), UseHttpsRedirection(), etc.
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

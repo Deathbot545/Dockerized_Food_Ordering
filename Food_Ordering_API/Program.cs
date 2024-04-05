@@ -14,7 +14,11 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+{
+    serverOptions.ListenAnyIP(80); // Listen for HTTP connections
+    // Removed the ListenAnyIP(443) block that configures HTTPS
+});
 
 ConfigureDatabase(builder);
 ConfigureIdentity(builder);

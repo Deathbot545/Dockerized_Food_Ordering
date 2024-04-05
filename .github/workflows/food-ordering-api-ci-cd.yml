@@ -1,0 +1,62 @@
+name: CI/CD for Food_Ordering_API
+
+on:
+  push:
+    paths:
+      - 'Food_Ordering_Web/**'
+      - 'Food_Ordering_API/**' # Add paths for any dependencies
+      - 'Order_API/**'         # Ensures workflow runs if dependencies change
+      - 'Restaurant_API/**'
+  pull_request:
+    paths:
+      - 'Food_Ordering_Web/**'
+      - 'Food_Ordering_API/**' # Add paths for any dependencies
+      - 'Order_API/**'         # Similar for pull requests
+      - 'Restaurant_API/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Food_Ordering_API/Dockerfile
+        push: true
+        tags: deathbot545/foodorderingapi:latest
+        
+    # Copy the SSH private key file from your repository to the runner's home directory and set permissions
+    - name: Prepare SSH Key
+      run: |
+        cp ./.github/workflows/restro.pem $HOME/restro.pem
+        chmod 600 $HOME/restro.pem
+
+    - name: Deploy to AWS EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-13-49-67-239.eu-north-1.compute.amazonaws.com << 'EOF'
+        # Pull the latest Docker image
+        sudo docker pull deathbot545/foodorderingapi:latest
+
+        # Stop and remove any containers using port 80
+        sudo docker ps -q --filter "publish=80" | xargs -r sudo docker stop
+        sudo docker ps -aq --filter "publish=80" | xargs -r sudo docker rm
+
+        # Additionally, ensure the 'web-container' is stopped and removed, if it exists
+        sudo docker rm -f web-container || true
+
+        # Finally, run a new container using the latest image
+        sudo docker run -d -p 80:80 --name web-container deathbot545/foodorderingapi:latest
+        EOF
+

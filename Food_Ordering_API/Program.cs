@@ -14,13 +14,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(443, listenOptions =>
-    {
-        listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
-    });
-});
+
 
 ConfigureDatabase(builder);
 ConfigureIdentity(builder);

@@ -21,7 +21,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
     });
 });
-
+//lk
 ConfigureDatabase(builder);
 ConfigureIdentity(builder);
 ConfigureSwagger(builder);

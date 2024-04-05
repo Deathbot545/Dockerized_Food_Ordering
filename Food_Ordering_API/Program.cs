@@ -21,8 +21,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
     });
 });
-//ok
-// Add services to the container.
+
 ConfigureDatabase(builder);
 ConfigureIdentity(builder);
 ConfigureSwagger(builder);

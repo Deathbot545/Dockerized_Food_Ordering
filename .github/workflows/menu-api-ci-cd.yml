@@ -1,4 +1,4 @@
-name: CI/CD for Order_API
+name: CI/CD for Menu_API
 
 on:
   push:

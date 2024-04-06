@@ -6,12 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
+builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(443, listenOptions =>
-    {
-        listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
-    });
+    serverOptions.ListenAnyIP(80); // Listen for HTTP connections
+    // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 //test
 builder.Services.AddDbContext<MenuDbContext>(options =>

@@ -1,5 +1,6 @@
 
 using Food_Ordering_API.Data;
+using Food_Ordering_API.Models;
 using Food_Ordering_API.Services.AccountService;
 using Food_Ordering_API.Services.User;
 using Microsoft.AspNetCore.Authentication;
@@ -125,22 +126,26 @@ app.UseEndpoints(endpoints =>
 
 app.Run();
 
-
-
-
 void ConfigureIdentity(WebApplicationBuilder builder)
 {
-    /*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();*/
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        // Configure identity options as needed
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 6;
+        // etc.
+    })
+    .AddEntityFrameworkStores<ApplicationUserDbContext>()
+    .AddDefaultTokenProviders();
 
-    // Add Google authentication
+    // Continue to configure external authentication providers as before
     builder.Services.AddAuthentication().AddGoogle(options =>
     {
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
     });
 }
+
 
 void ConfigureSwagger(WebApplicationBuilder builder)
 {

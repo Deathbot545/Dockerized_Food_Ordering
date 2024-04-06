@@ -42,7 +42,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-51-20-185-217.eu-north-1.compute.amazonaws.com << 'EOF'
         # Pull the latest Docker image for the API
-        sudo docker pull deathbot545/orderapi:latest
+        sudo docker pull deathbot545/menuapi:latest
 
         # Stop and remove the existing API container (if it exists)
         sudo docker stop api-container || true

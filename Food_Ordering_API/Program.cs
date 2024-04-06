@@ -21,6 +21,8 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 //hj
+builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
 
 ConfigureIdentity(builder);
 ConfigureSwagger(builder);
@@ -82,21 +84,13 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
-    {
-        var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
-        if (dbContext.Database.GetPendingMigrations().Any())
-        {
-            // This ensures that the database is created and all migrations are applied.
-            dbContext.Database.Migrate();
-        }
-    }
-    catch (Exception ex)
-    {
-        // Log errors or handle them as needed
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred creating the DB.");
-    }
+    var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
+
+    // Check if the database exists and ensure it's created
+    dbContext.Database.EnsureCreated();
+
+    // Apply any pending migrations
+    dbContext.Database.Migrate();
 }
 
 builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);

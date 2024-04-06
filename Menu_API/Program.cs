@@ -1,5 +1,4 @@
 
-
 using Menu_API.Data;
 using Menu_API.Services.MenuS;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 //test
-
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IMenuService, MenuService>();
 // Add services to the container.
 

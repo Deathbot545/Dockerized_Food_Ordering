@@ -77,8 +77,11 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
 });
 
-
-
+builder.Services.AddHttpClient("UserManagementApiClient", client =>
+{
+    client.BaseAddress = new Uri("https://your-user-management-api/");
+    // Optionally set headers, timeouts, etc.
+});
 
 // Add controllers and Razor pages
 builder.Services.AddControllers();

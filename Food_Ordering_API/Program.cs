@@ -19,7 +19,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     serverOptions.ListenAnyIP(80); // Listen for HTTP connections
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
-//hjiuv
+//hj
 ConfigureDatabase(builder);
 ConfigureIdentity(builder);
 ConfigureSwagger(builder);

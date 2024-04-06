@@ -16,7 +16,7 @@
     }
   },
   "ConnectionStrings": {
-    "ApplicationDbConnection": "Host=retroapi.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=ApplicationDb;Username=postgres;Password=NxPostgrsql;"
+    "ApplicationDbConnection": "Host=retroapi.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=ApplicationDb;User ID=postgres;Password=NxPostgrsql;"
   },
   "Authentication": {
     "Google": {

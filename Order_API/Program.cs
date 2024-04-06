@@ -15,7 +15,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
     });
 });
-
+//d
 builder.Services.AddDbContext<OrderDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("OrderDbConnection")));
 

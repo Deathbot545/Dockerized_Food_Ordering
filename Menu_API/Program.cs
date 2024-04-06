@@ -12,8 +12,6 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 //test
-builder.Services.AddDbContext<MenuDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDbConnection")));
 
 builder.Services.AddScoped<IMenuService, MenuService>();
 // Add services to the container.

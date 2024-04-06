@@ -465,8 +465,8 @@ namespace Food_Ordering_Web.Controllers
                 // Remove JWT token from HttpOnly cookie
                 Response.Cookies.Delete("jwtCookie");
 
-                // Use SignInManager to sign out the user
-              
+                Response.Cookies.Delete("jwtCookie");
+
 
                 // Redirect to another page (e.g., login page)
                 return RedirectToAction("Login", "Account");

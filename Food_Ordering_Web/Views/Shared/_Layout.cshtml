@@ -1,13 +1,12 @@
-﻿@using Food_Ordering_API.Models;
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
 @{
-    System.Diagnostics.Debug.WriteLine($"Is In Role Customer: {User.IsInRole("Customer")}");
-    System.Diagnostics.Debug.WriteLine($"Is In Role Admin: {User.IsInRole("Admin")}");
-    System.Diagnostics.Debug.WriteLine($"Is In Role Restaurant: {User.IsInRole("Restaurant")}");
+    var isAuthenticated = User.Identity.IsAuthenticated;
+    var isCustomer = User.IsInRole("Customer");
+    var isAdmin = User.IsInRole("Admin");
+    var isRestaurant = User.IsInRole("Restaurant");
 }
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -96,7 +95,7 @@
 
             <!-- ... (above part remains unchanged) -->
             <div class="ms-auto d-flex align-items-center">
-                @if (SignInManager.IsSignedIn(User))
+                @if (isAuthenticated)
                 {
                     <div class="me-2">
                         <a class="btn btn-outline-primary" href="@Url.Action("Index", "UserProfile")">

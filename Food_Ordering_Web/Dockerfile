@@ -11,6 +11,7 @@ COPY ["Food_Ordering_Web/Food_Ordering_Web.csproj", "Food_Ordering_Web/"]
 COPY ["Food_Ordering_API/Food_Ordering_API.csproj", "Food_Ordering_API/"]
 COPY ["Order_API/Order_API.csproj", "Order_API/"]
 COPY ["Restaurant_API/Restaurant_API.csproj", "Restaurant_API/"]
+COPY ["Menu_API/Menu_API.csproj", "Menu_API/"]
 RUN dotnet restore "Food_Ordering_Web/Food_Ordering_Web.csproj"
 COPY . .
 WORKDIR "/src/Food_Ordering_Web"

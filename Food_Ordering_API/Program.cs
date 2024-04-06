@@ -20,7 +20,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 //hj
-ConfigureDatabase(builder);
+
 ConfigureIdentity(builder);
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
@@ -72,14 +72,30 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
+
 var app = builder.Build();
+
 // Ensure Database is Created and Migrations are Applied
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
-    var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
-    dbContext.Database.Migrate();
+    try
+    {
+        var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            // This ensures that the database is created and all migrations are applied.
+            dbContext.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log errors or handle them as needed
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
 }
 
 builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);
@@ -109,11 +125,7 @@ app.UseEndpoints(endpoints =>
 
 app.Run();
 
-void ConfigureDatabase(WebApplicationBuilder builder)
-{
-    builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
-}
+
 
 
 void ConfigureIdentity(WebApplicationBuilder builder)

@@ -14,9 +14,6 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 //d
-builder.Services.AddDbContext<OrderDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("OrderDbConnection")));
-
 // Dependency Injection for services
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();

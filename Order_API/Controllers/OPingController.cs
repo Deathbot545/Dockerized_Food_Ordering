@@ -4,7 +4,7 @@ namespace Order_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PingController : ControllerBase
+    public class OPingController : ControllerBase
     {
         [HttpGet]
         public IActionResult Get()

@@ -4,7 +4,7 @@ namespace Restaurant_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PingController : ControllerBase
+    public class RPingController : ControllerBase
     {
         [HttpGet]
         public IActionResult Get()

@@ -4,7 +4,7 @@ namespace Menu_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PingController : ControllerBase
+    public class MPingController : ControllerBase
     {
         [HttpGet]
         public IActionResult Get()

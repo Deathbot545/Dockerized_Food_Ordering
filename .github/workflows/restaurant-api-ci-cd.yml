@@ -1,0 +1,54 @@
+name: CI/CD for Restaurant_API
+
+on:
+  push:
+    paths:
+      - 'Restaurant_API/**' # Add paths for any dependencies
+
+  pull_request:
+    paths:
+      - 'Restaurant_API/**' # Add paths for any dependencies
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Restaurant_API/Dockerfile
+        push: true
+        tags: deathbot545/restaurantapi:latest
+        
+    # Copy the SSH private key file from your repository to the runner's home directory and set permissions
+    - name: Prepare SSH Key
+      run: |
+        cp ./.github/workflows/restro.pem $HOME/restro.pem
+        chmod 600 $HOME/restro.pem
+
+    - name: Deploy to AWS EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-16-171-24-137.eu-north-1.compute.amazonaws.com << 'EOF'
+        # Pull the latest Docker image for the API
+        sudo docker pull deathbot545/restaurantapi:latest
+
+        # Stop and remove the existing API container (if it exists)
+        sudo docker stop api-container || true
+        sudo docker rm api-container || true
+
+        # Run a new container for the API using the latest image
+        sudo docker run -d -p 80:80 --name api-container deathbot545/restaurantapi:latest
+        EOF
+

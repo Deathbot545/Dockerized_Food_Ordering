@@ -70,8 +70,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
-
 builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
 
 if (app.Environment.IsDevelopment())

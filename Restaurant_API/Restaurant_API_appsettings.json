@@ -1,6 +1,6 @@
 {
   "ConnectionStrings": {
-    "OutletDbConnection": "Host=database-1.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=OutletDb;User Id=postgres;Password=NxPostgrsql;"
+    "OutletDbConnection": "Host=restaurantapi.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=OutletDb;User Id=postgres;Password=NxPostgrsql;"
   },
   "StripeSettings": {
     "ApiKey": "sk_test_51NjhBQFU6tKdw4REQ4sdK5t4EUN3aNkvW7Z3v9e41eXjEgfHwcnFztdPvwrRIFeGgwuMpzvkrcn8CSghhoCbJS9S006L3W13JP",

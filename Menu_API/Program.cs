@@ -25,15 +25,33 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<MenuDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDbConnection")));
+
 var app = builder.Build();
 
+// Ensure Database is Created and Migrations are Applied
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
-    var dbContext = services.GetRequiredService<MenuDbContext>();
-    dbContext.Database.Migrate();
+    try
+    {
+        var dbContext = services.GetRequiredService<MenuDbContext>();
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            // This ensures that the database is created and all migrations are applied.
+            dbContext.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log errors or handle them as needed
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
 }
+
+
 builder.Configuration.AddJsonFile("Menu_API_appsettings.json", optional: true, reloadOnChange: true);
 
 // Configure the HTTP request pipeline.

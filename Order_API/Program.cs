@@ -49,15 +49,33 @@ builder.Services.AddCors(options =>
 });
 
 
+builder.Services.AddDbContext<OrderDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OrderDbConnection")));
+
 var app = builder.Build();
 
+// Ensure Database is Created and Migrations are Applied
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
-    var dbContext = services.GetRequiredService<OrderDbContext>();
-    dbContext.Database.Migrate();
+    try
+    {
+        var dbContext = services.GetRequiredService<OrderDbContext>();
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            // This ensures that the database is created and all migrations are applied.
+            dbContext.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log errors or handle them as needed
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
 }
+
+
 
 builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
 

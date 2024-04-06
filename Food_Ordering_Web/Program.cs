@@ -7,9 +7,8 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.DataProtection;
-using Food_Ordering_API.Models;
-using Food_Ordering_API.Data;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,12 +49,15 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.MinimumSameSitePolicy = SameSiteMode.Lax;
     options.HttpOnly = HttpOnlyPolicy.Always;
-    options.Secure = CookieSecurePolicy.SameAsRequest; // Important for HTTP
+    options.Secure = CookieSecurePolicy.SameAsRequest;
 });
 
+// Configure Authentication to include both JWT and Cookie authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Use cookies by default
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Use JWT for authentication
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Use JWT for challenges
 })
 .AddJwtBearer(options =>
 {

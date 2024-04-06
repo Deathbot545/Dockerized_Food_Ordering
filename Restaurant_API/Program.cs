@@ -6,16 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Kestrel configuration for HTTPS
-builder.WebHost.ConfigureKestrel(serverOptions =>
+builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(443, listenOptions =>
-    {
-        listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
-    });
+    serverOptions.ListenAnyIP(80); // Listen for HTTP connections
+    // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 
-builder.Services.AddDbContext<OutletDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("OutletDbConnection")));
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -38,16 +34,33 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddDbContext<OutletDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("OutletDbConnection")));
 
 var app = builder.Build();
 
+// Ensure Database is Created and Migrations are Applied
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
-    var dbContext = services.GetRequiredService<OutletDbContext>();
-    dbContext.Database.Migrate();
+    try
+    {
+        var dbContext = services.GetRequiredService<OutletDbContext>();
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            // This ensures that the database is created and all migrations are applied.
+            dbContext.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log errors or handle them as needed
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
 }
+
+
 builder.Configuration.AddJsonFile("Restaurant_API_appsettings.json", optional: true, reloadOnChange: true);
 
 // Configure the HTTP request pipeline.

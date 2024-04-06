@@ -97,7 +97,7 @@
             function loadStaffMembers(outletId) {
                 console.log("Attempting to load staff for Outlet ID:", outletId);
                 $.ajax({
-                    url: `https://restosolutionssaas.com:7115/api/KitchenApi/GetStaffByOutlet/${outletId}`,
+                    url: `https://restosolutionssaas.com/api/KitchenApi/GetStaffByOutlet/${outletId}`,
                     type: 'GET',
                     success: function (response) {
                         $('#staffMembersList').empty(); // Clear existing staff members
@@ -163,7 +163,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "https://restosolutionssaas.com:7115/api/KitchenApi/AddKitchenStaff",
+                    url: "https://restosolutionssaas.com/api/KitchenApi/AddKitchenStaff",
                     data: formData,
                     processData: false,
                     contentType: false,
@@ -216,7 +216,7 @@
 
                 // AJAX call to update the staff member
                 $.ajax({
-                    url: `https://restosolutionssaas.com:7115/api/KitchenApi/UpdateStaffMember`,
+                    url: `https://restosolutionssaas.com/api/KitchenApi/UpdateStaffMember`,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({ id, name, email, role }),
@@ -235,7 +235,7 @@
             function deleteStaffMember(id) {
                 if (confirm('Are you sure you want to delete this staff member?')) {
                     $.ajax({
-                        url: `https://restosolutionssaas.com:7115/api/KitchenApi/DeleteStaffMember/${id}`,
+                        url: `https://restosolutionssaas.com/api/KitchenApi/DeleteStaffMember/${id}`,
                         type: 'DELETE',
                         success: function (response) {
                             alert(response.message);

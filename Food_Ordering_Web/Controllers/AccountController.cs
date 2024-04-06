@@ -500,7 +500,7 @@ namespace Food_Ordering_Web.Controllers
             var userId = userIdClaim.Value;
 
             // Construct the request to the API
-            var requestUrl = "https://restosolutionssaas.com:7248/api/UserProfileApi/UpdateUserProfile";
+            var requestUrl = "https://restosolutionssaas.com/api/UserProfileApi/UpdateUserProfile";
             var httpClient = _httpClientFactory.CreateClient(); // Assuming you have HttpClientFactory injected
 
             // Retrieve the JWT token from the cookie named "jwtCookie"

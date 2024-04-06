@@ -38,7 +38,7 @@ namespace Food_Ordering_Web.Controllers
             }
 
             var client = _clientFactory.CreateClient();
-            var response = await client.GetAsync("https://restosolutionssaas.com:7115/api/OutletApi/GetAllOutletsAsync");
+            var response = await client.GetAsync("https://restosolutionssaas.com/api/OutletApi/GetAllOutletsAsync");
 
             if (response.IsSuccessStatusCode)
             {
@@ -63,7 +63,7 @@ namespace Food_Ordering_Web.Controllers
             }
 
             var client = _clientFactory.CreateClient();
-            var response = await client.GetAsync($"https://restosolutionssaas.com:7268/api/OrderApi/GetOrdersByUser/{currentUserId}");
+            var response = await client.GetAsync($"https://restosolutionssaas.com/api/OrderApi/GetOrdersByUser/{currentUserId}");
 
             if (response.IsSuccessStatusCode)
             {

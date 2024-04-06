@@ -110,7 +110,7 @@
 
         // Your existing SignalR connection setup
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com:7268/orderStatusHub")
+            .withUrl("https://restosolutionssaas.com/orderStatusHub")
             .configureLogging(signalR.LogLevel.Information)
             .withAutomaticReconnect()
             .build();
@@ -227,7 +227,7 @@
             headers: {
                 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
             },
-            url: 'https://restosolutionssaas.com:7268/api/OrderApi/UpdateOrderStatus',
+            url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
             type: 'POST',
             data: JSON.stringify({
                 OrderId: orderId,
@@ -265,7 +265,7 @@
                     headers: {
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                     },
-                    url: 'https://restosolutionssaas.com:7268/api/OrderApi/UpdateOrderStatus',
+                    url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
                     type: 'POST',
                     data: JSON.stringify({
                         OrderId: orderId,

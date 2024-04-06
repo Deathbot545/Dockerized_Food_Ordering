@@ -123,7 +123,7 @@
         let outletId = '@ViewBag.OutletId';
 
         function fetchAndDisplayMenuItems() {
-            let apiEndpoint = `https://restosolutionssaas.com:7225/api/MenuApi/GetMenuItems/${outletId}`;
+            let apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItems/${outletId}`;
             $.get(apiEndpoint, function (menuItems) {
                 let categoryMap = {};
                 let navbarItems = '';
@@ -171,7 +171,7 @@
                 });
         }
         function fetchAndDisplayOutletInfo() {
-            let outletInfoEndpoint = `https://restosolutionssaas.com:7115/api/OutletApi/outletInfo/${outletId}`;
+            let outletInfoEndpoint = `https://restosolutionssaas.com/api/OutletApi/outletInfo/${outletId}`;
 
             console.log(`Fetching data from endpoint: ${outletInfoEndpoint}`); // Logs the endpoint being hit.
 

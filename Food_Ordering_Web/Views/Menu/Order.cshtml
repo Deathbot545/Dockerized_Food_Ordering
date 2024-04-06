@@ -22,7 +22,7 @@
 
     async function loadOrderDetails(orderId) {
         try {
-            const response = await fetch(`https://restosolutionssaas.com:7268/api/OrderApi/GetOrderDetails/${orderId}`);
+            const response = await fetch(`https://restosolutionssaas.com/api/OrderApi/GetOrderDetails/${orderId}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch order details');
             }
@@ -64,7 +64,7 @@
 
     async function cancelOrder(orderId) {
         try {
-            const response = await fetch(`https://restosolutionssaas.com:7268/api/OrderApi/CancelOrder/${orderId}`, { method: 'POST' });
+            const response = await fetch(`https://restosolutionssaas.com/api/OrderApi/CancelOrder/${orderId}`, { method: 'POST' });
             if (!response.ok) {
                 throw new Error('Failed to cancel the order');
             }

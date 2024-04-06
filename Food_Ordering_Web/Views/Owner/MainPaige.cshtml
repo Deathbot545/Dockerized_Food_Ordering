@@ -296,7 +296,7 @@
         }
         function fetchAndDisplayOutletImages(outletId) {
             $.ajax({
-                url: `https://restosolutionssaas.com:7115/api/OutletApi/GetOutletImages/${outletId}`,
+                url: `https://restosolutionssaas.com/api/OutletApi/GetOutletImages/${outletId}`,
                 method: 'GET',
                 success: function (data) {
                     const logoImageUrl = data.logoBase64 ? `data:image/png;base64,${data.logoBase64}` : '/path/to/default/logo.png';
@@ -330,7 +330,7 @@
         const selectedId = $('#deleteConfirmationModal').data('selected-id');
 
         $.ajax({
-            url: `https://restosolutionssaas.com:7115/api/OutletApi/delete/${selectedId}`,
+            url: `https://restosolutionssaas.com/api/OutletApi/delete/${selectedId}`,
             type: 'DELETE',
             success: function (response) {
                 console.log(response);  // Debugging line

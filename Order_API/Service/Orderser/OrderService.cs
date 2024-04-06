@@ -37,7 +37,7 @@ namespace Order_API.Service.Orderser
                 _logger.LogInformation($"Processing menu item with Id {item.Id}");
 
                 // Construct the URL to the Menu API endpoint
-                string url = $"https://restosolutionssaas.com:7225/api/MenuApi/GetMenuItem/{item.Id}";
+                string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItem/{item.Id}";
 
                 try
                 {
@@ -232,7 +232,7 @@ namespace Order_API.Service.Orderser
             var menuItemsDto = new List<MenuItemDto>();
 
             // Construct the URL to the Menu API endpoint
-            string url = $"https://restosolutionssaas.com:7225/api/MenuApi/GetMenuItems/{outletId}";
+            string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItems/{outletId}";
 
             try
             {

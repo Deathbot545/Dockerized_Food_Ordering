@@ -143,7 +143,7 @@ namespace Food_Ordering_Web.Controllers
             _logger.LogInformation($"Sending JSON payload to API: {jsonPayload}");
 
             var client = _httpClientFactory.CreateClient();
-            var response = await client.PostAsJsonAsync("https://restosolutionssaas.com:7268/api/OrderApi/AddOrder", orderData);
+            var response = await client.PostAsJsonAsync("https://restosolutionssaas.com/api/OrderApi/AddOrder", orderData);
 
             if (response.IsSuccessStatusCode)
             {

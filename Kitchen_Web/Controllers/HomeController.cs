@@ -42,7 +42,7 @@ namespace Kitchen_Web.Controllers
                 List<OrderDTO> orders;
                 using (var httpClient = new HttpClient())
                 {
-                    var response = await httpClient.GetAsync($"https://restosolutionssaas.com:7268/api/OrderApi/GetOrdersForOutlet/{outletId.Value}");
+                    var response = await httpClient.GetAsync($"https://restosolutionssaas.com/api/OrderApi/GetOrdersForOutlet/{outletId.Value}");
                     if (!response.IsSuccessStatusCode)
                     {
                         var errorResponse = await response.Content.ReadAsStringAsync();

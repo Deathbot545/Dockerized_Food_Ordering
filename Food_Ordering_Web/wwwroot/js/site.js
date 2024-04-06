@@ -20,7 +20,7 @@ function mapEnumToStatusText(statusValue) {
 
 async function fetchCurrentOrderStatus(orderId) {
     try {
-        const response = await fetch(`https://restosolutionssaas.com:7268/api/OrderApi/GetOrderStatus/${orderId}`);
+        const response = await fetch(`https://restosolutionssaas.com/api/OrderApi/GetOrderStatus/${orderId}`);
         if (!response.ok) {
             throw new Error('Failed to fetch current order status');
         }
@@ -88,7 +88,7 @@ async function setupSignalRConnection() {
 
     console.log("Establishing SignalR connection for order status updates.");
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`https://restosolutionssaas.com:7268/orderStatusHub?orderId=${currentOrder.orderId}`)
+        .withUrl(`https://restosolutionssaas.com/orderStatusHub?orderId=${currentOrder.orderId}`)
         .configureLogging(signalR.LogLevel.Information)
         .withAutomaticReconnect()
         .build();

@@ -49,7 +49,7 @@ builder.Services.AddDbContext<OrderDbContext>(options =>
 
 var app = builder.Build();
 
-// Ensure Database is Created and Migrations are Applied
+// Ensure Database is Created and Migrations are Applied gg
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

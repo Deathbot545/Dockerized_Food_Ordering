@@ -8,7 +8,7 @@
         "ASPNETCORE_ENVIRONMENT": "Production"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://restosolutionssaas.com:7248;http://restosolutionssaas.com:5173"
+      "applicationUrl": "https://restosolutionssaas.com;http://restosolutionssaas.com:5173"
     },
     "IIS Express": {
       "commandName": "IISExpress",

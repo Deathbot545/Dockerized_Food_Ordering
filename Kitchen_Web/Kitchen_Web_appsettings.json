@@ -25,7 +25,7 @@
     }
   },
   "ShowDetailedErrors": true,
-  "ApiBaseUrl": "https://restosolutionssaas.com:7248/",
-  "RestaurantApiBaseUrl": "https://restosolutionssaas.com:7115/",
+  "ApiBaseUrl": "https://restosolutionssaas.com/",
+  "RestaurantApiBaseUrl": "https://restosolutionssaas.com/",
   "AllowedHosts": "*"
 }

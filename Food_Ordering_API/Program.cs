@@ -80,6 +80,11 @@ builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
 
 var app = builder.Build();
 
+// Log the connection string to verify it's correctly loaded
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbConnection");
+logger.LogInformation($"Using connection string: {connectionString}");
+
 // Ensure Database is Created and Migrations are Applied
 using (var scope = app.Services.CreateScope())
 {
@@ -87,11 +92,19 @@ using (var scope = app.Services.CreateScope())
     var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
 
     // Check if the database exists and ensure it's created
-    dbContext.Database.EnsureCreated();
-
-    // Apply any pending migrations
-    dbContext.Database.Migrate();
+    try
+    {
+        logger.LogInformation("Ensuring database is created and applying migrations...");
+        dbContext.Database.EnsureCreated();
+        dbContext.Database.Migrate();
+        logger.LogInformation("Database check and migration applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while ensuring database is created and applying migrations.");
+    }
 }
+
 
 builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);
 

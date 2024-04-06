@@ -3,11 +3,9 @@ using Newtonsoft.Json;
 using Stripe;
 using Stripe.Checkout;
 using static Food_Ordering_API.Controllers.AccountApiController;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
-using Food_Ordering_API.Models;
+
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -15,38 +13,39 @@ namespace Food_Ordering_Web.Controllers
     public class StripeController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly string _apiBaseUrl;
-        public StripeController(HttpClient httpClient, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+
+        public StripeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             // Initialize Stripe with your secret key
-            StripeConfiguration.ApiKey = "sk_test_51NjhBQFU6tKdw4REQ4sdK5t4EUN3aNkvW7Z3v9e41eXjEgfHwcnFztdPvwrRIFeGgwuMpzvkrcn8CSghhoCbJS9S006L3W13JP";
-            _httpClient = httpClient;
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api/AccountApi";
+            StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
+            _httpClient = httpClientFactory.CreateClient("UserManagementApiClient");
+            _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api";
         }
 
-        [HttpGet("start-subscription")] // Change to [HttpGet] if you're initiating via a link or button
+        [HttpGet("start-subscription")]
         public ActionResult StartSubscription()
         {
-            var userId = _userManager.GetUserId(User);
             var domain = "https://restosolutionssaas.com"; // Adjust as per your application's domain
 
+            // Assume user's identifier is retrieved from their authentication cookie or JWT token.
+            // For demonstration purposes, the userId needs to be dynamically retrieved based on the authenticated user context,
+            // which should be passed to Stripe's SuccessUrl to identify the user once Stripe redirects back to your application.
+
+            // This approach requires the client application to pass the userId or ensure the session can resolve it when Stripe redirects back.
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card", },
                 LineItems = new List<SessionLineItemOptions>
+            {
+                new SessionLineItemOptions
                 {
-                    new SessionLineItemOptions
-                    {
-                        Price = "price_1OrDlcFU6tKdw4RE5iusepry", // Replace with your actual price ID
-                        Quantity = 1,
-                    },
+                    Price = "price_1OrDlcFU6tKdw4RE5iusepry", // Replace with your actual price ID
+                    Quantity = 1,
                 },
+            },
                 Mode = "subscription",
-                SuccessUrl = domain + $"/Stripe/RegistrationSuccess?session_id={{CHECKOUT_SESSION_ID}}&userId={userId}",
+                SuccessUrl = domain + "/Stripe/RegistrationSuccess?session_id={CHECKOUT_SESSION_ID}",
                 CancelUrl = domain + "/Stripe/RegistrationCancel",
             };
 
@@ -57,57 +56,29 @@ namespace Food_Ordering_Web.Controllers
         }
 
         [HttpGet("RegistrationSuccess")]
-        public async Task<IActionResult> RegistrationSuccess(string session_id, string userId)
+        public async Task<IActionResult> RegistrationSuccess(string session_id)
         {
-            if (!string.IsNullOrEmpty(userId))
+            // The userId should be resolved here, either by decoding the JWT from the user's request
+            // or by maintaining a mapping of session_id to userId on your server (set when creating the Stripe session).
+            // For demonstration, this is left as a manual step:
+
+            // string userId = ResolveUserIdFromSession(session_id);
+            // This requires an implementation specific to your authentication strategy.
+
+            // Since direct user management is not done here, call your User Management API to handle subscription success.
+            var apiResponse = await _httpClient.GetAsync($"{_apiBaseUrl}/HandleSubscriptionSuccess?sessionId={session_id}");
+
+            if (apiResponse.IsSuccessStatusCode)
             {
-                // Prepare the request to update the subscription status
-                var updateModel = new UpdateSubscriptionStatusDto
-                {
-                    UserId = userId,
-                    IsSubscribed = true
-                };
-
-                var jsonContent = JsonConvert.SerializeObject(updateModel);
-                var buffer = System.Text.Encoding.UTF8.GetBytes(jsonContent);
-                var byteContent = new ByteArrayContent(buffer) { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } };
-
-                // Call your API to update the subscription status in the database
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/UpdateSubscriptionStatus", byteContent);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var user = await _userManager.FindByIdAsync(userId);
-                    if (user != null)
-                    {
-                        // Retrieve user's claims and update the IsSubscribed claim
-                        var claims = await _userManager.GetClaimsAsync(user);
-                        var subscriptionClaim = claims.FirstOrDefault(c => c.Type == "IsSubscribed");
-                        if (subscriptionClaim != null)
-                        {
-                            // Remove the old claim
-                            await _userManager.RemoveClaimAsync(user, subscriptionClaim);
-                        }
-
-                        // Add the new IsSubscribed claim
-                        await _userManager.AddClaimAsync(user, new Claim("IsSubscribed", "true"));
-
-                        // Refresh user's authentication cookie to include the updated claim
-                        await _signInManager.RefreshSignInAsync(user);
-
-                        // Redirect to the desired page after updating the subscription status and refreshing claims
-                        return RedirectToAction("Index", "Restaurant"); // Adjust as needed
-                    }
-                }
-
+                // Assuming the API call to update the user's subscription status is successful
+                return RedirectToAction("Index", "Home"); // Adjust as needed based on your application's flow
             }
-
-            // Handle error or unsuccessful update
-            return RedirectToAction("ErrorPage"); // Adjust as needed
+            else
+            {
+                // Log the error or handle the failure appropriately
+                return RedirectToAction("ErrorPage"); // Adjust as needed
+            }
         }
-
-
-
 
         [HttpGet("RegistrationCancel")]
         public IActionResult RegistrationCancel()
@@ -116,4 +87,5 @@ namespace Food_Ordering_Web.Controllers
             return View("RegistrationCancelled");
         }
     }
+
 }

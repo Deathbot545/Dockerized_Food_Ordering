@@ -13,7 +13,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     serverOptions.ListenAnyIP(80); // Listen for HTTP connections
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
-//d
+
 // Dependency Injection for services
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();

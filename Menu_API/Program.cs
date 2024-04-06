@@ -1,4 +1,3 @@
-
 using Menu_API.Data;
 using Menu_API.Services.MenuS;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +13,26 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IMenuService, MenuService>();
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+ConfigureSwagger(builder);
+ConfigureControllers(builder);
+
+// CORS policy setup
+// Modify your existing CORS policy setup in the Program.cs file
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMyOrigins", builder =>
+    {
+        builder.WithOrigins(
+                 "https://restosolutionssaas.com:8443", // The first web application origin
+                 "https://restosolutionssaas.com" // The second web application origin
+               )
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
+    });
+});
 builder.Services.AddDbContext<MenuDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDbConnection")));
 
@@ -46,7 +59,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
 builder.Configuration.AddJsonFile("Menu_API_appsettings.json", optional: true, reloadOnChange: true);
 
 // Configure the HTTP request pipeline.
@@ -63,3 +75,15 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+void ConfigureSwagger(WebApplicationBuilder builder)
+{
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+}
+
+void ConfigureControllers(WebApplicationBuilder builder)
+{
+    builder.Services.AddControllers();
+}

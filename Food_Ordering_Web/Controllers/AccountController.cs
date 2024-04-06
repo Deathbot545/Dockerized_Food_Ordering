@@ -20,17 +20,15 @@ namespace Food_Ordering_Web.Controllers
     
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+
         private readonly HttpClient _httpClient;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _apiBaseUrl;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IHttpClientFactory httpClientFactory, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, ILogger<AccountController> logger)
+        public AccountController( IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AccountController> logger)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+         
             _httpClient = new HttpClient(); // Or however you get your HttpClient
             _httpClientFactory = httpClientFactory;
             _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api/AccountApi";  // Modify it here
@@ -82,17 +80,10 @@ namespace Food_Ordering_Web.Controllers
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
-                    if (responseObject != null)
+                    if (responseObject != null && responseObject.Token != null)
                     {
-                        ApplicationUser user = new ApplicationUser
-                        {
-                            Id = responseObject.User.Id,
-                            UserName = responseObject.User.UserName,
-                            Email = responseObject.User.Email
-                            // Populate other necessary fields
-                        };
-
-                        return await HandleLogin(user, responseObject.Token);
+                        // Directly use the token to handle login
+                        return await HandleLogin(responseObject.Token);
                     }
                     else
                     {
@@ -178,18 +169,10 @@ namespace Food_Ordering_Web.Controllers
                     var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
 
                     _logger.LogInformation($"Raw API Response: {responseContent}");
-                    if (responseObject != null)
+                    if (responseObject != null && responseObject.Token != null)
                     {
-                        // Create a new ApplicationUser object
-                        ApplicationUser user = new ApplicationUser
-                        {
-                            Id = responseObject.User.Id,
-                            UserName = responseObject.User.UserName,
-                            Email = responseObject.User.Email
-                            // Populate other necessary fields
-                        };
-                        _logger.LogInformation("JWT token read.");
-                        return await HandleLogin(user, responseObject.Token, outletId, tableId);
+                        // Now, simply pass the JWT token to HandleLogin
+                        return await HandleLogin(responseObject.Token, outletId, tableId);
                     }
                     else
                     {
@@ -344,15 +327,7 @@ namespace Food_Ordering_Web.Controllers
                     return RedirectToAction("SuccessAction");
                 }
 
-                ApplicationUser user = new ApplicationUser
-                {
-                    Id = responseObject.User.Id,
-                    UserName = responseObject.User.UserName,
-                    Email = responseObject.User.Email
-                    // Populate other necessary fields
-                };
-
-                return await HandleLogin(user, responseObject.Token, outletId, tableId);
+                return await HandleLogin(responseObject.Token, outletId, tableId);
 
 
             }
@@ -373,16 +348,8 @@ namespace Food_Ordering_Web.Controllers
                     var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
                     if (responseObject != null)
                     {
-                        // Create a new ApplicationUser object
-                        ApplicationUser user = new ApplicationUser
-                        {
-                            Id = responseObject.User.Id,
-                            UserName = responseObject.User.UserName,
-                            Email = responseObject.User.Email
-                            // Populate other necessary fields
-                        };
-
-                        return await HandleLogin(user, responseObject.Token, outletId, tableId);
+                       
+                        return await HandleLogin( responseObject.Token, outletId, tableId);
                     }
                     else
                     {
@@ -408,92 +375,83 @@ namespace Food_Ordering_Web.Controllers
         }
 
 
-        public async Task<IActionResult> HandleLogin(ApplicationUser user, string token, int? outletId = null, int? tableId = null)
+        public async Task<IActionResult> HandleLogin(string token, int? outletId = null, int? tableId = null)
         {
             try
             {
-                _logger.LogInformation($"Starting login process for user {user.UserName}");
+                _logger.LogInformation("Starting login process with JWT token.");
 
-                // Decode JWT to get role and subscription status
+                // Decode JWT to extract user information and claims
                 var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name) ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
+                if (userNameClaim == null)
+                {
+                    _logger.LogError("User name claim not found in JWT.");
+                    return BadRequest("User name claim not found in JWT.");
+                }
 
                 var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
-                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed"); // Get the IsSubscribed claim from the JWT
+                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed");
 
                 if (roleClaim == null)
                 {
-                    _logger.LogError($"Role claim not found in JWT for user {user.UserName}");
+                    _logger.LogError("Role claim not found in JWT.");
                     return BadRequest("Role claim not found in JWT.");
                 }
 
                 // Ensure you convert the IsSubscribed string to a boolean, and handle null cases
-                bool isSubscribed = isSubscribedClaim != null && bool.Parse(isSubscribedClaim.Value);
+                bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
 
-                var role = roleClaim.Value;
-                _logger.LogInformation($"Role {role} found in JWT for user {user.UserName}");
-
-                // Create claims, including the IsSubscribed claim
+                // Assemble claims for ClaimsIdentity
                 var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Role, role),
-            new Claim("UserId", user.Id),
-            new Claim("IsSubscribed", isSubscribed.ToString()) // Add IsSubscribed claim
+            new Claim(ClaimTypes.Name, userNameClaim.Value),
+            new Claim(ClaimTypes.Role, roleClaim.Value),
+            new Claim("IsSubscribed", isSubscribed.ToString())
         };
 
-                // Create ClaimsIdentity
+                // Create ClaimsIdentity and ClaimsPrincipal
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                _logger.LogInformation("Attempting to sign in user {UserName} with claims.", user.UserName);
-                await _signInManager.SignInWithClaimsAsync(user, isPersistent: false, claimsIdentity.Claims);
-                _logger.LogInformation("Sign in attempt for user {UserName} completed.", user.UserName);
-                _logger.LogInformation($"User {user.UserName} authenticated: {HttpContext.User.Identity.IsAuthenticated}");
-
-
-                // Check authentication status after SignInManager attempt
-                if (User.Identity.IsAuthenticated)
+                // Sign in the user with the assembled ClaimsPrincipal
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties
                 {
-                    _logger.LogInformation("User {UserName} is authenticated after sign in attempt.", user.UserName);
-                }
-                else
-                {
-                    _logger.LogWarning("User {UserName} is NOT authenticated after sign in attempt.", user.UserName);
-                }
-
-                // Set the JWT token in a cookie
-                Response.Cookies.Append("jwtCookie", token, new CookieOptions
-                {
-                    HttpOnly = true, // Recommended for security
-                    Secure = true, // Set to true to enforce the cookie to be sent over HTTPS
-                    SameSite = SameSiteMode.Lax, // Adjust based on your requirements
-                    Expires = DateTime.UtcNow.AddMinutes(30) // Set the same expiry as your JWT token
+                    IsPersistent = false, // Or true, depending on your requirements
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // Adjust to match the token's expiry
                 });
 
-                _logger.LogInformation("JWT cookie set for user {UserName}.", user.UserName);
-                foreach (var claim in HttpContext.User.Claims)
+                _logger.LogInformation($"User {userNameClaim.Value} signed in with claims.");
+
+                // Set the JWT token in a secure, HTTP-only cookie for client-side use
+                Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
-                    _logger.LogInformation($"Claim type: {claim.Type}, Claim value: {claim.Value}");
-                }
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+                });
 
-
-                // Redirect based on role
+                // Redirect based on role or other logic
                 if (outletId.HasValue && tableId.HasValue)
                 {
                     return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
                 }
                 else
                 {
-                    string finalUrl = Url.Action("Index", role); // Or whatever your target URL is
-                    return RedirectToAction("IntermediateRedirect", new { returnUrl = finalUrl }); // Assuming you have an Index action for each role.
+                    string finalUrl = Url.Action("Index", new { role = roleClaim.Value }); // Adjust as necessary
+                    return Redirect(finalUrl);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred during the login process for user {UserName}.", user.UserName);
-                return View("Error"); // Ensure you have an Error view to handle exceptions gracefully
+                _logger.LogError(ex, "An error occurred during the login process.");
+                return View("Error");
             }
         }
+
 
 
         [HttpPost]
@@ -508,7 +466,7 @@ namespace Food_Ordering_Web.Controllers
                 Response.Cookies.Delete("jwtCookie");
 
                 // Use SignInManager to sign out the user
-                await _signInManager.SignOutAsync();
+              
 
                 // Redirect to another page (e.g., login page)
                 return RedirectToAction("Login", "Account");
@@ -578,8 +536,6 @@ namespace Food_Ordering_Web.Controllers
                 return View(model); // Return back to the edit profile view with error message
             }
         }
-
-
 
     }
 }

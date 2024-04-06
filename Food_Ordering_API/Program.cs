@@ -85,7 +85,7 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbConnection");
 logger.LogInformation($"Using connection string: {connectionString}");
 
-// Ensure Database is Created and Migrations are Applied
+// Ensure Database is Created and Migrations
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

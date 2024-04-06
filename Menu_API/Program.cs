@@ -58,7 +58,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred creating the DB.");
     }
 }
-//ok
+
 builder.Configuration.AddJsonFile("Menu_API_appsettings.json", optional: true, reloadOnChange: true);
 
 // Configure the HTTP request pipeline.

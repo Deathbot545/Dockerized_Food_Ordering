@@ -40,22 +40,37 @@ builder.Services.AddHttpClient("namedClient", c =>
 // Authentication Configuration
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer(options =>
+.AddCookie(options =>
+{
+
+    options.Cookie.HttpOnly = true; // Enhance security by restricting access to the cookie from client-side scripts.
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Cookie security policy based on the request.
+    options.Cookie.SameSite = SameSiteMode.Lax; // Controls how cookies are attached to cross-site requests.
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie expiration time.
+    options.SlidingExpiration = true; // Reset the cookie expiration time if a user is active.
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.Authority = "your-authority-here";  // e.g., https://your-auth-server.com/
-        options.Audience = "your-audience-here";    // e.g., your-client-id
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            // Additional token validation parameters here
-        };
-    })
-    .AddGoogle(options =>
-    {
-        options.ClientId = configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = configuration["Jwt:Issuer"],
+        ValidAudience = configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+    };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+});
 
 // Controllers and Razor Pages
 builder.Services.AddControllers();
@@ -80,12 +95,6 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    HttpOnly = HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.Always
-});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

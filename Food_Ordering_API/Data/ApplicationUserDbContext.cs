@@ -22,7 +22,7 @@ namespace Food_Ordering_API.Data
             public ApplicationUserDbContext CreateDbContext(string[] args)
             {
                 var optionsBuilder = new DbContextOptionsBuilder<ApplicationUserDbContext>();
-                optionsBuilder.UseNpgsql("DefaultConnection");
+                optionsBuilder.UseNpgsql("ApplicationDbConnection");
 
                 return new ApplicationUserDbContext(optionsBuilder.Options);
             }

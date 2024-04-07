@@ -6,6 +6,8 @@ using Order_API.Service.Orderser;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
+
 var configuration = builder.Configuration;
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
@@ -70,7 +72,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
+
 
 if (app.Environment.IsDevelopment())
 {

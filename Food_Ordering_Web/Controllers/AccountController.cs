@@ -377,11 +377,11 @@ namespace Food_Ordering_Web.Controllers
 
         public async Task<IActionResult> HandleLogin(string token, int? outletId = null, int? tableId = null)
         {
+            _logger.LogInformation("HandleLogin method entered with JWT token.");
+
             try
             {
-                _logger.LogInformation("Starting login process with JWT token.");
-
-                // Decode JWT to extract user information and claims
+                _logger.LogDebug("Starting JWT token decoding process.");
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
@@ -401,10 +401,9 @@ namespace Food_Ordering_Web.Controllers
                     return BadRequest("Role claim not found in JWT.");
                 }
 
-                // Ensure you convert the IsSubscribed string to a boolean, and handle null cases
                 bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
 
-                // Assemble claims for ClaimsIdentity
+                _logger.LogDebug("Assembling claims for ClaimsIdentity.");
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, userNameClaim.Value),
@@ -412,20 +411,19 @@ namespace Food_Ordering_Web.Controllers
             new Claim("IsSubscribed", isSubscribed.ToString())
         };
 
-                // Create ClaimsIdentity and ClaimsPrincipal
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                // Sign in the user with the assembled ClaimsPrincipal
+                _logger.LogDebug("Signing in the user with the assembled ClaimsPrincipal.");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties
                 {
-                    IsPersistent = false, // Or true, depending on your requirements
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // Adjust to match the token's expiry
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
-                _logger.LogInformation($"User {userNameClaim.Value} signed in with claims.");
+                _logger.LogInformation($"User {userNameClaim.Value} signed in successfully with claims.");
 
-                // Set the JWT token in a secure, HTTP-only cookie for client-side use
+                _logger.LogDebug("Setting the JWT token in a secure, HTTP-only cookie for client-side use.");
                 Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
                     HttpOnly = true,
@@ -434,14 +432,17 @@ namespace Food_Ordering_Web.Controllers
                     Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
-                // Redirect based on role or other logic
+                _logger.LogDebug("Redirecting user based on role or other logic.");
                 if (outletId.HasValue && tableId.HasValue)
                 {
-                    return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
+                    string redirectUrl = $"/Order/Menu?outletId={outletId}&tableId={tableId}";
+                    _logger.LogInformation($"Redirecting to Order Menu: {redirectUrl}");
+                    return Redirect(redirectUrl);
                 }
                 else
                 {
-                    string finalUrl = Url.Action("Index", new { role = roleClaim.Value }); // Adjust as necessary
+                    string finalUrl = Url.Action("Index", new { role = roleClaim.Value });
+                    _logger.LogInformation($"Redirecting to final URL: {finalUrl}");
                     return Redirect(finalUrl);
                 }
             }
@@ -451,6 +452,7 @@ namespace Food_Ordering_Web.Controllers
                 return View("Error");
             }
         }
+
 
 
 

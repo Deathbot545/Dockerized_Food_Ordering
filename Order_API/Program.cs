@@ -29,7 +29,6 @@ builder.Services.AddControllers();
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// CORS policy setup
 // Modify your existing CORS policy setup in the Program.cs file
 builder.Services.AddCors(options =>
 {
@@ -71,8 +70,6 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred creating the DB.");
     }
 }
-
-
 
 if (app.Environment.IsDevelopment())
 {

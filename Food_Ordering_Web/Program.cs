@@ -1,6 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.AspNetCore.CookiePolicy;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json.Serialization;
@@ -95,6 +94,14 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.SameAsRequest,
+    MinimumSameSitePolicy = SameSiteMode.Lax
+});
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

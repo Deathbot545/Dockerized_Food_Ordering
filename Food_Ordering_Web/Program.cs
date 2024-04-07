@@ -25,7 +25,6 @@ builder.Services.AddSignalR();
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); // Listen for HTTP connections
-    // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 // Inside ConfigureServices method or directly in the Program.cs
 var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys"; // Path inside the container
@@ -59,18 +58,23 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Use JWT for authentication
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Use JWT for challenges
 })
+.AddCookie(options => // This is where we add the cookie middleware
+{
+    options.LoginPath = "/Account/Login"; // Specify the path to your login action
+    options.LogoutPath = "/Account/Logout"; // Specify the path to your logout action
+    // Configure other cookie options as needed
+})
 .AddJwtBearer(options =>
 {
-    // Since you're issuing the tokens yourself, you define the parameters for validating those tokens here
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = configuration["Jwt:Issuer"], // Your application's issuer name
-        ValidAudience = configuration["Jwt:Audience"], // Your application's audience name
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])), // The key used to sign the tokens
+        ValidIssuer = configuration["Jwt:Issuer"],
+        ValidAudience = configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
     };
 })
 .AddGoogle(options =>
@@ -78,6 +82,7 @@ builder.Services.AddAuthentication(options =>
     options.ClientId = configuration["Authentication:Google:ClientId"];
     options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
 });
+
 
 builder.Services.AddHttpClient("UserManagementApiClient", client =>
 {

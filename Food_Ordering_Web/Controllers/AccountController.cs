@@ -14,6 +14,7 @@ using System.Net.Http.Headers;
 using Food_Ordering_API.Models;
 using Food_Ordering_API.ViewModels;
 using Food_Ordering_API.DTO;
+using Microsoft.Extensions.Logging;
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -431,7 +432,7 @@ namespace Food_Ordering_Web.Controllers
                     SameSite = SameSiteMode.Lax,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
-
+                _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
                 _logger.LogDebug("Redirecting user based on role or other logic.");
                 if (outletId.HasValue && tableId.HasValue)
                 {
@@ -453,6 +454,16 @@ namespace Food_Ordering_Web.Controllers
             {
                 _logger.LogError(ex, "An error occurred during the login process.");
                 return View("Error"); // Ensure there's an Error view available to handle this scenario
+            }
+            finally
+            {
+                var cookieSet = Response.Headers.ContainsKey("Set-Cookie");
+                _logger.LogDebug($"Was 'Set-Cookie' header present in response: {cookieSet}");
+                if (cookieSet)
+                {
+                    var setCookieHeader = Response.Headers["Set-Cookie"];
+                    _logger.LogDebug($"'Set-Cookie' header value: {setCookieHeader}");
+                }
             }
         }
 

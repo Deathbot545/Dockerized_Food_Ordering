@@ -40,32 +40,22 @@ builder.Services.AddHttpClient("namedClient", c =>
 // Authentication Configuration
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie(options =>
-{
-
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = configuration["Jwt:Issuer"],
-        ValidAudience = configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
-    };
-})
-.AddGoogle(options =>
-{
-    options.ClientId = configuration["Authentication:Google:ClientId"];
-    options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-});
+        options.Authority = "your-authority-here";  // e.g., https://your-auth-server.com/
+        options.Audience = "your-audience-here";    // e.g., your-client-id
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            // Additional token validation parameters here
+        };
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+    });
 
 // Controllers and Razor Pages
 builder.Services.AddControllers();

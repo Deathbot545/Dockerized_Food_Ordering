@@ -46,7 +46,14 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(options =>
 {
-    //lk
+    options.LoginPath = "/Account/Login"; // Redirect path for login.
+    options.LogoutPath = "/Account/Logout"; // Redirect path for logout.
+    options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect path for access denied.
+    options.Cookie.HttpOnly = true; // Enhance security by restricting access to the cookie from client-side scripts.
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Cookie security policy based on the request.
+    options.Cookie.SameSite = SameSiteMode.Lax; // Controls how cookies are attached to cross-site requests.
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie expiration time.
+    options.SlidingExpiration = true; // Reset the cookie expiration time if a user is active.
 })
 .AddJwtBearer(options =>
 {

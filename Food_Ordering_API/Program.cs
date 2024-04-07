@@ -91,19 +91,18 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
 
-    // Check if the database exists and ensure it's created
     try
     {
-        logger.LogInformation("Ensuring database is created and applying migrations...");
-        dbContext.Database.EnsureCreated();
-        dbContext.Database.Migrate();
+        logger.LogInformation("Applying migrations to ensure the database and tables are created...");
+        dbContext.Database.Migrate(); // This will ensure DB exists and all migrations are applied.
         logger.LogInformation("Database check and migration applied successfully.");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "An error occurred while ensuring database is created and applying migrations.");
+        logger.LogError(ex, "An error occurred while applying migrations.");
     }
 }
+
 
 
 builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);

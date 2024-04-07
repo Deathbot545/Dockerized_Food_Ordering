@@ -426,7 +426,7 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogDebug("Setting the JWT token in a secure, HTTP-only cookie for client-side use.");
                 Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
-                    HttpOnly = true,
+                    HttpOnly = false,
                     Secure = true,
                     SameSite = SameSiteMode.Lax,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(30)
@@ -442,10 +442,6 @@ namespace Food_Ordering_Web.Controllers
                 }
                 else
                 {
-                    // Dynamically redirect based on user role
-                    // Assuming roleClaim.Value gives us "Customer", "Admin", etc.
-                    // The controller names should match these role names exactly, except for the "Controller" suffix
-                    // which should not be included in the controller name string here.
                     string controllerName = roleClaim.Value; // The role name is expected to match the controller name
                     _logger.LogInformation($"Redirecting to {controllerName} controller's Index action.");
 

@@ -61,6 +61,8 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred while applying migrations.");
     }
 }
+
+
 // Ensure Database is Created and Migrations are Applied
 
 //gf

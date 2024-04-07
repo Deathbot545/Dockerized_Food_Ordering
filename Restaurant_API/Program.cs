@@ -2,8 +2,10 @@ using Restaurant_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Restaurant_API.Services.OutletSer;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("Restaurant_API_appsettings.json", optional: true, reloadOnChange: true);
 
 // Kestrel configuration for HTTPS
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
@@ -39,29 +41,33 @@ builder.Services.AddDbContext<OutletDbContext>(options =>
 
 var app = builder.Build();
 
-// Ensure Database is Created and Migrations are Applied
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var connectionString = builder.Configuration.GetConnectionString("OutletDbConnection");
+logger.LogInformation($"Using connection string: {connectionString}");
+
+// Ensure Database is Created and Migrations
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<OutletDbContext>();
+
     try
     {
-        var dbContext = services.GetRequiredService<OutletDbContext>();
-        if (dbContext.Database.GetPendingMigrations().Any())
-        {
-            // This ensures that the database is created and all migrations are applied.
-            dbContext.Database.Migrate();
-        }
+        logger.LogInformation("Applying migrations to ensure the database and tables are created...");
+        dbContext.Database.Migrate(); // This will ensure DB exists and all migrations are applied.
+        logger.LogInformation("Database check and migration applied successfully.");
     }
     catch (Exception ex)
     {
-        // Log errors or handle them as needed
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred creating the DB.");
+        logger.LogError(ex, "An error occurred while applying migrations.");
     }
 }
+
+// Ensure Database is Created and Migrations are Applied
+
 //hfh
 
-builder.Configuration.AddJsonFile("Restaurant_API_appsettings.json", optional: true, reloadOnChange: true);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

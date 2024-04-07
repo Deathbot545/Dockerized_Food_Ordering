@@ -25,8 +25,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     // Removed the ListenAnyIP(443) block that configures HTTPS
 });
 //hj
-builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
+
 
 ConfigureIdentity(builder);
 ConfigureSwagger(builder);

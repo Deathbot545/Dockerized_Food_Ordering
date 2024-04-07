@@ -12,57 +12,42 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-// Inside ConfigureKestrel method
-var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
-
-builder.Services.AddHttpClient("namedClient", c => { c.BaseAddress = new Uri(configuration["ApiBaseUrl"]); });
-
-builder.Services.AddSignalR();
-
+// Configure Kestrel
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // Listen for HTTP connections
+    serverOptions.ListenAnyIP(80); // Listen for HTTP connections on port 80
+    // Consider configuring HTTPS options if you're running in production
 });
-// Inside ConfigureServices method or directly in the Program.cs
-var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys"; // Path inside the container
+
+// Data Protection Keys Configuration
+var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
-// Register the HttpClient, set its base address, and configure the timeout
+
+// HTTP Client Configuration
 builder.Services.AddHttpClient("namedClient", c =>
 {
     c.BaseAddress = new Uri(configuration["ApiBaseUrl"]);
-    c.Timeout = TimeSpan.FromSeconds(200); // Set the desired timeout here
+    c.Timeout = TimeSpan.FromSeconds(200); // Example timeout
 })
 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {
     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
 });
-//builder.Services.AddScoped<AccountService, AccountService>();
-builder.Services.AddSignalR();
-//j
 
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.MinimumSameSitePolicy = SameSiteMode.Lax;
-    options.HttpOnly = HttpOnlyPolicy.Always;
-    options.Secure = CookieSecurePolicy.SameAsRequest;
-});
-
-// Configure Authentication to include both JWT and Cookie authentication
+// Authentication Configuration
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Use cookies by default
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Use JWT for authentication
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Use JWT for challenges
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie(options => // This is where we add the cookie middleware
+.AddCookie(options =>
 {
-    options.LoginPath = "/Account/Login"; // Specify the path to your login action
-    options.LogoutPath = "/Account/Logout"; // Specify the path to your logout action
-    // Configure other cookie options as needed
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
 })
 .AddJwtBearer(options =>
 {
@@ -83,31 +68,21 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
 });
 
-
-builder.Services.AddHttpClient("UserManagementApiClient", client =>
-{
-    client.BaseAddress = new Uri("https://your-user-management-api/");
-    // Optionally set headers, timeouts, etc.
-});
-
-// Add controllers and Razor pages
+// Controllers and Razor Pages
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
+
+// Configure JSON Options if necessary
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
-// Add another HttpClient without a base address, if needed
-builder.Services.AddHttpClient();
-
 var app = builder.Build();
 
-// Temporarily apply these for debugging purposes
-app.UseDeveloperExceptionPage();
-
-if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
+// Middleware Configuration
+if (app.Environment.IsDevelopment() || configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();
 }
@@ -116,15 +91,12 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
-});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
-app.UseCookiePolicy();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -134,7 +106,6 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
-
 
 app.MapRazorPages();
 

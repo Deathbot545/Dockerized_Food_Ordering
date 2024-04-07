@@ -46,9 +46,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(options =>
 {
-    options.LoginPath = "/Account/Login"; // Redirect path for login.
-    options.LogoutPath = "/Account/Logout"; // Redirect path for logout.
-    options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect path for access denied.
+
     options.Cookie.HttpOnly = true; // Enhance security by restricting access to the cookie from client-side scripts.
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // Cookie security policy based on the request.
     options.Cookie.SameSite = SameSiteMode.Lax; // Controls how cookies are attached to cross-site requests.

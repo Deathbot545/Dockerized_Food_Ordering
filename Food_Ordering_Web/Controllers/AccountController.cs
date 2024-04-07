@@ -435,21 +435,28 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogDebug("Redirecting user based on role or other logic.");
                 if (outletId.HasValue && tableId.HasValue)
                 {
+                    // Specific redirection logic for ordering process
                     string redirectUrl = $"/Order/Menu?outletId={outletId}&tableId={tableId}";
                     _logger.LogInformation($"Redirecting to Order Menu: {redirectUrl}");
                     return Redirect(redirectUrl);
                 }
                 else
                 {
-                    string finalUrl = Url.Action("Index", new { role = roleClaim.Value });
-                    _logger.LogInformation($"Redirecting to final URL: {finalUrl}");
-                    return Redirect(finalUrl);
+                    // Dynamically redirect based on user role
+                    // Assuming roleClaim.Value gives us "Customer", "Admin", etc.
+                    // The controller names should match these role names exactly, except for the "Controller" suffix
+                    // which should not be included in the controller name string here.
+                    string controllerName = roleClaim.Value; // The role name is expected to match the controller name
+                    _logger.LogInformation($"Redirecting to {controllerName} controller's Index action.");
+
+                    // Fix applied here: Ensure the "controller" parameter is correctly named and passed
+                    return RedirectToAction("Index", controllerName); // Correct redirection to controller based on role
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred during the login process.");
-                return View("Error");
+                return View("Error"); // Ensure there's an Error view available to handle this scenario
             }
         }
 

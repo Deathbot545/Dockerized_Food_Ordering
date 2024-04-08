@@ -429,10 +429,10 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogDebug("Attempting to set the JWT token in a cookie.");
                 Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
-                    HttpOnly = true, // Recommended for security
-                    Secure = true, // Send the cookie over HTTPS only
-                    SameSite = SameSiteMode.Strict, // Recommended for security
-                    Expires = DateTime.UtcNow.AddMinutes(30) // Set the same expiry as your JWT token
+                    HttpOnly = false,
+                    Secure = false, // Modified to allow over HTTP
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
                 _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
@@ -460,16 +460,7 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogError(ex, "An error occurred during the login process.");
                 return View("Error"); // Ensure there's an Error view available to handle this scenario
             }
-            finally
-            {
-                var cookieSet = Response.Headers.ContainsKey("Set-Cookie");
-                _logger.LogDebug($"Was 'Set-Cookie' header present in response: {cookieSet}");
-                if (cookieSet)
-                {
-                    var setCookieHeader = Response.Headers["Set-Cookie"];
-                    _logger.LogDebug($"'Set-Cookie' header value: {setCookieHeader}");
-                }
-            }
+          
         }
 
 

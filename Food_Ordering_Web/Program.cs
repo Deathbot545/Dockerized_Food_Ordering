@@ -41,16 +41,18 @@ builder.Services.AddHttpClient("namedClient", c =>
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-
-    //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie(options => // Register cookie authentication
+.AddCookie(options =>
 {
-    options.Cookie.HttpOnly = true;
+
+    options.Cookie.HttpOnly = true; // Enhance security by restricting access to the cookie from client-side scripts.
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-    options.SlidingExpiration = true;
+    // Cookie security policy based on the request.
+    options.Cookie.SameSite = SameSiteMode.Lax; // Controls how cookies are attached to cross-site requests.
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie expiration time.
+    options.SlidingExpiration = true; // Reset the cookie expiration time if a user is active.
 })
 .AddJwtBearer(options =>
 {

@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Google;
 using Newtonsoft.Json;
 using System.Net;
@@ -14,7 +13,7 @@ using System.Net.Http.Headers;
 using Food_Ordering_API.Models;
 using Food_Ordering_API.ViewModels;
 using Food_Ordering_API.DTO;
-using Microsoft.Extensions.Logging;
+
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -423,13 +422,26 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogInformation($"User {userNameClaim.Value} signed in successfully with claims.");
 
                 _logger.LogDebug("Attempting to set the JWT token in a cookie.");
-                Response.Cookies.Append("jwtCookie", token, new CookieOptions
+                try
                 {
-                    HttpOnly = false,
-                    Secure = false, // Modified to allow over HTTP
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-                });
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = false,
+                        Secure = false, // Consider your environment - this might need to be true if you're using HTTPS
+                        SameSite = SameSiteMode.Lax,
+                        Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+                    };
+
+                    _logger.LogDebug($"Cookie Options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}, Expires={cookieOptions.Expires}");
+
+                    Response.Cookies.Append("jwtCookie", token, cookieOptions);
+                    _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error setting cookie.");
+                }
+
 
                 _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
 

@@ -42,14 +42,13 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-   // options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddCookie(options =>
 {
 
     options.Cookie.HttpOnly = true; // Enhance security by restricting access to the cookie from client-side scripts.
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    // Cookie security policy based on the request.
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Cookie security policy based on the request.
     options.Cookie.SameSite = SameSiteMode.Lax; // Controls how cookies are attached to cross-site requests.
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie expiration time.
     options.SlidingExpiration = true; // Reset the cookie expiration time if a user is active.
@@ -97,26 +96,14 @@ else
     app.UseHsts();
 }
 
-
-app.Use(async (context, next) =>
+app.UseCookiePolicy(new CookiePolicyOptions
 {
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    if (context.Request.Headers["X-Forwarded-Proto"] == "https")
-    {
-        logger.LogInformation("Adjusting request scheme to 'https'.");
-        context.Request.Scheme = "https";
-    }
-    else
-    {
-        logger.LogInformation("Request scheme remains '{Scheme}'.", context.Request.Scheme);
-    }
-    await next();
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.SameAsRequest, // Aligns with request security
+    MinimumSameSitePolicy = SameSiteMode.Lax
 });
-
-
-
 //ff
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

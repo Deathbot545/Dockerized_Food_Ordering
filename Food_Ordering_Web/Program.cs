@@ -44,7 +44,14 @@ builder.Services.AddAuthentication(options =>
 
     //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-
+.AddCookie(options => // Register cookie authentication
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+})
 .AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters

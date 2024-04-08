@@ -23,7 +23,8 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 // Data Protection Keys Configuration
 var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
+    .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
 
 // HTTP Client Configuration
 builder.Services.AddHttpClient("namedClient", c =>
@@ -102,7 +103,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
     MinimumSameSitePolicy = SameSiteMode.Lax
 });
 //ff
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

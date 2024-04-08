@@ -40,7 +40,9 @@ builder.Services.AddHttpClient("namedClient", c =>
 // Authentication Configuration
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+    //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 
 .AddJwtBearer(options =>

@@ -98,14 +98,19 @@ else
 }
 
 
-app.Use((context, next) =>
+app.Use(async (context, next) =>
 {
-    if (context.Request.Headers["X-Forwarded-Proto"] == "https")
-    {
-        context.Request.Scheme = "https";
-    }
-    return next();
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("Before executing middleware for {Path}", context.Request.Path);
+
+    // Continue to the next middleware in the pipeline
+    await next();
+
+    // After next middleware has executed
+    logger.LogInformation("After executing middleware for {Path}", context.Request.Path);
 });
+
+
 
 //ff
 //app.UseHttpsRedirection();

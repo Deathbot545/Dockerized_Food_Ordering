@@ -21,7 +21,6 @@ namespace Food_Ordering_Web.Controllers
     
     public class AccountController : Controller
     {
-
         private readonly HttpClient _httpClient;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _apiBaseUrl;
@@ -133,9 +132,6 @@ namespace Food_Ordering_Web.Controllers
                 return View("Signup"); // Assuming the view file is in /Views/Account/Register.cshtml or /Views/Account/Signup.cshtml based on your setup
             }
         }
-
-
-
 
         public IActionResult Login()
         {

@@ -411,9 +411,8 @@ namespace Food_Ordering_Web.Controllers
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                try
-                {
-                    _logger.LogDebug("Signing in the user with the assembled ClaimsPrincipal.");
+
+                _logger.LogDebug("Signing in the user with the assembled ClaimsPrincipal.");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties
                 {
                     IsPersistent = false,
@@ -423,7 +422,8 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogInformation($"User {userNameClaim.Value} signed in successfully with claims.");
 
                 _logger.LogDebug("Attempting to set the JWT token in a cookie.");
-                
+                try
+                {
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = false,

@@ -428,10 +428,11 @@ namespace Food_Ordering_Web.Controllers
                 Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
                     HttpOnly = false,
-                    Secure = true,
+                    Secure = false, // Allow cookie to be sent over HTTP
                     SameSite = SameSiteMode.Lax,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
+
                 _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
                 _logger.LogDebug("Redirecting user based on role or other logic.");
                 if (outletId.HasValue && tableId.HasValue)

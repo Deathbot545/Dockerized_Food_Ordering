@@ -103,6 +103,15 @@ app.UseCookiePolicy(new CookiePolicyOptions
     Secure = CookieSecurePolicy.SameAsRequest, // Aligns with request security
     MinimumSameSitePolicy = SameSiteMode.Lax
 });
+app.Use((context, next) =>
+{
+    if (context.Request.Headers["X-Forwarded-Proto"] == "https")
+    {
+        context.Request.Scheme = "https";
+    }
+    return next();
+});
+
 //ff
 //app.UseHttpsRedirection();
 app.UseStaticFiles();

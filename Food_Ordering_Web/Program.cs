@@ -101,13 +101,16 @@ else
 app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("Before executing middleware for {Path}", context.Request.Path);
-
-    // Continue to the next middleware in the pipeline
+    if (context.Request.Headers["X-Forwarded-Proto"] == "https")
+    {
+        logger.LogInformation("Adjusting request scheme to 'https'.");
+        context.Request.Scheme = "https";
+    }
+    else
+    {
+        logger.LogInformation("Request scheme remains '{Scheme}'.", context.Request.Scheme);
+    }
     await next();
-
-    // After next middleware has executed
-    logger.LogInformation("After executing middleware for {Path}", context.Request.Path);
 });
 
 

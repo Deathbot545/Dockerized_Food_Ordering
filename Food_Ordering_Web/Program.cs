@@ -101,8 +101,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
     Secure = CookieSecurePolicy.SameAsRequest,
     MinimumSameSitePolicy = SameSiteMode.Lax
 });
-
-
+//ff
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -112,7 +111,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
 });
-
 
 app.UseAuthentication();
 app.UseAuthorization();

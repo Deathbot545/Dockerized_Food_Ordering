@@ -459,9 +459,6 @@ namespace Food_Ordering_Web.Controllers
           
         }
 
-
-
-
         [HttpPost]
         public async Task<IActionResult> Logout()
         {

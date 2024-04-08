@@ -97,12 +97,7 @@ else
     app.UseHsts();
 }
 
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    HttpOnly = HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.SameAsRequest, // Aligns with request security
-    MinimumSameSitePolicy = SameSiteMode.Lax
-});
+
 app.Use((context, next) =>
 {
     if (context.Request.Headers["X-Forwarded-Proto"] == "https")

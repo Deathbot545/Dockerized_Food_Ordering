@@ -386,6 +386,8 @@ namespace Food_Ordering_Web.Controllers
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
+                _logger.LogDebug($"JWT Token received and decoded. Payload: {jwtToken.Payload.SerializeToJson()}");
+
                 var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name) ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
                 if (userNameClaim == null)
                 {
@@ -403,8 +405,8 @@ namespace Food_Ordering_Web.Controllers
                 }
 
                 bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
+                _logger.LogDebug($"User claims assembled. UserName: {userNameClaim.Value}, Role: {roleClaim.Value}, IsSubscribed: {isSubscribed}");
 
-                _logger.LogDebug("Assembling claims for ClaimsIdentity.");
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, userNameClaim.Value),
@@ -424,16 +426,18 @@ namespace Food_Ordering_Web.Controllers
 
                 _logger.LogInformation($"User {userNameClaim.Value} signed in successfully with claims.");
 
-                _logger.LogDebug("Setting the JWT token in a secure, HTTP-only cookie for client-side use.");
+                _logger.LogDebug("Attempting to set the JWT token in a cookie.");
                 Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
                     HttpOnly = false,
-                    Secure = false, // Allow cookie to be sent over HTTP
+                    Secure = false, // Modified to allow over HTTP
                     SameSite = SameSiteMode.Lax,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
                 _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
+
+                // Redirection logic remains the same
                 _logger.LogDebug("Redirecting user based on role or other logic.");
                 if (outletId.HasValue && tableId.HasValue)
                 {

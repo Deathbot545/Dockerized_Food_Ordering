@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Services.Users;
 using Newtonsoft.Json;
 using Order_API.DTO;
 using Restaurant_API.DTO;
@@ -22,7 +23,7 @@ namespace Food_Ordering_Web.Controllers
         public async Task<IActionResult> Index()
         {
             _logger.LogInformation("Accessed Customer Index Page");
-
+           
             if (!User.Identity.IsAuthenticated)
             {
                 _logger.LogWarning("User is not authenticated.");

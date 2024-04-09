@@ -24,12 +24,7 @@ namespace Food_Ordering_Web.Controllers
         {
             _logger.LogInformation("Accessed Customer Index Page");
            
-            if (!User.Identity.IsAuthenticated)
-            {
-                _logger.LogWarning("User is not authenticated.");
-                // Consider redirecting to login page or showing an error
-                return RedirectToAction("Login", "Account");
-            }
+           
 
             _logger.LogInformation("Authenticated User: {UserName}", User.Identity.Name);
             // Log additional details as needed

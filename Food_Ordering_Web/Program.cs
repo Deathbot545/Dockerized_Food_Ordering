@@ -89,7 +89,11 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.Always
+});
 //ff
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

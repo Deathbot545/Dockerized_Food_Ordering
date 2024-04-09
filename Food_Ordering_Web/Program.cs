@@ -45,17 +45,6 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddCookie(options =>
-{
-    // Other cookie settings...
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensure cookies are always sent over HTTPS
-    options.Cookie.Domain = ".restosolutionssaas.com"; // Specify the domain, adjust if necessary
-    options.Cookie.SameSite = SameSiteMode.None; // May need adjustment based on your cross-origin needs
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-    options.SlidingExpiration = true;
-    // Additional configurations...
-})
 .AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters

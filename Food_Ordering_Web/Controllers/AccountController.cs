@@ -427,7 +427,7 @@ namespace Food_Ordering_Web.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = false, // Consider your environment - this might need to be true if you're using HTTPS
+                        Secure = true, // Consider your environment - this might need to be true if you're using HTTPS
                         SameSite = SameSiteMode.Lax,
                         Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                     };

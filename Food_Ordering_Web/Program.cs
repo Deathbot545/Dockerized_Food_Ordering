@@ -102,6 +102,24 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 // Make sure this is above app.UseAuthentication() and app.UseAuthorization()
 
+app.Use(async (context, next) =>
+{
+    if (context.Request.Cookies.Any())
+    {
+        foreach (var cookie in context.Request.Cookies)
+        {
+            context.Response.Headers["Access-Control-Allow-Origin"] = "*"; // Ensure you adhere to CORS policies in production
+            app.Logger.LogInformation($"Received cookie: {cookie.Key} = {cookie.Value}");
+        }
+    }
+    else
+    {
+        app.Logger.LogInformation("No cookies received in this request.");
+    }
+
+    await next.Invoke();
+});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

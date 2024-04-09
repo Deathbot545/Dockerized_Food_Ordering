@@ -489,9 +489,6 @@ namespace Food_Ordering_Web.Controllers
                 // Remove JWT token from HttpOnly cookie
                 Response.Cookies.Delete("jwtCookie");
 
-                Response.Cookies.Delete("jwtCookie");
-
-
                 // Redirect to another page (e.g., login page)
                 return RedirectToAction("Login", "Account");
             }

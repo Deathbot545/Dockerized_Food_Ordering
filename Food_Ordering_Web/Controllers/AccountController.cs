@@ -442,16 +442,6 @@ namespace Food_Ordering_Web.Controllers
                     _logger.LogError(ex, "Error setting cookie.");
                 }
 
-
-                _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
-                if (User.Identity.IsAuthenticated)
-                {
-                    _logger.LogInformation("User is authenticated, proceeding to redirect.");
-                }
-                else
-                {
-                    _logger.LogWarning("User is not authenticated after sign-in attempt.");
-                }
                 // Redirection logic remains the same
                 _logger.LogDebug("Redirecting user based on role or other logic.");
                 if (outletId.HasValue && tableId.HasValue)

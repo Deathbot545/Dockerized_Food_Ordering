@@ -419,7 +419,10 @@ namespace Food_Ordering_Web.Controllers
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
 
-                _logger.LogInformation($"User {userNameClaim.Value} signed in successfully with claims.");
+                _logger.LogDebug("After SignInAsync call");
+                _logger.LogDebug($"User.Identity.IsAuthenticated: {User.Identity.IsAuthenticated}");
+                _logger.LogDebug($"User.Identity.Name: {User.Identity?.Name}");
+
 
                 _logger.LogDebug("Attempting to set the JWT token in a cookie.");
                 try
@@ -431,6 +434,8 @@ namespace Food_Ordering_Web.Controllers
                         SameSite = SameSiteMode.Lax,
                         Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                     };
+                    var cookiesAfterSignIn = HttpContext.Response.Headers["Set-Cookie"];
+                    _logger.LogDebug($"Cookies set after SignInAsync: {string.Join(", ", cookiesAfterSignIn)}");
 
                     _logger.LogDebug($"Cookie Options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}, Expires={cookieOptions.Expires}");
 

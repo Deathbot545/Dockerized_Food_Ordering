@@ -75,8 +75,6 @@ builder.Services.Configure<JsonOptions>(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
-
-
 var app = builder.Build();
 
 // Middleware Configuration
@@ -94,12 +92,6 @@ app.UseCookiePolicy(new CookiePolicyOptions
     HttpOnly = HttpOnlyPolicy.Always,
     Secure = CookieSecurePolicy.Always
 });
-//ff
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
 // Make sure this is above app.UseAuthentication() and app.UseAuthorization()
 
 app.Use(async (context, next) =>
@@ -120,13 +112,18 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {

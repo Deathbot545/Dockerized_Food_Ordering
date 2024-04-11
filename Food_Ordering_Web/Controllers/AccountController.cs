@@ -370,6 +370,23 @@ namespace Food_Ordering_Web.Controllers
             return Redirect(returnUrl);
         }
 
+        public async Task<IActionResult> MockLogin()
+        {
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, "TestUser"),
+        new Claim(ClaimTypes.Role, "Tester"),
+        // Add more claims as needed
+    };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+            return RedirectToAction("TestAuth", "Home"); // Redirect to a method that checks if the user is authenticated
+        }
+
 
         public async Task<IActionResult> HandleLogin(string token, int? outletId = null, int? tableId = null)
         {

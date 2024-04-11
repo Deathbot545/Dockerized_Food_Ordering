@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,6 +19,26 @@ namespace Food_Ordering_Web.Controllers
         {
             _logger = logger;
             
+        }
+        public IActionResult TestAuth()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                // If the user is authenticated, return some success message or information
+                var userName = User.Identity.Name;
+                var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                // Logging for demonstration
+                _logger.LogInformation($"User is authenticated. Name: {userName}, Role: {role}");
+
+                return Content($"User is authenticated. Name: {userName}, Role: {role}");
+            }
+            else
+            {
+                // If not authenticated, return an appropriate message
+                _logger.LogWarning("User is not authenticated.");
+                return Content("User is not authenticated.");
+            }
         }
 
         public IActionResult Index()

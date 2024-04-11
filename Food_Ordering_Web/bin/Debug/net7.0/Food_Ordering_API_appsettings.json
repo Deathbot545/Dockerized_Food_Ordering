@@ -1,5 +1,4 @@
 {
-
   "AzureAd": {
     "Instance": "https://login.microsoftonline.com/",
     "Domain": "qualified.domain.name",
@@ -16,7 +15,7 @@
     }
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Host=database-1.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=Food_Ordering;User Id=postgres;Password=NxPostgrsql;"
+    "ApplicationDbConnection": "Host=retroapi.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=ApplicationDb;User ID=postgres;Password=NxPostgrsql;"
   },
   "Authentication": {
     "Google": {

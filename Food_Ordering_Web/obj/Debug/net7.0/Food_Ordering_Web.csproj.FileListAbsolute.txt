@@ -275,3 +275,4 @@ D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\refint\Food_Ordering_W
 D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\Food_Ordering_Web.pdb
 D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\Food_Ordering_Web.genruntimeconfig.cache
 D:\Dockerize\dockerize\Food_Ordering_Web\obj\Debug\net7.0\ref\Food_Ordering_Web.dll
+D:\Dockerize\dockerize\Food_Ordering_Web\bin\Debug\net7.0\ContainerFile\FoodOrderingWebTaskDefinition19.json

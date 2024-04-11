@@ -104,23 +104,6 @@ app.UseCookiePolicy(new CookiePolicyOptions
 });
 // Make sure this is above app.UseAuthentication() and app.UseAuthorization()
 
-app.Use(async (context, next) =>
-{
-    if (context.Request.Cookies.Any())
-    {
-        foreach (var cookie in context.Request.Cookies)
-        {
-            context.Response.Headers["Access-Control-Allow-Origin"] = "*"; // Ensure you adhere to CORS policies in production
-            app.Logger.LogInformation($"Received cookie: {cookie.Key} = {cookie.Value}");
-        }
-    }
-    else
-    {
-        app.Logger.LogInformation("No cookies received in this request.");
-    }
-
-    await next.Invoke();
-});
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
@@ -131,9 +114,26 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
 
+app.Use(async (context, next) =>
+{
+    // Before continuing to the next middleware
+    await next();
+
+    // Log claims after authentication
+    if (context.User.Identity.IsAuthenticated)
+    {
+        app.Logger.LogInformation($"Authenticated User: {context.User.Identity.Name}");
+        foreach (var claim in context.User.Claims)
+        {
+            app.Logger.LogInformation($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+        }
+    }
+    else
+    {
+        app.Logger.LogInformation("User is not authenticated.");
+    }
+});
 
 app.UseEndpoints(endpoints =>
 {
@@ -142,6 +142,9 @@ app.UseEndpoints(endpoints =>
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.MapRazorPages();
 
 app.Run();

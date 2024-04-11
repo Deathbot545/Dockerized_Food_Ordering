@@ -431,8 +431,8 @@ namespace Food_Ordering_Web.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = false, // Consider your environment - this might need to be true if you're using HTTPS
-                        SameSite = SameSiteMode.None,
+                        Secure = true, // Set to true because your site is served over HTTPS
+                        SameSite = SameSiteMode.None, // Necessary for cross-site request if applicable
                         Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                     };
                     var cookiesAfterSignIn = HttpContext.Response.Headers["Set-Cookie"];

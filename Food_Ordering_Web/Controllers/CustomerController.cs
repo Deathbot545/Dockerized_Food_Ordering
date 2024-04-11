@@ -34,9 +34,6 @@ namespace Food_Ordering_Web.Controllers
             {
                 _logger.LogWarning("User is not authenticated.");
             }
-
-
-
             _logger.LogInformation("Authenticated User: {UserName}", User.Identity.Name);
             // Log additional details as needed
             foreach (var claim in User.Claims)

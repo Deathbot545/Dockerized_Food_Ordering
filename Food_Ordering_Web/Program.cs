@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.DataProtection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.VisualStudio.Services.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +88,7 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 app.UseCookiePolicy(new CookiePolicyOptions
 {
     HttpOnly = HttpOnlyPolicy.Always,

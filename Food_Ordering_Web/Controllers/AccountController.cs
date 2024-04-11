@@ -418,10 +418,11 @@ namespace Food_Ordering_Web.Controllers
                     IsPersistent = false,
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
-
-                _logger.LogDebug("After SignInAsync call");
-                _logger.LogDebug($"User.Identity.IsAuthenticated: {User.Identity.IsAuthenticated}");
-                _logger.LogDebug($"User.Identity.Name: {User.Identity?.Name}");
+                _logger.LogInformation("User signed in. Claims:");
+                foreach (var claim in claimsPrincipal.Claims)
+                {
+                    _logger.LogInformation($"{claim.Type}: {claim.Value}");
+                }
 
 
                 _logger.LogDebug("Attempting to set the JWT token in a cookie.");

@@ -132,15 +132,7 @@ namespace Food_Ordering_Web.Controllers
             }
         }
 
-        public IActionResult Login()
-        {
-            if (TempData["ErrorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
-            }
-          
-            return View("Views/Account/Login.cshtml");
-        }
+       
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string actionName, string controllerName, int? outletId = null, int? tableId = null)

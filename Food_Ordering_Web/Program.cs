@@ -117,13 +117,19 @@ app.UseAuthorization();
 
 app.Use(async (context, next) =>
 {
-    // Before continuing to the next middleware
+    var cookies = context.Request.Cookies;
+    app.Logger.LogInformation($"Request for {context.Request.Path} received with cookies:");
+    foreach (var cookie in cookies)
+    {
+        app.Logger.LogInformation($"{cookie.Key}: {cookie.Value}");
+    }
+
     await next();
 
-    // Log claims after authentication
+    // Logging after the next middleware might be especially useful if something modifies the context
     if (context.User.Identity.IsAuthenticated)
     {
-        app.Logger.LogInformation($"Authenticated User: {context.User.Identity.Name}");
+        app.Logger.LogInformation("Post-middleware: User is authenticated.");
         foreach (var claim in context.User.Claims)
         {
             app.Logger.LogInformation($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
@@ -131,9 +137,10 @@ app.Use(async (context, next) =>
     }
     else
     {
-        app.Logger.LogInformation("User is not authenticated.");
+        app.Logger.LogInformation("Post-middleware: User is not authenticated.");
     }
 });
+
 
 app.UseEndpoints(endpoints =>
 {

@@ -59,6 +59,14 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
     };
 })
+.AddCookie(options => // This is where you set the cookie options for authentication cookies
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Always use Secure cookies
+    options.Cookie.SameSite = SameSiteMode.None; // Adjust according to your cross-site request needs
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Set your desired expiration
+})
 .AddGoogle(options =>
 {
     options.ClientId = configuration["Authentication:Google:ClientId"];

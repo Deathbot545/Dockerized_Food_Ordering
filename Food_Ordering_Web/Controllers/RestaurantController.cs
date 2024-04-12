@@ -30,28 +30,46 @@ namespace Food_Ordering_Web.Controllers
             _logger.LogInformation($"_apiBaseUrl: {_apiBaseUrl}");
             _logger.LogInformation($"HttpClient Base Address: {_httpClient.BaseAddress}");
         }
-      
+
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Entered Index method of RestaurantController.");
+
             string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(currentUserId))
             {
-                // Redirect to login or show error
+                _logger.LogWarning("No user ID found in claims. Redirecting to Login.");
                 return RedirectToAction("Login", "Account");
             }
 
-            Guid ownerId = new Guid(currentUserId);
+            _logger.LogInformation("Current User ID: {UserId}", currentUserId);
 
-            // You can now use _httpClient instead of creating a new HttpClient
-            var response = await _httpClient.GetAsync($"api/OutletApi/GetOutletsByOwner/{ownerId}");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var outlets = JsonConvert.DeserializeObject<List<Outlet>>(await response.Content.ReadAsStringAsync());
-                return View("~/Views/Owner/MainPaige.cshtml", outlets);
-            }
+                Guid ownerId = new Guid(currentUserId);
+                _logger.LogInformation("Converted User ID to GUID: {OwnerId}", ownerId);
 
-            return View("Error"); // Or handle errors differently
+                var response = await _httpClient.GetAsync($"api/OutletApi/GetOutletsByOwner/{ownerId}");
+                _logger.LogInformation("Requested GetOutletsByOwner for OwnerId: {OwnerId}", ownerId);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var outlets = JsonConvert.DeserializeObject<List<Outlet>>(content);
+                    _logger.LogInformation("Successfully retrieved outlets data for {OwnerId}. Data: {Data}", ownerId, content);
+                    return View("~/Views/Owner/MainPaige.cshtml", outlets);
+                }
+                else
+                {
+                    _logger.LogError("Failed to fetch outlets. HTTP Status Code: {StatusCode}. Reason: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                    return View("Error");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while trying to fetch outlets for OwnerId: {OwnerId}", currentUserId);
+                return View("Error");
+            }
         }
         public IActionResult Add()
         {

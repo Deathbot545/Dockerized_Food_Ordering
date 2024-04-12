@@ -14,6 +14,7 @@ using Food_Ordering_API.Models;
 using Food_Ordering_API.ViewModels;
 using Food_Ordering_API.DTO;
 using Microsoft.VisualStudio.Services.Users;
+using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
 
 
 namespace Food_Ordering_Web.Controllers
@@ -378,16 +379,23 @@ namespace Food_Ordering_Web.Controllers
                 var jwtToken = handler.ReadJwtToken(token);
                 var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name) ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
                 var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier); // Ensure user ID claim is present in the token
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
                 var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed");
 
                 bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
+
+                // Ensure that userIdClaim is not null before trying to use its value.
+                if (userIdClaim == null)
+                {
+                    _logger.LogError("User ID claim is missing in the JWT.");
+                    return View("Error");
+                }
 
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, userNameClaim?.Value ?? string.Empty),
             new Claim(ClaimTypes.Role, roleClaim?.Value ?? string.Empty),
-            new Claim(ClaimTypes.NameIdentifier, userIdClaim?.Value ?? string.Empty), // Ensure user ID is included as a claim
+            new Claim(ClaimTypes.NameIdentifier, userIdClaim.Value),
             new Claim("IsSubscribed", isSubscribed.ToString())
         };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

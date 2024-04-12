@@ -13,6 +13,7 @@ using System.Net.Http.Headers;
 using Food_Ordering_API.Models;
 using Food_Ordering_API.ViewModels;
 using Food_Ordering_API.DTO;
+using Microsoft.VisualStudio.Services.Users;
 
 
 namespace Food_Ordering_Web.Controllers
@@ -372,22 +373,23 @@ namespace Food_Ordering_Web.Controllers
 
             try
             {
-             
+
                 var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadJwtToken(token);         
+                var jwtToken = handler.ReadJwtToken(token);
                 var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name) ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
                 var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier); // Ensure user ID claim is present in the token
                 var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed");
 
                 bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
-               
+
                 var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, userNameClaim.Value),
-            new Claim(ClaimTypes.Role, roleClaim.Value),
+            new Claim(ClaimTypes.Name, userNameClaim?.Value ?? string.Empty),
+            new Claim(ClaimTypes.Role, roleClaim?.Value ?? string.Empty),
+            new Claim(ClaimTypes.NameIdentifier, userIdClaim?.Value ?? string.Empty), // Ensure user ID is included as a claim
             new Claim("IsSubscribed", isSubscribed.ToString())
         };
-
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 

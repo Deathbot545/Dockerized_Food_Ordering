@@ -62,10 +62,9 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(options => // This is where you set the cookie options for authentication cookies
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Always use Secure cookies
-    options.Cookie.SameSite = SameSiteMode.None; // Adjust according to your cross-site request needs
-    options.SlidingExpiration = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Set your desired expiration
+    options.ExpireTimeSpan = TimeSpan.FromHours(1); // Set the expiration time as needed
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.None; // Set your desired expiration
 })
 .AddGoogle(options =>
 {

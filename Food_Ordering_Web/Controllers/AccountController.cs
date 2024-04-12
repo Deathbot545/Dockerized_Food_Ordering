@@ -132,7 +132,11 @@ namespace Food_Ordering_Web.Controllers
             }
         }
 
-       
+        public IActionResult Login()
+        {
+
+            return View("/Views/Account/Login.cshtml");
+        }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string actionName, string controllerName, int? outletId = null, int? tableId = null)
@@ -220,7 +224,7 @@ namespace Food_Ordering_Web.Controllers
             // Add other properties as per API response
         }
 
-
+        
 
         [HttpGet]
         public IActionResult ExternalRegisterOrLogin(string role = null, int? outletId = null, int? tableId = null)

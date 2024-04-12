@@ -107,34 +107,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-app.Use(async (context, next) =>
-{
-    var cookies = context.Request.Cookies;
-    app.Logger.LogInformation($"Request for {context.Request.Path} received with cookies:");
-    foreach (var cookie in cookies)
-    {
-        app.Logger.LogInformation($"{cookie.Key}: {cookie.Value}");
-    }
-
-    await next();
-    //kk
-    // Logging after the next middleware might be especially useful if something modifies the context
-    if (context.User.Identity.IsAuthenticated)
-    {
-        app.Logger.LogInformation("Post-middleware: User is authenticated.");
-        foreach (var claim in context.User.Claims)
-        {
-            app.Logger.LogInformation($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-        }
-    }
-    else
-    {
-        app.Logger.LogInformation("Post-middleware: User is not authenticated.");
-    }
-});
-
-
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(

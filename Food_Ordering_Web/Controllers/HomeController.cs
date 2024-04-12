@@ -20,26 +20,6 @@ namespace Food_Ordering_Web.Controllers
             _logger = logger;
             
         }
-        public IActionResult TestAuth()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                // If the user is authenticated, return some success message or information
-                var userName = User.Identity.Name;
-                var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-
-                // Logging for demonstration
-                _logger.LogInformation($"User is authenticated. Name: {userName}, Role: {role}");
-
-                return Content($"User is authenticated. Name: {userName}, Role: {role}");
-            }
-            else
-            {
-                // If not authenticated, return an appropriate message
-                _logger.LogWarning("User is not authenticated.");
-                return Content("User is not authenticated.");
-            }
-        }
 
         public IActionResult Index()
         {

@@ -366,55 +366,21 @@ namespace Food_Ordering_Web.Controllers
             return Redirect(returnUrl);
         }
 
-        public async Task<IActionResult> MockLogin()
-        {
-            var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, "TestUser"),
-        new Claim(ClaimTypes.Role, "Tester"),
-        // Add more claims as needed
-    };
-
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-
-            return RedirectToAction("TestAuth", "Home"); // Redirect to a method that checks if the user is authenticated
-        }
-
-
         public async Task<IActionResult> HandleLogin(string token, int? outletId = null, int? tableId = null)
         {
             _logger.LogInformation("HandleLogin method entered with JWT token.");
 
             try
             {
-                _logger.LogDebug("Starting JWT token decoding process.");
+             
                 var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadJwtToken(token);
-
-                _logger.LogDebug($"JWT Token received and decoded. Payload: {jwtToken.Payload.SerializeToJson()}");
-
+                var jwtToken = handler.ReadJwtToken(token);         
                 var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name) ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
-                if (userNameClaim == null)
-                {
-                    _logger.LogError("User name claim not found in JWT.");
-                    return BadRequest("User name claim not found in JWT.");
-                }
-
                 var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
                 var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed");
 
-                if (roleClaim == null)
-                {
-                    _logger.LogError("Role claim not found in JWT.");
-                    return BadRequest("Role claim not found in JWT.");
-                }
-
                 bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
-                _logger.LogDebug($"User claims assembled. UserName: {userNameClaim.Value}, Role: {roleClaim.Value}, IsSubscribed: {isSubscribed}");
-
+               
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, userNameClaim.Value),
@@ -425,20 +391,11 @@ namespace Food_Ordering_Web.Controllers
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                _logger.LogDebug("Signing in the user with the assembled ClaimsPrincipal.");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties
                 {
                     IsPersistent = false,
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
-                _logger.LogInformation("User signed in. Claims:");
-                foreach (var claim in claimsPrincipal.Claims)
-                {
-                    _logger.LogInformation($"{claim.Type}: {claim.Value}");
-                }
-
-
-                _logger.LogDebug("Attempting to set the JWT token in a cookie.");
                 try
                 {
                     var cookieOptions = new CookieOptions
@@ -449,31 +406,22 @@ namespace Food_Ordering_Web.Controllers
                         Expires = DateTimeOffset.UtcNow.AddMinutes(30)
                     };
                     var cookiesAfterSignIn = HttpContext.Response.Headers["Set-Cookie"];
-                    _logger.LogDebug($"Cookies set after SignInAsync: {string.Join(", ", cookiesAfterSignIn)}");
-
-                    _logger.LogDebug($"Cookie Options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}, Expires={cookieOptions.Expires}");
-
                     Response.Cookies.Append("jwtCookie", token, cookieOptions);
-                    _logger.LogDebug("Cookie 'jwtCookie' has been appended to the response.");
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error setting cookie.");
                 }
 
-                // Redirection logic remains the same
-                _logger.LogDebug("Redirecting user based on role or other logic.");
                 if (outletId.HasValue && tableId.HasValue)
                 {
                     // Specific redirection logic for ordering process
                     string redirectUrl = $"/Order/Menu?outletId={outletId}&tableId={tableId}";
-                    _logger.LogInformation($"Redirecting to Order Menu: {redirectUrl}");
                     return Redirect(redirectUrl);
                 }
                 else
                 {
                     string controllerName = roleClaim.Value; // The role name is expected to match the controller name
-                    _logger.LogInformation($"Redirecting to {controllerName} controller's Index action.");
 
                     // Fix applied here: Ensure the "controller" parameter is correctly named and passed
                     return RedirectToAction("Index", controllerName); // Correct redirection to controller based on role

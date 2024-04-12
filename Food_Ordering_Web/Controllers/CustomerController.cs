@@ -33,6 +33,7 @@ namespace Food_Ordering_Web.Controllers
             else
             {
                 _logger.LogWarning("User is not authenticated.");
+                RedirectToAction("Login","Account");
             }
             _logger.LogInformation("Authenticated User: {UserName}", User.Identity.Name);
             // Log additional details as needed

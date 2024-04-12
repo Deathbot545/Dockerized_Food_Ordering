@@ -1,9 +1,8 @@
 ﻿
+using Food_Ordering_Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Services.Users;
 using Newtonsoft.Json;
-using Order_API.DTO;
-using Restaurant_API.DTO;
 using System.Security.Claims;
 
 namespace Food_Ordering_Web.Controllers
@@ -34,16 +33,16 @@ namespace Food_Ordering_Web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var responseString = await response.Content.ReadAsStringAsync();
-                var outlets = JsonConvert.DeserializeObject<List<OutletInfoDTO>>(responseString);
+                var outlets = JsonConvert.DeserializeObject<List<OutletInfoDTO>>(responseString) ?? new List<OutletInfoDTO>(); // Ensuring a non-null list
                 return View("~/Views/Customer/MainPaige.cshtml", outlets);
             }
             else
             {
                 _logger.LogError("Failed to fetch outlets. Status Code: {StatusCode}", response.StatusCode);
-                // Handle API call failure, perhaps redirect to an error page or display a message
                 return View("Error");
             }
         }
+
         public async Task<IActionResult> MyOrders()
         {
             string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);

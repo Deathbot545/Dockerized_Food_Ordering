@@ -77,9 +77,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensure it matches your environment (use Always if under HTTPS)
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.Name = ".AspNetCore.Cookies";
-    options.LoginPath = "/Account/Login"; // Ensure the path is correct
-    options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Adjust as necessary
     options.SlidingExpiration = true;
 });

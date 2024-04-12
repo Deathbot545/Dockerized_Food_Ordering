@@ -22,24 +22,10 @@ namespace Food_Ordering_Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                _logger.LogInformation("User is authenticated. Claims:");
-                foreach (var claim in User.Claims)
-                {
-                    _logger.LogInformation($"{claim.Type}: {claim.Value}");
-                }
-            }
-            else
+            if (!User.Identity.IsAuthenticated)
             {
                 _logger.LogWarning("User is not authenticated.");
-                RedirectToAction("Login","Account");
-            }
-            _logger.LogInformation("Authenticated User: {UserName}", User.Identity.Name);
-            // Log additional details as needed
-            foreach (var claim in User.Claims)
-            {
-                _logger.LogInformation("Claim {ClaimType}: {ClaimValue}", claim.Type, claim.Value);
+                return RedirectToAction("Login", "Account");
             }
 
             var client = _clientFactory.CreateClient();

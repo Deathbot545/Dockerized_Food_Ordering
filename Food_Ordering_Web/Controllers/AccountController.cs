@@ -438,27 +438,27 @@ namespace Food_Ordering_Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            // HTTP POST to the API to invalidate the token or perform other logout activities
+            // Use built-in method to sign out the user
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Optionally, you could also ensure that any API logout logic is handled if necessary
+            // This might include invalidating the token server-side, if your architecture requires it
             var httpResponse = await _httpClient.PostAsync($"{_apiBaseUrl}/Logout", null);
-
-            if (httpResponse.IsSuccessStatusCode)
+            if (!httpResponse.IsSuccessStatusCode)
             {
-                // Remove JWT token from HttpOnly cookie
-                Response.Cookies.Delete("jwtCookie");
-
-                // Redirect to another page (e.g., login page)
-                return RedirectToAction("Login", "Account");
-            }
-            else
-            {
-                // If you wish, you can read the error message from API and display it
                 var error = await httpResponse.Content.ReadAsStringAsync();
                 ModelState.AddModelError(string.Empty, $"Failed to logout: {error}");
-
-                // Return to the same or different view as needed
-                return View();
+                // Optionally, log this server-side as well
+                _logger.LogError("Failed to logout via API: {Error}", error);
             }
+
+            // Remove JWT token from HttpOnly cookie
+            Response.Cookies.Delete("jwtCookie");
+
+            // Redirect to the login page or a page indicating successful logout
+            return RedirectToAction("Login", "Account");
         }
+
 
         public class ErrorResponse
         {

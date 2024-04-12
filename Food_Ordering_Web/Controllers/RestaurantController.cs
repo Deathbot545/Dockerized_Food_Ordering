@@ -34,7 +34,18 @@ namespace Food_Ordering_Web.Controllers
         public async Task<IActionResult> Index()
         {
             _logger.LogInformation("Entered Index method of RestaurantController.");
+            if (!User.Identity.IsAuthenticated)
+            {
+                _logger.LogWarning("User is not authenticated.");
+                return RedirectToAction("Login", "Account");
+            }
 
+            // Log all claims
+            _logger.LogInformation("User is authenticated. Claims:");
+            foreach (var claim in User.Claims)
+            {
+                _logger.LogInformation($"{claim.Type}: {claim.Value}");
+            }
             string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(currentUserId))
             {

@@ -125,7 +125,7 @@ app.Use(async (context, next) =>
     }
 
     await next();
-
+    //kk
     // Logging after the next middleware might be especially useful if something modifies the context
     if (context.User.Identity.IsAuthenticated)
     {

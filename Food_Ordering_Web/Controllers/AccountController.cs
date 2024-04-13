@@ -32,7 +32,7 @@ namespace Food_Ordering_Web.Controllers
          
             _httpClient = new HttpClient(); // Or however you get your HttpClient
             _httpClientFactory = httpClientFactory;
-            _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}";  // Modify it here
+            _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api/AccountApi";  // Modify it here
             _logger = logger;
         }
 

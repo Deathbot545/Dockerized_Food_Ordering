@@ -18,7 +18,9 @@ namespace Food_Ordering_Web.Controllers
         public StripeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             // Initialize Stripe with your secret key
-            StripeConfiguration.ApiKey = configuration["Stripe:SecretKey"];
+            var apiKey = configuration["Stripe:SecretKey"];
+            Console.WriteLine($"Stripe API Key: {apiKey}");  // Use logging in production apps
+
             _httpClient = httpClientFactory.CreateClient("UserManagementApiClient");
             _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api";
         }

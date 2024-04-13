@@ -1,7 +1,7 @@
 ﻿
+using Food_Ordering_Web.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Restaurant_API.Models;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
@@ -39,13 +39,13 @@ namespace Food_Ordering_Web.Controllers
             var response = await _httpClient.GetAsync($"api/OutletApi/GetOutletsByOwner/{ownerId}");
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync();
-                var outlets = JsonConvert.DeserializeObject<List<Outlet>>(content);
-                return View("~/Views/Owner/MainPaige.cshtml", outlets ?? new List<Outlet>());
+                var responseString = await response.Content.ReadAsStringAsync();
+                var outlets = JsonConvert.DeserializeObject<List<OutletInfoDTO>>(responseString) ?? new List<OutletInfoDTO>(); // Ensuring a non-null list
+                return View("~/Views/Customer/MainPaige.cshtml", outlets);
             }
             else
             {
-                _logger.LogError("Failed to fetch outlets. HTTP Status Code: {StatusCode}. Reason: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                _logger.LogError("Failed to fetch outlets. Status Code: {StatusCode}", response.StatusCode);
                 return View("Error");
             }
         }
@@ -115,7 +115,7 @@ namespace Food_Ordering_Web.Controllers
             }
         }
 
-        private List<Table> FetchTablesByOutletId(int id)
+      /*  private List<Table> FetchTablesByOutletId(int id)
         {
             // Fetch tables based on outlet ID and return
             return new List<Table>(); // Replace with your actual logic
@@ -218,7 +218,7 @@ namespace Food_Ordering_Web.Controllers
             }
 
             return View("Error"); // Or handle errors differently
-        }
+        }*/
 
     }
 }

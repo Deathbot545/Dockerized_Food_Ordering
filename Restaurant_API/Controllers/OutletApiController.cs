@@ -172,7 +172,7 @@ namespace Restaurant_API.Controllers
                 return BadRequest($"An error occurred while updating the outlet. Error: {ex.Message}");
             }
         }
-
+        //dd
 
         [HttpGet("GetOutletsByOwner/{ownerId}")]
         public async Task<IActionResult> GetOutletsByOwner(Guid ownerId)

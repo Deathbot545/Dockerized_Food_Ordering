@@ -182,7 +182,7 @@ namespace Restaurant_API.Controllers
                 var outlets = await _outletService.GetOutletsByOwner(ownerId);
                 if (outlets == null || !outlets.Any())
                 {
-                    return Ok(new List<Outlet>());  // Return an empty list instead of causing an error
+                    return Ok(new List<Outlet>());  // Return an empty list instead of causing an er
                 }
                 return Ok(outlets);
             }

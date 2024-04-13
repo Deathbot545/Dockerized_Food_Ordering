@@ -5,7 +5,9 @@ using Stripe.Checkout;
 using static Food_Ordering_API.Controllers.AccountApiController;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-
+using Microsoft.VisualStudio.Services.Users;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -25,17 +27,10 @@ namespace Food_Ordering_Web.Controllers
             _logger = logger;
         }
 
-
         [HttpGet("start-subscription")]
         public ActionResult StartSubscription()
         {
             var domain = "https://restosolutionssaas.com"; // Adjust as per your application's domain
-
-            // Assume user's identifier is retrieved from their authentication cookie or JWT token.
-            // For demonstration purposes, the userId needs to be dynamically retrieved based on the authenticated user context,
-            // which should be passed to Stripe's SuccessUrl to identify the user once Stripe redirects back to your application.
-
-            // This approach requires the client application to pass the userId or ensure the session can resolve it when Stripe redirects back.
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card", },
@@ -61,26 +56,52 @@ namespace Food_Ordering_Web.Controllers
         [HttpGet("RegistrationSuccess")]
         public async Task<IActionResult> RegistrationSuccess(string session_id)
         {
-            try
-            {
-                var apiResponse = await _httpClient.GetAsync($"{_apiBaseUrl}/HandleSubscriptionSuccess?sessionId={session_id}");
+            // Retrieve user ID from the current user's claims
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (apiResponse.IsSuccessStatusCode)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    _logger.LogError("Failed to fetch outlets. Status Code: {StatusCode}, Content: {Content}", apiResponse.StatusCode, await apiResponse.Content.ReadAsStringAsync());
-                    return RedirectToAction("ErrorPage");
-                }
-            }
-            catch (Exception ex)
+            if (string.IsNullOrEmpty(userId))
             {
-                _logger.LogError("An error occurred in RegistrationSuccess: {Exception}", ex);
+                _logger.LogError("User ID is missing in the current session.");
                 return RedirectToAction("ErrorPage");
             }
+
+            // Update the IsSubscribed status in the database
+            var updateResult = await _httpClient.PutAsJsonAsync($"{_apiBaseUrl}/api/UserProfileApi/UpdateSubscriptionStatus", new { userId = userId, isSubscribed = true });
+            if (!updateResult.IsSuccessStatusCode)
+            {
+                _logger.LogError("Failed to update user subscription status. Status Code: {StatusCode}", updateResult.StatusCode);
+                return RedirectToAction("ErrorPage");
+            }
+
+            // Update claims and re-sign in the user
+            await UpdateUserSubscription(userId, true);
+
+            return RedirectToAction("Index", "Home");
         }
+
+        private async Task UpdateUserSubscription(string userId, bool isSubscribed)
+        {
+            // Directly update claims in the current session, assuming the API has already updated the user's subscription status in the database
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+
+            // Remove the old IsSubscribed claim and add the updated one
+            var existingClaim = claimsIdentity.FindFirst("IsSubscribed");
+            if (existingClaim != null)
+            {
+                claimsIdentity.RemoveClaim(existingClaim);
+            }
+            claimsIdentity.AddClaim(new Claim("IsSubscribed", isSubscribed.ToString()));
+
+            // Create a new ClaimsPrincipal and re-sign in to update the cookie
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties { IsPersistent = true });
+
+            _logger.LogInformation("Updated subscription status for user ID {UserId} and re-authenticated user.", userId);
+        }
+
+
+
 
         [HttpGet("RegistrationCancel")]
         public IActionResult RegistrationCancel()

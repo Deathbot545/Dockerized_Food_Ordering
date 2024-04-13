@@ -59,6 +59,19 @@ namespace Food_Ordering_API.Controllers
             return Ok("User profile updated successfully.");
         }
 
+        [HttpPut("UpdateSubscriptionStatus")]
+        public async Task<IActionResult> UpdateSubscriptionStatus(string userId, bool isSubscribed)
+        {
+            var result = await _userService.UpdateSubscriptionStatusAsync(userId, isSubscribed);
+            if (!result)
+            {
+                return BadRequest("Could not update subscription status.");
+            }
+
+            return Ok("Subscription status updated successfully.");
+        }
+
+
         // PUT api/UserProfile
 
     }

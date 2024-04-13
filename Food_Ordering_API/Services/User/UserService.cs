@@ -19,7 +19,18 @@ namespace Food_Ordering_API.Services.User
         {
             _userManager = userManager;
         }
+        public async Task<bool> UpdateSubscriptionStatusAsync(string userId, bool isSubscribed)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
 
+            user.IsSubscribed = isSubscribed;
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
+        }
         public async Task<UserProfileModel> GetUserProfileAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);

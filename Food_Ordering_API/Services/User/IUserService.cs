@@ -11,6 +11,7 @@ namespace Food_Ordering_API.Services.User
 {
     public interface IUserService
     {
+        Task<bool> UpdateSubscriptionStatusAsync(string userId, bool isSubscribed);
         Task<UserProfileModel> GetUserProfileAsync(string userId);
         Task<bool> UpdateUserProfileAsync(string userId, UserProfileUpdateDTO model);
     }

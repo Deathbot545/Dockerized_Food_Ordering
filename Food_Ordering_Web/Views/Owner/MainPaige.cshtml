@@ -1,11 +1,4 @@
-﻿@{
-    var errorMessage = ViewData["ErrorMessage"] as string ?? "Some default error message.";
-}
-<div class="alert alert-danger">
-    <strong>Error!</strong> @Html.Raw(errorMessage)
-</div>
-
-@if (TempData["SubscriptionMessage"] != null)
+﻿@if (TempData["SubscriptionMessage"] != null)
 {
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
         @TempData["SubscriptionMessage"]

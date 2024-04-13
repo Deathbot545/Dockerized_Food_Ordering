@@ -34,35 +34,22 @@ namespace Food_Ordering_Web.Controllers
         public async Task<IActionResult> Index()
         {
             string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            _logger.LogInformation("Current User ID: {UserId}", currentUserId);
+            Guid ownerId = new Guid(currentUserId);
 
-            try
+            var response = await _httpClient.GetAsync($"api/OutletApi/GetOutletsByOwner/{ownerId}");
+            if (response.IsSuccessStatusCode)
             {
-                Guid ownerId = new Guid(currentUserId);
-                _logger.LogInformation("Converted User ID to GUID: {OwnerId}", ownerId);
-
-                var response = await _httpClient.GetAsync($"api/OutletApi/GetOutletsByOwner/{ownerId}");
-                _logger.LogInformation("Requested GetOutletsByOwner for OwnerId: {OwnerId}", ownerId);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var outlets = JsonConvert.DeserializeObject<List<Outlet>>(content) ?? new List<Outlet>(); // Initialize as empty if null
-                    _logger.LogInformation("Successfully retrieved outlets data for {OwnerId}. Data: {Data}", ownerId, content);
-                    return View("~/Views/Owner/MainPaige.cshtml", outlets);
-                }
-                else
-                {
-                    _logger.LogError("Failed to fetch outlets. HTTP Status Code: {StatusCode}. Reason: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
-                    return View("Error");
-                }
+                var content = await response.Content.ReadAsStringAsync();
+                var outlets = JsonConvert.DeserializeObject<List<Outlet>>(content);
+                return View("~/Views/Owner/MainPaige.cshtml", outlets ?? new List<Outlet>());
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "An error occurred while trying to fetch outlets for OwnerId: {OwnerId}", currentUserId);
+                _logger.LogError("Failed to fetch outlets. HTTP Status Code: {StatusCode}. Reason: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
                 return View("Error");
             }
         }
+
 
         public IActionResult Add()
         {

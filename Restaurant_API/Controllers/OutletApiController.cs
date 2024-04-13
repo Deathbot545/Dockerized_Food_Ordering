@@ -180,14 +180,19 @@ namespace Restaurant_API.Controllers
             try
             {
                 var outlets = await _outletService.GetOutletsByOwner(ownerId);
+                if (outlets == null || !outlets.Any())
+                {
+                    return Ok(new List<Outlet>());  // Return an empty list instead of causing an error
+                }
                 return Ok(outlets);
             }
             catch (Exception ex)
             {
-                // Log the exception
+                _logger.LogError(ex, "Error fetching outlets for owner ID {OwnerId}", ownerId);
                 return StatusCode(500, "Internal server error");
             }
         }
+
 
         [HttpGet("GetOutletImages/{outletId}")]
         public async Task<IActionResult> GetOutletImages(int outletId)

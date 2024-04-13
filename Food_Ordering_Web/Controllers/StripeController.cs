@@ -14,13 +14,15 @@ namespace Food_Ordering_Web.Controllers
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiBaseUrl;
+        private readonly ILogger<StripeController> _logger;
 
-        public StripeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public StripeController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<StripeController> logger)
         {
             var apiKey = configuration["StripeSettings:ApiKey"];
             StripeConfiguration.ApiKey = apiKey;
             _httpClient = httpClientFactory.CreateClient("UserManagementApiClient");
             _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api";
+            _logger = logger;
         }
 
 

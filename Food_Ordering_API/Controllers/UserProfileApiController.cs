@@ -60,9 +60,14 @@ namespace Food_Ordering_API.Controllers
         }
 
         [HttpPut("UpdateSubscriptionStatus")]
-        public async Task<IActionResult> UpdateSubscriptionStatus(string userId, bool isSubscribed)
+        public async Task<IActionResult> UpdateSubscriptionStatus([FromBody] SubscriptionUpdateDTO update)
         {
-            var result = await _userService.UpdateSubscriptionStatusAsync(userId, isSubscribed);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _userService.UpdateSubscriptionStatusAsync(update.UserId, update.IsSubscribed);
             if (!result)
             {
                 return BadRequest("Could not update subscription status.");
@@ -70,6 +75,7 @@ namespace Food_Ordering_API.Controllers
 
             return Ok("Subscription status updated successfully.");
         }
+
 
 
         // PUT api/UserProfile

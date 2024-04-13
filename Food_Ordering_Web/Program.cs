@@ -19,6 +19,7 @@ var configuration = builder.Configuration;
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); // Listen for HTTP connections on port 80
+    // Consider configuring HTTPS options if you're running in
 });
 //kk
 // Data Protection Keys Configuration

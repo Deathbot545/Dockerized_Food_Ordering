@@ -33,26 +33,7 @@ namespace Food_Ordering_Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            _logger.LogInformation("Entered Index method of RestaurantController.");
-            if (!User.Identity.IsAuthenticated)
-            {
-                _logger.LogWarning("User is not authenticated.");
-                return RedirectToAction("Login", "Account");
-            }
-
-            // Log all claims
-            _logger.LogInformation("User is authenticated. Claims:");
-            foreach (var claim in User.Claims)
-            {
-                _logger.LogInformation($"{claim.Type}: {claim.Value}");
-            }
             string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                _logger.LogWarning("No user ID found in claims. Redirecting to Login.");
-                return RedirectToAction("Login", "Account");
-            }
-
             _logger.LogInformation("Current User ID: {UserId}", currentUserId);
 
             try
@@ -66,7 +47,7 @@ namespace Food_Ordering_Web.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var outlets = JsonConvert.DeserializeObject<List<Outlet>>(content);
+                    var outlets = JsonConvert.DeserializeObject<List<Outlet>>(content) ?? new List<Outlet>(); // Initialize as empty if null
                     _logger.LogInformation("Successfully retrieved outlets data for {OwnerId}. Data: {Data}", ownerId, content);
                     return View("~/Views/Owner/MainPaige.cshtml", outlets);
                 }
@@ -82,6 +63,7 @@ namespace Food_Ordering_Web.Controllers
                 return View("Error");
             }
         }
+
         public IActionResult Add()
         {
             var isSubscribed = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;

@@ -59,25 +59,24 @@ namespace Food_Ordering_Web.Controllers
         [HttpGet("RegistrationSuccess")]
         public async Task<IActionResult> RegistrationSuccess(string session_id)
         {
-            // The userId should be resolved here, either by decoding the JWT from the user's request
-            // or by maintaining a mapping of session_id to userId on your server (set when creating the Stripe session).
-            // For demonstration, this is left as a manual step:
-
-            // string userId = ResolveUserIdFromSession(session_id);
-            // This requires an implementation specific to your authentication strategy.
-
-            // Since direct user management is not done here, call your User Management API to handle subscription success.
-            var apiResponse = await _httpClient.GetAsync($"{_apiBaseUrl}/HandleSubscriptionSuccess?sessionId={session_id}");
-
-            if (apiResponse.IsSuccessStatusCode)
+            try
             {
-                // Assuming the API call to update the user's subscription status is successful
-                return RedirectToAction("Index", "Home"); // Adjust as needed based on your application's flow
+                var apiResponse = await _httpClient.GetAsync($"{_apiBaseUrl}/HandleSubscriptionSuccess?sessionId={session_id}");
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    _logger.LogError("Failed to fetch outlets. Status Code: {StatusCode}, Content: {Content}", apiResponse.StatusCode, await apiResponse.Content.ReadAsStringAsync());
+                    return RedirectToAction("ErrorPage");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Log the error or handle the failure appropriately
-                return RedirectToAction("ErrorPage"); // Adjust as needed
+                _logger.LogError("An error occurred in RegistrationSuccess: {Exception}", ex);
+                return RedirectToAction("ErrorPage");
             }
         }
 

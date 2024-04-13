@@ -412,6 +412,23 @@ namespace Food_Ordering_Web.Controllers
                     IsPersistent = false,
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
+                try
+                {
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true, // Set to true because your site is served over HTTPS
+                        SameSite = SameSiteMode.None, // Necessary for cross-site request if applicable
+                        Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+                    };
+                    var cookiesAfterSignIn = HttpContext.Response.Headers["Set-Cookie"];
+                    Response.Cookies.Append("jwtCookie", token, cookieOptions);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error setting cookie.");
+                }
+
 
                 if (outletId.HasValue && tableId.HasValue)
                 {

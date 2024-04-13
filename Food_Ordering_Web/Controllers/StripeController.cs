@@ -66,7 +66,7 @@ namespace Food_Ordering_Web.Controllers
             }
 
             // Update the IsSubscribed status in the database
-            var updateResult = await _httpClient.PutAsJsonAsync($"{_apiBaseUrl}/api/UserProfileApi/UpdateSubscriptionStatus", new { userId = userId, isSubscribed = true });
+            var updateResult = await _httpClient.PutAsJsonAsync($"{_apiBaseUrl}/UserProfileApi/UpdateSubscriptionStatus", new { userId = userId, isSubscribed = true });
             if (!updateResult.IsSuccessStatusCode)
             {
                 _logger.LogError("Failed to update user subscription status. Status Code: {StatusCode}", updateResult.StatusCode);

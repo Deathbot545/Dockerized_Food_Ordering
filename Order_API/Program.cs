@@ -13,7 +13,7 @@ var configuration = builder.Configuration;
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); // Listen for HTTP connections
-    // Removed the ListenAnyIP(443) block that configures HTTPS
+
 });
 
 // Dependency Injection for services

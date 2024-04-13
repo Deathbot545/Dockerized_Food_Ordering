@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 builder.Services.AddControllersWithViews(); // This line is crucial
-// Inside ConfigureKestrel method
+// Inside ConfigureKestrel metho
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>

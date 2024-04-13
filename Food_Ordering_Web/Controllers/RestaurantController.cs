@@ -41,7 +41,7 @@ namespace Food_Ordering_Web.Controllers
             {
                 var responseString = await response.Content.ReadAsStringAsync();
                 var outlets = JsonConvert.DeserializeObject<List<OutletInfoDTO>>(responseString) ?? new List<OutletInfoDTO>(); // Ensuring a non-null list
-                return View("~/Views/Customer/MainPaige.cshtml", outlets);
+                return View("~/Views/Owner/MainPaige.cshtml", outlets);
             }
             else
             {

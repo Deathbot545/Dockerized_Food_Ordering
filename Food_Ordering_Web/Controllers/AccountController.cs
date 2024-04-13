@@ -374,22 +374,27 @@ namespace Food_Ordering_Web.Controllers
 
             try
             {
-
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
-                var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name) ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
-                var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
-                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed");
 
-                bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
+                // Debugging: Log all claims
+                foreach (var claim in jwtToken.Claims)
+                {
+                    _logger.LogInformation("Claim Type: {ClaimType}, Claim Value: {ClaimValue}", claim.Type, claim.Value);
+                }
 
-                // Ensure that userIdClaim is not null before trying to use its value.
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
                 if (userIdClaim == null)
                 {
                     _logger.LogError("User ID claim is missing in the JWT.");
                     return View("Error");
                 }
+
+                var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name);
+                var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
+                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed");
+
+                bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
 
                 var claims = new List<Claim>
         {
@@ -398,6 +403,7 @@ namespace Food_Ordering_Web.Controllers
             new Claim(ClaimTypes.NameIdentifier, userIdClaim.Value),
             new Claim("IsSubscribed", isSubscribed.ToString())
         };
+
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
@@ -406,35 +412,16 @@ namespace Food_Ordering_Web.Controllers
                     IsPersistent = false,
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
                 });
-                try
-                {
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true, // Set to true because your site is served over HTTPS
-                        SameSite = SameSiteMode.None, // Necessary for cross-site request if applicable
-                        Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-                    };
-                    var cookiesAfterSignIn = HttpContext.Response.Headers["Set-Cookie"];
-                    Response.Cookies.Append("jwtCookie", token, cookieOptions);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error setting cookie.");
-                }
 
                 if (outletId.HasValue && tableId.HasValue)
                 {
-                    // Specific redirection logic for ordering process
                     string redirectUrl = $"/Order/Menu?outletId={outletId}&tableId={tableId}";
                     return Redirect(redirectUrl);
                 }
                 else
                 {
-                    string controllerName = roleClaim.Value; // The role name is expected to match the controller name
-
-                    // Fix applied here: Ensure the "controller" parameter is correctly named and passed
-                    return RedirectToAction("Index", controllerName); // Correct redirection to controller based on role
+                    string controllerName = roleClaim?.Value ?? "Home";  // Default to Home if role is not found
+                    return RedirectToAction("Index", controllerName);
                 }
             }
             catch (Exception ex)
@@ -442,8 +429,8 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogError(ex, "An error occurred during the login process.");
                 return View("Error"); // Ensure there's an Error view available to handle this scenario
             }
-          
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()

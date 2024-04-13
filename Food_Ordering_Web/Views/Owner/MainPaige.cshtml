@@ -48,8 +48,7 @@
                                 <th scope="col">Updated At</th>
                             </tr>
                     </thead>
-                    @if (Model != null && Model.Any())
-                    {
+                   
                         <tbody>
                             @foreach (var outlet in Model)
                             {
@@ -78,11 +77,7 @@
                                 </tr>
                             }
                         </tbody>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info">No outlets available. Please add some outlets to get started.</div>
-                    }
+                   
                     </table>
                     
                 </div>

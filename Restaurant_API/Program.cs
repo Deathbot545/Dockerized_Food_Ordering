@@ -10,7 +10,7 @@ builder.Configuration.AddJsonFile("Restaurant_API_appsettings.json", optional: t
 // Kestrel configuration for HTTPS
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // Listen for HTTP 
+    serverOptions.ListenAnyIP(80); 
 });
 
 // Add services to the container

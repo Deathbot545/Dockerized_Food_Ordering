@@ -40,7 +40,7 @@ namespace Food_Ordering_Web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var responseString = await response.Content.ReadAsStringAsync();
-                var outlets = JsonConvert.DeserializeObject<List<OutletInfoDTO>>(responseString) ?? new List<OutletInfoDTO>(); // Ensuring a non-null list
+                var outlets = JsonConvert.DeserializeObject<List<OutletDTO>>(responseString) ?? new List<OutletDTO>(); // Ensuring a non-null list
                 return View("~/Views/Owner/MainPaige.cshtml", outlets);
             }
             else

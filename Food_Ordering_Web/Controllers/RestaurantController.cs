@@ -115,13 +115,13 @@ namespace Food_Ordering_Web.Controllers
             }
         }
 
-      /*  private List<Table> FetchTablesByOutletId(int id)
+        private List<TableDTO> FetchTablesByOutletId(int id)
         {
             // Fetch tables based on outlet ID and return
-            return new List<Table>(); // Replace with your actual logic
+            return new List<TableDTO>(); // Replace with your actual logic
         }
 
-        public async Task<IActionResult> AddOutlet([FromForm] Outlet outlet, [FromForm] IFormFile Logo, [FromForm] IFormFile RestaurantImage)
+        public async Task<IActionResult> AddOutlet([FromForm] OutletDTO outlet, [FromForm] IFormFile Logo, [FromForm] IFormFile RestaurantImage)
         {
             string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(currentUserId))
@@ -189,7 +189,7 @@ namespace Food_Ordering_Web.Controllers
         public class ApiOutletResponse
         {
             public bool Success { get; set; }
-            public Outlet Outlet { get; set; }
+            public OutletDTO Outlet { get; set; }
         }
         private string GenerateSubdomain(string internalOutletName)
         {
@@ -212,13 +212,13 @@ namespace Food_Ordering_Web.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                var outlets = JsonConvert.DeserializeObject<List<Outlet>>(await response.Content.ReadAsStringAsync());
+                var outlets = JsonConvert.DeserializeObject<List<OutletDTO>>(await response.Content.ReadAsStringAsync());
                 // You can pass these outlets to the view to let the user select an outlet for the kitchen staff
                 return View("Views/Kitchen/AddStaff.cshtml",outlets);
             }
 
             return View("Error"); // Or handle errors differently
-        }*/
+        }
 
     }
 }

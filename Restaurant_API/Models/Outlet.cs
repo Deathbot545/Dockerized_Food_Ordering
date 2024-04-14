@@ -13,6 +13,7 @@ namespace Restaurant_API.Models
         public Outlet()
         {
             Tables = new List<Table>(); // Initialize to empty list here
+            KitchenStaffs = new List<KitchenStaff>();
         }
         [Key] public int Id { get; set; }
         public string InternalOutletName { get; set; }
@@ -45,5 +46,6 @@ namespace Restaurant_API.Models
         public ICollection<Table> Tables { get; set; } // one-to-many with Table
 
         public string Subdomain { get; set; }
+        public ICollection<KitchenStaff> KitchenStaffs { get; set; }
     }
 }

@@ -11,11 +11,13 @@ namespace Menu_API.Controllers
     public class MenuApiController : Controller
     {
         private readonly IMenuService _menuService;
+        private readonly ILogger<MenuApiController> _logger;
         
 
-        public MenuApiController(IMenuService menuService)
+        public MenuApiController(IMenuService menuService,ILogger<MenuApiController> logger)
         {
             _menuService = menuService;
+            _logger = logger;
         }
 
         [HttpPost("AddCategory")]
@@ -144,6 +146,29 @@ namespace Menu_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
+        [HttpDelete("DeleteMenusByOutlet/{outletId}")]
+        public async Task<IActionResult> DeleteMenusByOutlet(int outletId)
+        {
+            try
+            {
+                var isSuccess = await _menuService.DeleteMenusByOutletIdAsync(outletId);
+                if (isSuccess)
+                {
+                    return Ok(new { Message = "All menus for the outlet were deleted successfully." });
+                }
+                else
+                {
+                    return NotFound(new { Message = "Menus for the specified outlet were not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while trying to delete menus for outlet {outletId}.");
+                return StatusCode(500, new { Message = "An error occurred while deleting the menus.", Details = ex.Message });
+            }
+        }
+
 
 
     }

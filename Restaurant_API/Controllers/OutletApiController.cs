@@ -78,16 +78,15 @@ namespace Restaurant_API.Controllers
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                var menuApiUrl = $"http://menu-api-service/api/menus/outlet/{id}";
+                var menuApiUrl = $"https://restosolutionssaas.com/api/MenuApi/outlet/{id}";
                 var response = await httpClient.DeleteAsync(menuApiUrl);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning($"Failed to delete menus for outlet {id}.");
-                    // Handle failure as appropriate, possibly returning an error response
+                    _logger.LogWarning($"Failed to delete menus for outlet {id}. HTTP status: {response.StatusCode}");
+                    return StatusCode((int)response.StatusCode, new { Message = $"Failed to delete associated menus for outlet {id}" });
                 }
 
-                // Assuming _outletService.DeleteOutletByIdAsync(id) correctly deletes the outlet
                 var result = await _outletService.DeleteOutletByIdAsync(id);
                 if (result)
                 {
@@ -104,6 +103,7 @@ namespace Restaurant_API.Controllers
                 return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
             }
         }
+
 
 
         [HttpPatch("update/{id}"), Consumes("multipart/form-data")]

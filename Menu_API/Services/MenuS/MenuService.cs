@@ -9,10 +9,12 @@ namespace Menu_API.Services.MenuS
     public class MenuService : IMenuService
     {
         private readonly MenuDbContext _context;
+        private readonly ILogger<MenuService> _logger;
 
-        public MenuService(MenuDbContext context)
+        public MenuService(MenuDbContext context, ILogger<MenuService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<Menu> EnsureMenuExistsAsync(int outletId, string internalOutletName)
@@ -146,6 +148,43 @@ namespace Menu_API.Services.MenuS
             _context.MenuItems.Remove(item);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> DeleteMenusByOutletIdAsync(int outletId)
+        {
+            try
+            {
+                // Fetch all menus for the given outlet ID
+                var menus = await _context.Menus
+                                          .Include(m => m.MenuCategories)
+                                            .ThenInclude(mc => mc.MenuItems)
+                                          .Where(m => m.OutletId == outletId)
+                                          .ToListAsync();
+
+                if (!menus.Any())
+                {
+                    return false;
+                }
+
+                // Remove all related menu items and categories
+                foreach (var menu in menus)
+                {
+                    foreach (var category in menu.MenuCategories)
+                    {
+                        _context.MenuItems.RemoveRange(category.MenuItems);
+                    }
+                    _context.MenuCategories.RemoveRange(menu.MenuCategories);
+                }
+                _context.Menus.RemoveRange(menus);
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete menus for outlet {OutletId}.", outletId);
+                return false;
+            }
         }
 
     }

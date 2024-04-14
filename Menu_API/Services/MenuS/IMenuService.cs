@@ -19,5 +19,6 @@ namespace Menu_API.Services.MenuS
         Task<List<MenuItemDto>> GetMenuItemsByOutletIdAsync(int outletId);
         Task<MenuItemDto> GetMenuItemByIdAsync(int menuItemId);
         Task<bool> DeleteMenuItemAsync(int itemId);
+        Task<bool> DeleteMenusByOutletIdAsync(int outletId);
     }
 }

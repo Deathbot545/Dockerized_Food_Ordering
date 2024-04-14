@@ -146,9 +146,28 @@ namespace Restaurant_API.Services.OutletSer
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var outlet = await _context.Outlets.FindAsync(id); // Simplified to FindAsync since we're not dealing with related entities here
+                var outlet = await _context.Outlets.Include(o => o.Tables)
+                                                   .ThenInclude(t => t.QRCode)
+                                                   .Include(o => o.KitchenStaffs)
+                                                   .SingleOrDefaultAsync(o => o.Id == id);
                 if (outlet == null) return false;
 
+                // Manually delete related QR codes (if any)
+                foreach (var table in outlet.Tables)
+                {
+                    if (table.QRCode != null)
+                    {
+                        _context.QRCodes.Remove(table.QRCode);
+                    }
+                }
+
+                // Manually delete related tables
+                _context.Tables.RemoveRange(outlet.Tables);
+
+                // Manually delete related kitchen staff
+                _context.KitchenStaffs.RemoveRange(outlet.KitchenStaffs);
+
+                // Finally, delete the outlet itself
                 _context.Outlets.Remove(outlet);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -157,8 +176,8 @@ namespace Restaurant_API.Services.OutletSer
             }
             catch (Exception ex)
             {
-                // Log the exception
                 await transaction.RollbackAsync();
+                // Log the exception
                 throw; // Re-throw the exception to be handled by the caller or global exception handler
             }
         }

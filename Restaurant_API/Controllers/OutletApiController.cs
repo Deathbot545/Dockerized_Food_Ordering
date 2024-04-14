@@ -78,7 +78,7 @@ namespace Restaurant_API.Controllers
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                var menuApiUrl = $"https://restosolutionssaas.com/api/MenuApi/outlet/{id}";
+                var menuApiUrl = $"https://restosolutionssaas.com/api/MenuApi/DeleteMenusByOutlet/{id}";
                 var response = await httpClient.DeleteAsync(menuApiUrl);
 
                 if (!response.IsSuccessStatusCode)

@@ -75,8 +75,8 @@ namespace Food_Ordering_Web.Controllers
 
             // Update claims and re-sign in the user
             await UpdateUserSubscription(userId, true);
+            return RedirectToAction("Index", "Restaurant");
 
-            return RedirectToAction("Index", "Home");
         }
 
         private async Task UpdateUserSubscription(string userId, bool isSubscribed)
@@ -99,9 +99,6 @@ namespace Food_Ordering_Web.Controllers
 
             _logger.LogInformation("Updated subscription status for user ID {UserId} and re-authenticated user.", userId);
         }
-
-
-
 
         [HttpGet("RegistrationCancel")]
         public IActionResult RegistrationCancel()

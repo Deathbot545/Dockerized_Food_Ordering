@@ -159,7 +159,8 @@ namespace Menu_API.Controllers
                 }
                 else
                 {
-                    return NotFound(new { Message = "Menus for the specified outlet were not found." });
+                    // Change this to return an OK status even if no menus were found
+                    return Ok(new { Message = "No menus found for the outlet, but the operation completed successfully." });
                 }
             }
             catch (Exception ex)
@@ -168,6 +169,7 @@ namespace Menu_API.Controllers
                 return StatusCode(500, new { Message = "An error occurred while deleting the menus.", Details = ex.Message });
             }
         }
+
 
 
 

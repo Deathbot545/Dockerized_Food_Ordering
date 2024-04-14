@@ -76,7 +76,9 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+app.UseRouting(); // This should be added to ensure UseCors works with routing
 
+app.UseCors("AllowMyOrigins");
 app.UseAuthorization();
 
 app.MapControllers();

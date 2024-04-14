@@ -1,27 +1,20 @@
-﻿
-using Food_Ordering_Web.Models;
+﻿using Food_Ordering_Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Text.Json;
-using Stripe;
 using System.Diagnostics;
 using System.Security.Claims;
-using System.IO.Pipelines;
-using Order_API.Service.Orderser;
 using Food_Ordering_Web.DTO;
 
 namespace Food_Ordering_Web.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly IOrderService _orderService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<OrderController> _logger;
 
-        public OrderController(IOrderService orderService, IHttpContextAccessor httpContextAccessor,IHttpClientFactory httpClientFactory, ILogger<OrderController> logger)
+        public OrderController( IHttpContextAccessor httpContextAccessor,IHttpClientFactory httpClientFactory, ILogger<OrderController> logger)
         {
-            _orderService = orderService;
+           
             _httpContextAccessor = httpContextAccessor;
             _httpClientFactory = httpClientFactory;
             _logger = logger;

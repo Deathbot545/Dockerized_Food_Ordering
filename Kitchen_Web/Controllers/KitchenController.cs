@@ -8,8 +8,7 @@ using System.Diagnostics;
 
 namespace Kitchen_Web.Controllers
 {
-    [Route("kitchen/[controller]")]
-    [EnableCors("AllowMyOrigins")]
+    [Route("kitchen")]
     public class KitchenController : Controller
     {
         private readonly ILogger<KitchenController> _logger;
@@ -20,7 +19,7 @@ namespace Kitchen_Web.Controllers
             _logger = logger;
             _httpClientFactory = httpClientFactory;
         }
-
+        [HttpGet("{outletId}")]
         public async Task<IActionResult> Index(int? outletId)
         {
             if (!outletId.HasValue)

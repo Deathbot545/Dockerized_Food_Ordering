@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Kitchen_Web.Controllers
 {
-    [Route("kitchen")]
+    [Route("kitchen/[controller]")]
     [ApiController]
     public class KitchenController : Controller
     {

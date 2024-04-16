@@ -14,8 +14,6 @@ using Stripe;
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
-
-// Configure Kestrel
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); // Listen for HTTP connections on port 80

@@ -15,9 +15,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);
-
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {

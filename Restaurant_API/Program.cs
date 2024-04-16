@@ -13,7 +13,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     serverOptions.ListenAnyIP(80); 
 });
 
-// Add services to the container
+// Add services to the contain
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

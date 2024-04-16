@@ -69,7 +69,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
-//kl
+
 // Configure JSON Options if necessary
 builder.Services.Configure<JsonOptions>(options =>
 {

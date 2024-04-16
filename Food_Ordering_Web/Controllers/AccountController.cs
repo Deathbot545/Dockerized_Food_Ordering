@@ -39,7 +39,6 @@ namespace Food_Ordering_Web.Controllers
         [HttpGet]
         public IActionResult SpecialLogin(int outletId, int tableId)
         {
-            
                 return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
            
         }

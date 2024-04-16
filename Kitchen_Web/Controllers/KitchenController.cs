@@ -8,8 +8,7 @@ using System.Diagnostics;
 
 namespace Kitchen_Web.Controllers
 {
-    [Route("kitchen/[controller]")]
-    [ApiController]
+    [Route("kitchen")]
     public class KitchenController : Controller
     {
         private readonly ILogger<KitchenController> _logger;

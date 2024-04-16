@@ -16,7 +16,6 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 
 });
 
-// Dependency Injection for services
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 

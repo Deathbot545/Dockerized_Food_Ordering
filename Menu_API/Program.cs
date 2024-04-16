@@ -20,7 +20,6 @@ builder.Services.AddControllers();
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// CORS policy setup
 // Modify your existing CORS policy setup in the Program.cs file
 builder.Services.AddCors(options =>
 {

@@ -20,7 +20,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IOutletService, OutletService>();
 
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigins", builder =>

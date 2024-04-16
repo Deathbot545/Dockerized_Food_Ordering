@@ -19,7 +19,7 @@ namespace Kitchen_Web.Controllers
             _logger = logger;
             _httpClientFactory = httpClientFactory;
         }
-        [HttpGet("{outletId}")]
+        [HttpGet("{outletId:int}")]
         public async Task<IActionResult> Index(int? outletId)
         {
             if (!outletId.HasValue)

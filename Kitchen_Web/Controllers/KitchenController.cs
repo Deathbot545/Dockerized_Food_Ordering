@@ -22,36 +22,36 @@ namespace Kitchen_Web.Controllers
         [HttpGet("{outletId:int}")]
         public async Task<IActionResult> Index(int? outletId)
         {
+            _logger.LogInformation("Entering Index method. OutletId: {OutletId}", outletId);
+
             if (!outletId.HasValue)
             {
-                // If no outletId is provided, just return the default view without additional data.
+                _logger.LogInformation("No outletId provided, returning default view.");
                 return View("~/Views/Home/Index.cshtml");
             }
 
             var httpClient = _httpClientFactory.CreateClient();
             List<OrderDTO> orders = new List<OrderDTO>();
 
-            // Fetching Orders
             var response = await httpClient.GetAsync($"https://restosolutionssaas.com/api/OrderApi/GetOrdersForOutlet/{outletId.Value}");
             if (!response.IsSuccessStatusCode)
             {
                 var errorResponse = await response.Content.ReadAsStringAsync();
-                _logger.LogError($"API Error fetching orders: {errorResponse}");
+                _logger.LogError("API Error fetching orders: {ErrorResponse}", errorResponse);
                 return View("Error", new ErrorViewModel { Message = $"API Error: {errorResponse}" });
             }
-            //hh
+
             try
             {
                 orders = await response.Content.ReadAsAsync<List<OrderDTO>>();
+                _logger.LogInformation("Orders successfully fetched and parsed.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error while processing the API response: {ex.Message}");
+                _logger.LogError(ex, "Error while processing the API response.");
                 return View("Error", new ErrorViewModel { Message = $"API Processing Error: {ex.Message}" });
             }
 
-            // Constructing ViewModel to pass to the view. Since only order details are needed and they include TableId,
-            // there's no need to fetch or include table information separately.
             var model = new OutletViewModel
             {
                 Orders = orders

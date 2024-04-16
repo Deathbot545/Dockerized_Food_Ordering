@@ -20,8 +20,9 @@
   },
   "Logging": {
     "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
     }
   },
   "ShowDetailedErrors": true,

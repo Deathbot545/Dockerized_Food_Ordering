@@ -9,6 +9,8 @@ using Restaurant_API.Services.OutletSer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true, reloadOnChange: true);
+
 WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 builder.Services.AddControllersWithViews(); // This line is crucial
@@ -85,7 +87,7 @@ builder.Services.AddCors(options =>
 });
 var app = builder.Build();
 
-builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true, reloadOnChange: true);
+
 // Configure the HTTP request pipeline.
 
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))

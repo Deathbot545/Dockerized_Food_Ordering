@@ -12,7 +12,7 @@ var configuration = builder.Configuration;
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // Listen for HTTP 
+    serverOptions.ListenAnyIP(80); 
 
 });
 

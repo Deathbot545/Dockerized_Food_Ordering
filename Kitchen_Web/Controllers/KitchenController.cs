@@ -1,5 +1,6 @@
 ﻿
 using Kitchen_Web.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Order_API.DTO;
 using Restaurant_API.ViewModels;
@@ -7,6 +8,8 @@ using System.Diagnostics;
 
 namespace Kitchen_Web.Controllers
 {
+    [Route("kitchen/[controller]")]
+    [EnableCors("AllowMyOrigins")]
     public class KitchenController : Controller
     {
         private readonly ILogger<KitchenController> _logger;

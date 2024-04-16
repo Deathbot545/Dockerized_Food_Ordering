@@ -17,27 +17,15 @@ var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // Listen for HTTP
-    serverOptions.ListenAnyIP(443, listenOptions =>
-    {
-        try
-        {
-            listenOptions.UseHttps("/etc/ssl/certs/certificate.pfx", "raaed");
-            logger.LogInformation("HTTPS setup was successful.");
-        }
-        catch (Exception ex)
-        {
-            // Log detailed information about the exception
-            logger.LogError(ex, "An error occurred while setting up HTTPS.");
-        }
-    });
+    serverOptions.ListenAnyIP(80); // Listen for HTTP connections on port 80
+    // Consider configuring HTTPS options if you're running in
 });
-
-// Inside ConfigureServices method or directly in the Program.cs
-var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys"; // Path inside the container
+// Data Protection Keys Configuration
+var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
-// Register the HttpClient, set its base address, and configure the timeout
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
+    .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
+
 builder.Services.AddHttpClient("namedClient", c =>
 {
     c.BaseAddress = new Uri(configuration["ApiBaseUrl"]);
@@ -51,11 +39,6 @@ builder.Services.AddHttpClient("namedClient", c =>
 builder.Services.AddSignalR();
 
 
-
-/*builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-*/
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.MinimumSameSitePolicy = SameSiteMode.Lax;
@@ -90,13 +73,15 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowMyOrigins",
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
+    options.AddPolicy("AllowMyOrigins", builder =>
+    {
+        builder.WithOrigins(
+                 "https://restosolutionssaas.com" // The second web application origin
+               )
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
+    });
 });
 var app = builder.Build();
 

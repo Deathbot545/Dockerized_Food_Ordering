@@ -30,7 +30,7 @@ jobs:
         context: .
         file: ./Kitchen_Web/Dockerfile
         push: true
-        tags: deathbot545/rkitchenweb:latest
+        tags: deathbot545/kitchenweb:latest
         
     # Copy the SSH private key file from your repository to the runner's home directory and set permissions
     - name: Prepare SSH Key

@@ -39,7 +39,7 @@ namespace Kitchen_Web.Controllers
                 _logger.LogError($"API Error fetching orders: {errorResponse}");
                 return View("Error", new ErrorViewModel { Message = $"API Error: {errorResponse}" });
             }
-
+            //hh
             try
             {
                 orders = await response.Content.ReadAsAsync<List<OrderDTO>>();

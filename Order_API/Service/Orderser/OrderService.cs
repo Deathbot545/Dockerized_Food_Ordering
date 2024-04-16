@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Order_API.Service.Orderser
@@ -224,6 +225,9 @@ namespace Order_API.Service.Orderser
                     Quantity = od.Quantity
                 }).ToList()
             }).ToList();
+            _logger.LogInformation("Orders processed for serialization: {OrdersJson}", JsonSerializer.Serialize(ordersDTO, new JsonSerializerOptions { WriteIndented = true }));
+
+            return ordersDTO;
         }
 
 

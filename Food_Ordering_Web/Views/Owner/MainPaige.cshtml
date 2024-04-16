@@ -291,7 +291,7 @@
         });
         function updateKitchenLink(outletId) {
             if (outletId) {
-                const kitchenUrl = `https://restosolutionssaas.com:8443/Kitchen?outletId=${outletId}`;
+                const kitchenUrl = `https://restosolutionssaas.com/kitchen/${outletId}`;
                 $('#kitchenLink').attr('href', kitchenUrl);
             } else {
                 $('#kitchenLink').attr('href', '#'); // Reset or handle appropriately if no outlet is selected

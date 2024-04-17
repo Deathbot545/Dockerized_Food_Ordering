@@ -19,10 +19,7 @@ namespace Order_API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Order>(entity =>
-            {
-                entity.Property(e => e.Customer).IsRequired(false);  // Allow nulls
-            });
+            base.OnModelCreating(modelBuilder);
             // Model configurations here, e.g., modelBuilder.Entity<Order>().ToTable("Orders");
         }
     }

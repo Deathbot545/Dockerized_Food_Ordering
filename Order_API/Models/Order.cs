@@ -10,7 +10,7 @@ namespace Order_API.Models
     {
         public int Id { get; set; }
         public DateTime OrderTime { get; set; }
-        public string Customer { get; set; } // null if the user is a guest
+        public string? Customer { get; set; } // null if the user is a guest
         public int TableId { get; set; }
         public int OutletId { get; set; }
         public OrderStatus Status { get; set; } // Enum for Order Status: Pending, Preparing, Ready, Served

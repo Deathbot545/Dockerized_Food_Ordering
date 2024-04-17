@@ -11,7 +11,7 @@ builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true
 
 WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
-builder.Services.AddControllersWithViews(); // This line is cruci
+builder.Services.AddControllersWithViews(); // This line is 
 // Inside ConfigureKestrel metho
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
 

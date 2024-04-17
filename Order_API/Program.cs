@@ -18,7 +18,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-// SignalR for real-time web functionality
+// SignalR for real-time web 
 builder.Services.AddSignalR();
 
 // Controllers

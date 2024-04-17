@@ -19,7 +19,7 @@ builder.Services.AddControllers();
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// Modify your existing CORS policy setup in the Program.cs file
+// Modify your existing CORS policy setup in the 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigins", builder =>

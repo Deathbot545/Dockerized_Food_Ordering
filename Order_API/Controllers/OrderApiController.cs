@@ -76,20 +76,21 @@ namespace Order_API.Controllers
          }
 
          [HttpGet("GetOrdersForOutlet/{outletId}")]
-         public async Task<IActionResult> GetOrdersForOutlet(int outletId)
-         {
-             try
-             {
-                 var ordersDTO = _orderService.GetOrdersByOutletIdAsync(outletId);
-                 return Ok(ordersDTO);
-             }
-             catch (Exception ex)
-             {
-                 return StatusCode(500, $"Internal server error: {ex.Message}");
-             }
-         }
+        public async Task<IActionResult> GetOrdersForOutlet(int outletId)
+        {
+            try
+            {
+                var ordersDTO = await _orderService.GetOrdersByOutletIdAsync(outletId);
+                return Ok(ordersDTO);  // Ensure ordersDTO does not contain non-serializable types
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-         [HttpDelete("DeleteOrder/{orderId}")]
+
+        [HttpDelete("DeleteOrder/{orderId}")]
          public async Task<IActionResult> DeleteOrder(int orderId)
          {
              try

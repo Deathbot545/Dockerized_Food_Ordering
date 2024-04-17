@@ -26,7 +26,7 @@ ConfigureIdentity(builder);
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// Add this line to add in-memory caching
+// Add this line to add in-memory 
 builder.Services.AddDistributedMemoryCache();
 
 // Register AccountService

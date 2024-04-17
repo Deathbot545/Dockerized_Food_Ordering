@@ -18,7 +18,7 @@ var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); // Listen for HTTP connections on port 80
-    // Consider configuring HTTPS options if you're running in
+    // Consider configuring HTTPS options if 
 });
 // Data Protection Keys Configuration
 var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";

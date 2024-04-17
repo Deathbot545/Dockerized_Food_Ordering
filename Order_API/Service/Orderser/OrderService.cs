@@ -92,6 +92,7 @@ namespace Order_API.Service.Orderser
 
         public async Task<int> AddToCartAsync(MenuItem menuItem, int quantity, string userId = null, int tableId = 0, int outletId = 0)
          {
+
              if (string.IsNullOrEmpty(userId))
              {
                  return await AddToCartAsGuestAsync(menuItem, quantity, tableId, outletId);
@@ -347,48 +348,49 @@ namespace Order_API.Service.Orderser
                 .Include(o => o.OrderDetails)
                 .ToListAsync();
 
-            // Since we now know each order contains OutletId, we can directly fetch menu items for each order's outlet
+            // Prepare DTOs to fill with data
+            var orderDtos = new List<OrderDTO>();
+
             foreach (var order in orders)
             {
                 var menuItems = await FetchMenuItemsByOutletIdAsync(order.OutletId);
 
-                // Convert Order and its details to OrderDTO, incorporating fetched menu items
-                order.OrderDetails.ForEach(od =>
+                var orderDetailsDto = order.OrderDetails.Select(od =>
                 {
-                    var menuItem = menuItems.FirstOrDefault(mi => mi.id == od.MenuItemId);
-                    od.MenuItem = menuItem != null ? new MenuItemData
+                    var menuItemData = menuItems.FirstOrDefault(mi => mi.id == od.MenuItemId);
+                    return new OrderDetailDTO
                     {
-                        Id = menuItem.id,
-                        Name = menuItem.Name,
-                        Description = menuItem.Description,
-                        Price = (double)menuItem.Price,
-                        MenuCategoryId = menuItem.MenuCategoryId,
-                        Image = menuItem.Image
-                    } : null;
+                        Id = od.Id,
+                        OrderId = od.OrderId,
+                        MenuItemId = od.MenuItemId,
+                        Quantity = od.Quantity,
+                        MenuItem = menuItemData != null ? new MenuItemData
+                        {
+                            Id = menuItemData.id,
+                            Name = menuItemData.Name,
+                            Description = menuItemData.Description,
+                            Price = (double)menuItemData.Price,
+                            MenuCategoryId = menuItemData.MenuCategoryId,
+                            Image = menuItemData.Image
+                        } : null
+                    };
+                }).ToList();
+
+                orderDtos.Add(new OrderDTO
+                {
+                    Id = order.Id,
+                    OrderTime = order.OrderTime,
+                    Customer = order.Customer,
+                    TableId = order.TableId,
+                    OutletId = order.OutletId,
+                    Status = order.Status,
+                    OrderDetails = orderDetailsDto
                 });
             }
 
-            // Convert the enriched orders to DTOs
-            var orderDtos = orders.Select(o => new OrderDTO
-            {
-                Id = o.Id,
-                OrderTime = o.OrderTime,
-                Customer = o.Customer,
-                TableId = o.TableId,
-                OutletId = o.OutletId,
-                Status = o.Status,
-                OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
-                {
-                    Id = od.Id,
-                    OrderId = od.OrderId,
-                    MenuItemId = od.MenuItemId,
-                    MenuItem = od.MenuItem, // Now contains the MenuItemData converted from MenuItemDto
-                    Quantity = od.Quantity
-                }).ToList()
-            }).ToList();
-
             return orderDtos;
         }
+
 
         // Assume FetchMenuItemsByOutletIdAsync and MenuItemData are defined similarly to your previous context.
 

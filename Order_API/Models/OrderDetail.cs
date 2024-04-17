@@ -14,6 +14,5 @@ namespace Order_API.Models
         public int MenuItemId { get; set; }
         //public virtual MenuItem MenuItem { get; set; }
         public int Quantity { get; set; }
-        public MenuItemData MenuItem { get; internal set; }
     }
 }

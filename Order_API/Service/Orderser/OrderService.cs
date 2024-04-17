@@ -50,8 +50,15 @@ namespace Order_API.Service.Orderser
                         throw new Exception($"MenuItem with Id {item.Id} not found.");
                     }
 
-                    // Assuming your Menu API returns a JSON object that matches the MenuItemDto structure
                     var menuItemDto = await response.Content.ReadAsAsync<MenuItemDto>();
+                    if (menuItemDto == null || menuItemDto.id == 0)
+                    {
+                        _logger.LogError($"Invalid data received for MenuItem with Id {item.Id}");
+                        throw new Exception($"Invalid data received for MenuItem with Id {item.Id}");
+                    }
+
+                    // Assuming your Menu API returns a JSON object that matches the MenuItemDto structure
+                   
 
                     MenuItem menuItem = new MenuItem
                     {

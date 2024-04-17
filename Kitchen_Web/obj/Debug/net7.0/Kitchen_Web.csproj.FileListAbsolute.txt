@@ -142,3 +142,4 @@ D:\Dockerize\dockerize\Kitchen_Web\obj\Debug\net7.0\refint\Kitchen_Web.dll
 D:\Dockerize\dockerize\Kitchen_Web\obj\Debug\net7.0\Kitchen_Web.pdb
 D:\Dockerize\dockerize\Kitchen_Web\obj\Debug\net7.0\Kitchen_Web.genruntimeconfig.cache
 D:\Dockerize\dockerize\Kitchen_Web\obj\Debug\net7.0\ref\Kitchen_Web.dll
+D:\Dockerize\dockerize\Kitchen_Web\bin\Debug\net7.0\ContainerFile\FoodOrderingWebTaskDefinition19.json

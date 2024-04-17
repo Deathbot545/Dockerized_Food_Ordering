@@ -17,7 +17,6 @@ namespace Restaurant_API.ViewModels
             Orders = new List<OrderDTO>();
 
         }
-
         public Outlet OutletInfo { get; set; }
         public List<Table> Tables { get; set; }
         public List<OrderDTO> Orders { get; set; }  // NOTE: Use OrderDTO instead of Order

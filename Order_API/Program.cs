@@ -88,7 +88,7 @@ app.UseCors("AllowMyOrigins");
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<OrderStatusHub>("/orderStatusHub");
+app.MapHub<OrderStatusHub>("/api/OrderApi/orderStatusHub");
 
 app.Run();
 

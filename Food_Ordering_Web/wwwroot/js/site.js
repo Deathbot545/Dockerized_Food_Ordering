@@ -88,7 +88,7 @@ async function setupSignalRConnection() {
 
     console.log("Establishing SignalR connection for order status updates.");
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`https://restosolutionssaas.com/orderStatusHub?orderId=${currentOrder.orderId}`)
+        .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?orderId=${currentOrder.orderId}`)
         .configureLogging(signalR.LogLevel.Information)
         .withAutomaticReconnect()
         .build();

@@ -110,7 +110,7 @@
 
         // Your existing SignalR connection setup
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com/orderStatusHub")
+            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub")
             .configureLogging(signalR.LogLevel.Information)
             .withAutomaticReconnect()
             .build();

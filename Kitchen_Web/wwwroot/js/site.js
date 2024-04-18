@@ -1,4 +1,5 @@
-﻿function getStatusColor(status) {
+﻿// Define getStatusColor globally
+window.getStatusColor = function (status) {
     switch (status) {
         case "Pending": return "orange";
         case "Preparing": return "blue";
@@ -7,6 +8,7 @@
         default: return "black"; // Unknown status or the default color
     }
 }
+
 
 function mapEnumToStatusText(statusValue) {
     switch (statusValue) {

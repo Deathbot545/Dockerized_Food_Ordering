@@ -3,8 +3,9 @@
         case "Pending": return "orange";
         case "Preparing": return "blue";
         case "Ready": return "green";
-        case "Served": return "grey";
-        default: return "black"; // Unknown status or the default color
+        case "Served":
+        case "Cancelled": return "grey"; // Using grey for both served and cancelled for simplicity
+        default: return "black"; // Unknown or default color
     }
 }
 
@@ -14,6 +15,7 @@ function mapEnumToStatusText(statusValue) {
         case 1: return "Preparing";
         case 2: return "Ready";
         case 3: return "Served";
+        case 4: return "Cancelled"; // Ensure the cancelled status is recognized
         default: return "Unknown";
     }
 }

@@ -1,4 +1,5 @@
 ﻿function getStatusColor(status) {
+    console.log("Called getStatusColor from Main Application", status);
     switch (status) {
         case "Pending": return "orange";
         case "Preparing": return "blue";

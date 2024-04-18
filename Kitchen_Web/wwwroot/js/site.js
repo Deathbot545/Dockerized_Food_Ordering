@@ -59,8 +59,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         connection.start().catch(function (err) {
-            return console.error(err.toString());
+            console.error("Error while starting SignalR connection:", err);
         });
+
 
         // Since 'currentOrder' exists, show the indicator to the user.
         let statusText = getOrderStatusText(currentOrder.status);

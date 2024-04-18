@@ -79,12 +79,6 @@ builder.Services.AddCors(options =>
 });
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    Console.WriteLine("Requested Path: " + context.Request.Path);
-    await next.Invoke();
-});
-
 // Configure the HTTP request pipeline.
 
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
@@ -97,6 +91,14 @@ else
     app.UseHsts();
 }
 app.UseHttpsRedirection();
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Requested Path: {context.Request.Path}");
+    await next.Invoke();
+});
+
+app.UseStaticFiles(); // Make sure this comes after logging middleware
+
 app.UseStaticFiles();
 if (!string.IsNullOrEmpty(builder.Configuration["PathBase"]))
 {

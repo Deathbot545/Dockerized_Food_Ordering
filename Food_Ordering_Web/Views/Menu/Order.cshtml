@@ -8,15 +8,24 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const orderId = JSON.parse(localStorage.getItem('currentOrder')).orderId;
-        if (!orderId) {
+        const orderInfo = localStorage.getItem('currentOrder');
+        if (!orderInfo) {
             console.error("No current order found in localStorage.");
-            return; // Handle case where no order is present
+            return; // Exit if no order is present
         }
+
+        const orderId = JSON.parse(orderInfo).orderId;
+        if (!orderId) {
+            console.error("Order ID not found in local storage.");
+            return;
+        }
+
         loadOrderDetails(orderId);
 
         document.getElementById("cancelOrderButton").addEventListener("click", function () {
-            cancelOrder(orderId);
+            if (confirm('Are you sure you want to cancel this order?')) {
+                updateOrderStatusToCancelled(orderId);
+            }
         });
     });
 
@@ -24,9 +33,10 @@
         try {
             const response = await fetch(`https://restosolutionssaas.com/api/OrderApi/GetOrderDetails/${orderId}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch order details');
+                throw new Error(`Failed to fetch order details: ${response.statusText}`);
             }
             const orderDetails = await response.json();
+            console.log("Order details fetched:", orderDetails);
             displayOrderDetails(orderDetails);
         } catch (error) {
             console.error('Error fetching order details:', error);
@@ -47,7 +57,7 @@
                 <li class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col-md-4">
-                            <img src="data:image/png;base64,${item.menuItem.image}" class="img-fluid rounded" alt="${item.menuItem.name}" style="max-width: 100px;"> <!-- Adjust image size as needed -->
+                            <img src="data:image/png;base64,${item.menuItem.image}" class="img-fluid rounded" alt="${item.menuItem.name}" style="max-width: 100px;">
                         </div>
                         <div class="col-md-8">
                             <h5 class="mb-1">${item.menuItem.name}</h5>
@@ -62,16 +72,28 @@
         orderDetailsElement.innerHTML = htmlContent;
     }
 
-    async function cancelOrder(orderId) {
+    async function updateOrderStatusToCancelled(orderId) {
+        const cancelledStatus = 4; // Assuming 4 represents "Cancelled" in your OrderStatus enum
         try {
-            const response = await fetch(`https://restosolutionssaas.com/api/OrderApi/CancelOrder/${orderId}`, { method: 'POST' });
+            const response = await fetch(`https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    OrderId: orderId,
+                    Status: cancelledStatus
+                })
+            });
             if (!response.ok) {
-                throw new Error('Failed to cancel the order');
+                throw new Error(`Failed to update order status: ${response.statusText}`);
             }
             alert('Order cancelled successfully.');
-            // Redirect or update UI as needed
+            window.location.reload(); // Reload the page to reflect the change
         } catch (error) {
-            console.error('Error cancelling order:', error);
+            console.error('Error updating order status to cancelled:', error);
+            alert('Error cancelling order. Please try again.');
         }
     }
+
 </script>

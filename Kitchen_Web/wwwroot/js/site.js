@@ -7,18 +7,14 @@
         default: return "black"; // Unknown status or the default color
     }
 }
+
 function mapEnumToStatusText(statusValue) {
     switch (statusValue) {
-        case 0:
-            return "Pending";
-        case 1:
-            return "Preparing";
-        case 2:
-            return "Ready";
-        case 3:
-            return "Served";
-        default:
-            return "Unknown";
+        case 0: return "Pending";
+        case 1: return "Preparing";
+        case 2: return "Ready";
+        case 3: return "Served";
+        default: return "Unknown";
     }
 }
 

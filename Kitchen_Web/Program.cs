@@ -65,12 +65,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
-// Add DbContext
-/*builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));*/
-
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigins", builder =>
@@ -85,7 +79,6 @@ builder.Services.AddCors(options =>
 });
 var app = builder.Build();
 
-
 // Configure the HTTP request pipeline.
 
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
@@ -97,22 +90,35 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+// Redirect HTTP to HTTPS
 app.UseHttpsRedirection();
+
+// Set the base path if your application is served from a subdirectory
+app.UsePathBase("/kitchen");
+
+// Serve static files. Ensure this comes after setting the base path
 app.UseStaticFiles();
 
+// Routing middleware
 app.UseRouting();
 
+// Apply CORS policy
 app.UseCors("AllowMyOrigins");
 
+// Authentication and Authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Define endpoint routing
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
-    endpoints.MapControllers();  // Make sure attribute routes are also mapped
+    endpoints.MapControllers(); // Ensures attribute routes are also mapped
 });
 
+// Run the application
 app.Run();
+

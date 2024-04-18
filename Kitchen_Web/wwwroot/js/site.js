@@ -1,5 +1,4 @@
-﻿// Define getStatusColor globally
-window.getStatusColor = function (status) {
+﻿window.getStatusColor = function (status) {
     switch (status) {
         case "Pending": return "orange";
         case "Preparing": return "blue";
@@ -7,10 +6,10 @@ window.getStatusColor = function (status) {
         case "Served": return "grey";
         default: return "black"; // Unknown status or the default color
     }
-}
+};
 
-
-function mapEnumToStatusText(statusValue) {
+// Define mapEnumToStatusText globally
+window.mapEnumToStatusText = function (statusValue) {
     switch (statusValue) {
         case 0: return "Pending";
         case 1: return "Preparing";
@@ -18,7 +17,7 @@ function mapEnumToStatusText(statusValue) {
         case 3: return "Served";
         default: return "Unknown";
     }
-}
+};
 
 document.addEventListener("DOMContentLoaded", function () {
 

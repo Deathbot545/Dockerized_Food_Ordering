@@ -8,7 +8,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true, reloadOnChange: true);
-
+builder.WebHost.UseWebRoot("wwwroot");
 WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 builder.Services.AddControllersWithViews(); // This line is 
@@ -79,6 +79,11 @@ builder.Services.AddCors(options =>
 });
 var app = builder.Build();
 
+app.Use(async (context, next) =>
+{
+    Console.WriteLine("Requested Path: " + context.Request.Path);
+    await next.Invoke();
+});
 
 // Configure the HTTP request pipeline.
 

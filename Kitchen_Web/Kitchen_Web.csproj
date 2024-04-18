@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\js\site.js" />
+    <Content Remove="wwwroot\js\kitchen-site.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\js\site.js" />
+    <None Include="wwwroot\js\kitchen-site.js" />
   </ItemGroup>
 
   <ItemGroup>

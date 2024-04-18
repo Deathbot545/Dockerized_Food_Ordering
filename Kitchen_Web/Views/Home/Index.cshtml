@@ -148,7 +148,7 @@
         function createOrderHtml(order) {
             console.log("Creating HTML for order:", order);
 
-            // Ensure that order.orderDetails is defined and is an array
+            // Check if 'orderDetails' is defined and is an array
             if (!Array.isArray(order.orderDetails)) {
                 console.error("Order details are not provided or malformed:", order.orderDetails);
                 return ''; // Return empty string or some error message in HTML
@@ -181,7 +181,6 @@
             </div>
         </div>`;
         }
-
 
         // Use delegated events for dynamically added elements
         $(document).on('click', '.btn-group .btn', function () {

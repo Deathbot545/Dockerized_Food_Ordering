@@ -93,6 +93,10 @@ else
 }
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+if (!string.IsNullOrEmpty(builder.Configuration["PathBase"]))
+{
+    app.UsePathBase(builder.Configuration["PathBase"]);  // e.g., "/kitchen"
+}
 
 app.UseRouting();
 

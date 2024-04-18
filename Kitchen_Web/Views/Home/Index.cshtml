@@ -118,48 +118,60 @@
         // Handlers for SignalR events
         connection.on("NewOrderPlaced", function (order) {
             console.log("New order received", order);
-            addNewOrderToUI(order);
+            addNewOrderToDOM(order);
         });
 
-        function addNewOrderToUI(order) {
-            var statusSection = mapStatusToSectionId(order.status);
-            var newOrderHtml = createOrderHtml(order);
-            document.getElementById(statusSection).innerHTML += newOrderHtml;
+        connection.on("ReceiveOrderUpdate", function (order) {
+            console.log("Order status update received", order);
+            updateOrderInDOM(order);
+        });
+
+        connection.start().catch(function (err) {
+            console.error(err.toString());
+        });
+
+        $('.btn-group .btn').click(function () {
+            const $btn = $(this);
+            const $card = $btn.closest('.order-card');
+            const orderId = $card.data('order-id');
+            const newStatus = $btn.data('status');
+
+            updateOrderStatus(orderId, newStatus);
+        });
+
+        function addNewOrderToDOM(order) {
+            var sectionId = mapStatusToSectionId(order.status);
+            var orderHtml = createOrderHtml(order);
+            $('#' + sectionId).append(orderHtml);
         }
 
         function createOrderHtml(order) {
-            var orderTimeInIST = ConvertToCorrectTimeZone(new Date(order.orderTime)).toString("yyyy-MM-dd HH:mm:ss");
-            var statusText = mapEnumToStatusText(order.status);
-            var color = getStatusColor(order.status);
+            console.log("Creating HTML for order:", order);
+
+            // Date formatting
+            let orderDate = new Date(order.orderTime); // Adjust this based on the actual property name
+            let formattedDate = orderDate.toLocaleDateString('en-US') + ' ' + orderDate.toLocaleTimeString('en-US');
+
+            // Ensure details are structured as expected, similar to OrderDetailDTO
+            let detailsHtml = order.details.map(detail => `<li>${detail.name} x ${detail.qty}</li>`).join("");
 
             return `
-            <div class="card mb-3 order-card bg-light" data-order-id="${order.id}">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: ${color};">
-                    <span>Order #${order.id} | Date: ${orderTimeInIST}</span>
-                    <span>STATUS: ${statusText}</span>
+            <div class="card mb-3 order-card bg-light" data-order-id="${order.orderId}">
+                <div class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
+                    <span>Order #${order.orderId} | Table: ${order.tableId} | Date: ${formattedDate}</span>
+                    <span>STATUS: ${mapEnumToStatusText(order.status)}</span>
                 </div>
                 <div class="card-body">
-                    <ul>
-                        ${order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("")}
-                    </ul>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                        <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
-                        <button type="button" class="btn btn-success" data-status="ready">Completed</button>
-                        <button type="button" class="btn btn-danger delete-order" data-order-id="${order.id}">Delete Order</button>
+                    <ul class="mb-3">${detailsHtml}</ul>
+                    <div class="btn-group" role="group" aria-label="Order Status">
+                        <button type="button" class="btn btn-warning" data-status="pending" data-order-id="${order.orderId}">Pending</button>
+                        <button type="button" class="btn btn-primary" data-status="in-progress" data-order-id="${order.orderId}">In Progress</button>
+                        <button type="button" class="btn btn-success" data-status="completed" data-order-id="${order.orderId}">Completed</button>
+                        <button type="button" class="btn btn-danger delete-order" data-order-id="${order.orderId}">Delete Order</button>
                     </div>
                 </div>
-            </div>`;
-        }
-
-        function mapStatusToSectionId(status) {
-            switch (status) {
-                case "Pending": return "pendingOrders";
-                case "Preparing": return "preparingOrders";
-                case "Ready": return "readyOrders";
-                case "Served": return "servedOrders";
-                default: return "unknownOrders"; // Handle unknown or new statuses
-            }
+            </div>
+            `;
         }
 
         // Use delegated events for dynamically added elements

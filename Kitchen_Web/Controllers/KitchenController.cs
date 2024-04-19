@@ -27,34 +27,30 @@ namespace Kitchen_Web.Controllers
                 return View("~/Views/Home/Index.cshtml");
             }
 
-            var httpClient = _httpClientFactory.CreateClient();
-            List<OrderDTO> orders = new List<OrderDTO>();
-
-            var response = await httpClient.GetAsync($"https://restosolutionssaas.com/api/OrderApi/GetOrdersForOutlet/{outletId.Value}");
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                _logger.LogError("API Error fetching orders: {ErrorResponse}", errorResponse);
-                return View("Error", new ErrorViewModel { Message = $"API Error: {errorResponse}" });
-            }
-
             try
             {
-                orders = await response.Content.ReadAsAsync<List<OrderDTO>>();
-                _logger.LogInformation("Orders successfully fetched and parsed.");
+                var httpClient = _httpClientFactory.CreateClient();
+                var response = await httpClient.GetAsync($"https://restosolutionssaas.com/api/OrderApi/GetOrdersForOutlet/{outletId.Value}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    _logger.LogError("API Error fetching orders: {ErrorResponse}", errorResponse);
+                    return View("Error", new ErrorViewModel { Message = $"API Error: {errorResponse}" });
+                }
+
+                var orders = await response.Content.ReadAsAsync<List<OrderDTO>>();
+                _logger.LogInformation("Orders successfully fetched and parsed, Count: {Count}", orders.Count);
+
+                var model = new OutletViewModel { Orders = orders };
+                return View("~/Views/Home/Index.cshtml", model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while processing the API response.");
-                return View("Error", new ErrorViewModel { Message = $"API Processing Error: {ex.Message}" });
+                _logger.LogError(ex, "Error processing orders.");
+                return View("Error", new ErrorViewModel { Message = "An error occurred." });
             }
-
-            var model = new OutletViewModel
-            {
-                Orders = orders
-            };
-
-            return View("~/Views/Home/Index.cshtml", model);
         }
+
     }
 }

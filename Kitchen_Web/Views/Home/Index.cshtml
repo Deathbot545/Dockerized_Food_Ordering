@@ -156,12 +156,17 @@
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
             const detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
 
+            // Initially set table identifier, fetch more details if necessary
             let tableIdentifier = `Table: ${order.tableId}`;
-            fetchTableName(order.tableId).then(tableName => {
-                $(`.order-card[data-order-id="${order.id}"] .card-header`).html(
-                    `Order #${order.id} | ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
-                );
-            });
+            if (order.tableId && order.tableId !== 'Unknown') {
+                fetchTableName(order.tableId).then(tableName => {
+                    $(`.order-card[data-order-id="${order.id}"] .card-header`).html(
+                        `Order #${order.id} | ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
+                    );
+                });
+            } else {
+                tableIdentifier = "Table: Unknown";
+            }
 
             return `
         <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" style="background-color: ${color};">
@@ -178,7 +183,6 @@
             </div>
         </div>`;
         }
-
         function fetchTableName(tableId) {
             return fetch(`https://restosolutionssaas.com/api/TablesApi/GetTableName/${tableId}`)
                 .then(response => {
@@ -190,7 +194,6 @@
                     return "Unknown";
                 });
         }
-
 
         function mapStatusToSectionId(status) {
             switch (status) {

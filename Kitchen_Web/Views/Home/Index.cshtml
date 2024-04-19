@@ -81,143 +81,107 @@
 <script>
     
     $(document).ready(function () {
-        console.log("Document ready function started.");
-
-        // Defining the mapStatusToSectionId function within $(document).ready to ensure scope is correct
-        function mapStatusToSectionId(status) {
-            switch (status) {
-                case 0: return 'pendingOrders';
-                case 1: return 'preparingOrders';
-                case 2: return 'readyOrders';
-                case 3: return 'servedOrders';
-                default: return 'unknownOrders'; // Handle unknown or new statuses
-            }
-        }
-
-        // Ensuring mapEnumToStatusText is also within $(document).ready
-        function mapEnumToStatusText(status) {
-            console.log(`mapEnumToStatusText called with status: ${status}`);
-            switch (status) {
-                case 0: return 'Pending';
-                case 1: return 'Preparing';
-                case 2: return 'Ready';
-                case 3: return 'Served';
-                default: return 'Unknown'; // Handle cases where status is outside known values
-            }
-        }
-
-        console.log(mapEnumToStatusText(0)); // Testing the function
-
-        // Your existing SignalR connection setup
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub")
             .configureLogging(signalR.LogLevel.Information)
             .withAutomaticReconnect()
             .build();
 
-        // Handlers for SignalR events
-        connection.on("NewOrderPlaced", function (order) {
-            console.log("New order received", order);
-            addNewOrderToDOM(order);
-        });
+        connection.on("NewOrderPlaced", addNewOrderToDOM);
+        connection.on("ReceiveOrderUpdate", updateOrderInDOM);
 
-        connection.on("ReceiveOrderUpdate", function (order) {
-            var $orderCard = $(`.order-card[data-order-id="${order.id}"]`);
-            if ($orderCard.length) {
-                var statusText = mapEnumToStatusText(order.status);
-                var color = getStatusColor(order.status);
-                $orderCard.css("background-color", color);
-                $orderCard.find('.card-header').text(statusText);
-            } else {
-                // If the order card does not exist, it needs to be added
-                addNewOrderToDOM(order);
-            }
-        });
+        connection.start().catch(err => console.error("SignalR connection error:", err));
 
-
-        connection.start().catch(function (err) {
-            console.error(err.toString());
-        });
-
-        $('.btn-group .btn').click(function () {
-            const $btn = $(this);
-            const $card = $btn.closest('.order-card');
-            const orderId = $card.data('order-id');
-            const newStatus = $btn.data('status');
-
+        // Delegated event to handle status updates on dynamic elements
+        $(document).on('click', '.btn-group .btn', function () {
+            const orderId = $(this).closest('.order-card').data('order-id');
+            const newStatus = $(this).data('status');
             updateOrderStatus(orderId, newStatus);
         });
 
         function addNewOrderToDOM(order) {
-            var sectionId = mapStatusToSectionId(order.status);
-            var orderHtml = createOrderHtml(order);
+            const orderHtml = createOrderHtml(order);
+            const sectionId = mapStatusToSectionId(order.status);
             $('#' + sectionId).append(orderHtml);
         }
 
+        function updateOrderInDOM(order) {
+            const orderCard = $(`.order-card[data-order-id="${order.id}"]`);
+            if (orderCard.length) {
+                updateOrderCard(order, orderCard);
+            } else {
+                addNewOrderToDOM(order);
+            }
+        }
+
+        function updateOrderStatus(orderId, status) {
+            const statusEnumValue = mapStatusToEnumValue(status);
+            const requestData = JSON.stringify({ OrderId: orderId, Status: statusEnumValue });
+
+            $.ajax({
+                url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
+                type: 'POST',
+                contentType: 'application/json',
+                data: requestData,
+                success: function () {
+                    console.log("Order status updated successfully.");
+                    // Update UI here if needed instead of reloading the page
+                },
+                error: function (jqXHR) {
+                    console.error("Error updating order status:", jqXHR.responseText);
+                }
+            });
+        }
+
         function createOrderHtml(order) {
-            console.log("Creating HTML for order:", order);
-            var statusText = mapEnumToStatusText(order.status);
-            var color = getStatusColor(order.status); // Ensure the color is determined based on the status
-
-
-            // Date formatting
-            let orderDate = new Date(order.orderTime); // Adjust based on the actual property name
-            let formattedDate = orderDate.toLocaleDateString('en-US') + ' ' + orderDate.toLocaleTimeString('en-US');
-
-            // Generate order details HTML
-            let detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
-
-            var statusText = mapEnumToStatusText(order.status);
-            var color = getStatusColor(order.status);
+            const statusText = mapEnumToStatusText(order.status);
+            const color = getStatusColor(order.status);
+            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
+            const detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
 
             return `
-        <div class="card mb-3 order-card bg-light" data-order-id="${order.id}">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: ${color};">
-                <span>Order #${order.id} | Date: ${formattedDate}</span>
-                <span>STATUS: ${statusText}</span>
-            </div>
-            <div class="card-body">
-                <ul class="mb-3">${detailsHtml}</ul>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                    <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
-                    <button type="button" class="btn btn-success" data-status="ready">Completed</button>
-                    <button type="button" class="btn btn-danger delete-order" data-order-id="${order.id}">Delete Order</button>
-                </div>
-            </div>
-        </div>`;
+                <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" style="background-color: ${color};">
+                    <div class="card-header">
+                        Order #${order.id} | Date: ${formattedDate} | STATUS: ${statusText}
+                    </div>
+                    <div class="card-body">
+                        <ul>${detailsHtml}</ul>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
+                            <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
+                            <button type="button" class="btn btn-success" data-status="ready">Completed</button>
+                        </div>
+                    </div>
+                </div>`;
         }
 
-        // Use delegated events for dynamically added elements
-        $(document).on('click', '.btn-group .btn', function () {
-            const $btn = $(this);
-            const orderId = $btn.data('order-id');
-            const newStatus = $btn.data('status');
-            updateOrderStatus(orderId, newStatus);
-        });
-
-        function updateOrderInDOM(order) {
-            var orderCard = $(`.order-card[data-order-id="${order.id}"]`);
-            if (!orderCard.length) {
-                // If the order card doesn't exist, it might be a new order.
-                addNewOrderToDOM(order);
-                return;
+        function mapStatusToSectionId(status) {
+            switch (status) {
+                case 0: return 'pendingOrders';
+                case 1: return 'preparingOrders';
+                case 2: return 'readyOrders';
+                case 3: return 'servedOrders';
+                default: return 'unknownOrders';
             }
-
-            // If it exists, update its contents or status.
-            updateOrderCard(order, orderCard);
         }
 
-        function updateOrderCard(order, orderCard) {
-            // Update the status text. Assume a span with class 'order-status' displays the status.
-            orderCard.find('.order-status').text(mapEnumToStatusText(order.status));
+        function mapEnumToStatusText(statusValue) {
+            switch (statusValue) {
+                case 0: return "Pending";
+                case 1: return "Preparing";
+                case 2: return "Ready";
+                case 3: return "Served";
+                default: return "Unknown";
+            }
+        }
 
-            // Check if the order needs to be moved to another section based on its new status.
-            var currentSectionId = mapStatusToSectionId(order.status);
-            if (!orderCard.closest(`#${currentSectionId}`).length) {
-                // If the order card is not in the correct section, move it.
-                orderCard.detach();
-                $(`#${currentSectionId}`).append(orderCard);
+        function mapStatusToEnumValue(status) {
+            switch (status.toLowerCase()) {
+                case 'pending': return 0;
+                case 'preparing': return 1;
+                case 'ready': return 2;
+                case 'served': return 3;
+                default: return undefined; // Make sure this is handled or logged
             }
         }
     });

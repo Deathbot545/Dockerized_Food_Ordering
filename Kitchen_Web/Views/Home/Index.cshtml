@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Html;
+﻿
+@using Microsoft.AspNetCore.Html;
 @using System.Text;
 @using Kitchen_Web.DTO;
 @model Kitchen_Web.ViewModel.OutletViewModel;
@@ -156,12 +157,11 @@
             console.log("Creating HTML for order:", order);
             var statusText = mapEnumToStatusText(order.status);
             var color = getStatusColor(order.status); // Ensure the color is determined based on the status
-            var tableIdentifier = order.tableId ? `Table: ${order.tableId}` : "Table: Unknown";
-           
+
 
             // Date formatting
             let orderDate = new Date(order.orderTime); // Adjust based on the actual property name
-            var formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
+            let formattedDate = orderDate.toLocaleDateString('en-US') + ' ' + orderDate.toLocaleTimeString('en-US');
 
             // Generate order details HTML
             let detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
@@ -170,10 +170,10 @@
             var color = getStatusColor(order.status);
 
             return `
-            <div class="card mb-3 order-card bg-light" data-order-id="${order.id}">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: ${getStatusColor(order.status)};">
-                <span>Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate}</span>
-                <span>STATUS: ${mapEnumToStatusText(order.status)}</span>
+        <div class="card mb-3 order-card bg-light" data-order-id="${order.id}">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: ${color};">
+                <span>Order #${order.id} | Date: ${formattedDate}</span>
+                <span>STATUS: ${statusText}</span>
             </div>
             <div class="card-body">
                 <ul class="mb-3">${detailsHtml}</ul>
@@ -241,15 +241,21 @@
         console.log("Sending update request with data:", requestData);
 
         $.ajax({
+            headers: {
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val(), // Check this token
+                'Content-Type': 'application/json' // Ensure content type is set to application/json
+            },
             url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
             type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
+            data: requestData,
             success: function (response) {
-                console.log("Order status updated successfully.");
+                console.log("Order status updated successfully, response:", response);
+                location.reload(); // Refresh page to reflect changes
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.error("Error updating order status:", textStatus, jqXHR.responseText);
+                console.error("AJAX Error:", textStatus);
+                console.error("Response Text:", jqXHR.responseText);
+                console.error("Error Thrown:", errorThrown);
             }
         });
 

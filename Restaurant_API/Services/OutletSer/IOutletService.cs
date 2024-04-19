@@ -27,7 +27,7 @@ namespace Restaurant_API.Services.OutletSer
         Task<bool> DeleteKitchenStaffAsync(int id);
         Task<bool> UpdateKitchenStaffAsync(KitchenStaffUpdateViewModel model);
         Task<List<OutletInfoDTO>> GetAllOutletsAsync();
-
+        Task<TableDto> GetTableByIdAsync(int tableId);
         // Add other methods related to Outlet management
     }
 

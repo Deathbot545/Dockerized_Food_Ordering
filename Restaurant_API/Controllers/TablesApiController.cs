@@ -27,6 +27,29 @@ namespace Restaurant_API.Controllers
             var tableDtos = tables.Select(TableDtoAndConverter.TableToDto).ToList(); // Convert to DTOs, now with Id included
             return tableDtos;
         }
+        // GET api/TablesApi/GetTableName/{id}
+        [HttpGet("GetTableName/{id}")]
+        public async Task<ActionResult<string>> GetTableName(int id)
+        {
+            try
+            {
+                var tableDto = await _outletService.GetTableByIdAsync(id);
+                if (tableDto != null)
+                {
+                    return Ok(tableDto.TableIdentifier);
+                }
+                else
+                {
+                    return NotFound("Table not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error fetching table name for ID {Id}: {Error}", id, ex);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
 
         // Service remains the same
         [HttpPost("AddTable")]

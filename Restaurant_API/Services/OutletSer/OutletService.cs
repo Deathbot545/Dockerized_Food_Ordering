@@ -419,6 +419,16 @@ namespace Restaurant_API.Services.OutletSer
             return true;
         }
 
+        public async Task<TableDto> GetTableByIdAsync(int tableId)
+        {
+            var table = await _context.Tables.Include(t => t.QRCode).SingleOrDefaultAsync(t => t.Id == tableId);
+            if (table == null)
+            {
+                return null;  // Or handle as needed, e.g., throw an exception
+            }
+
+            return TableDtoAndConverter.TableToDto(table);
+        }
 
     }
 

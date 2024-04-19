@@ -120,7 +120,6 @@
             addNewOrderToDOM(order);
         });
 
-
         connection.on("ReceiveOrderUpdate", function (order) {
             var $orderCard = $(`.order-card[data-order-id="${order.id}"]`);
             if ($orderCard.length) {
@@ -155,11 +154,24 @@
         }
 
         function createOrderHtml(order) {
+            console.log("Creating HTML for order:", order);
+            var statusText = mapEnumToStatusText(order.status);
+            var color = getStatusColor(order.status); // Ensure the color is determined based on the status
             var tableIdentifier = order.tableId ? `Table: ${order.tableId}` : "Table: Unknown";
+           
+
+            // Date formatting
+            let orderDate = new Date(order.orderTime); // Adjust based on the actual property name
             var formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
+            // Generate order details HTML
+            let detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
+
+            var statusText = mapEnumToStatusText(order.status);
+            var color = getStatusColor(order.status);
+
             return `
-        <div class="card mb-3 order-card bg-light" data-order-id="${order.id}">
+            <div class="card mb-3 order-card bg-light" data-order-id="${order.id}">
             <div class="card-header d-flex justify-content-between align-items-center" style="background-color: ${getStatusColor(order.status)};">
                 <span>Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate}</span>
                 <span>STATUS: ${mapEnumToStatusText(order.status)}</span>
@@ -211,7 +223,9 @@
     });
 
     function updateOrderStatus(orderId, newStatus) {
-        let statusEnumValue = mapStatusToEnum(newStatus); // Ensure this function returns a number
+        let statusEnumValue = mapStatusToEnum(newStatus);
+
+        console.log("Sending update request with data:", requestData);
 
         $.ajax({
             url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',

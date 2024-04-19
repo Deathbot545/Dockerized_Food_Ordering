@@ -1,4 +1,4 @@
-﻿window.getStatusColor = function (status) {
+window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);
     switch (status) {
         case 0: return "orange"; // Pending

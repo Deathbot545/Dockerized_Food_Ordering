@@ -98,9 +98,16 @@
             const orderId = $card.data('order-id');
             const newStatus = $btn.data('status');
 
-            console.log("Updating order:", orderId, "to status:", newStatus);  // Debugging line
-            updateOrderStatus(orderId, newStatus);
+            console.log("Button clicked:", $btn);  // Inspect the button element
+            console.log("Order ID:", orderId, "Requested Status:", newStatus);  // Log the captured values
+
+            if (newStatus === undefined) {
+                console.error("Status undefined for order ID:", orderId);
+            } else {
+                updateOrderStatus(orderId, newStatus);
+            }
         });
+
 
         function addNewOrderToDOM(order) {
             const orderHtml = createOrderHtml(order);
@@ -170,22 +177,15 @@
         function mapStatusToEnumValue(status) {
             switch (status.toLowerCase()) {
                 case 'pending': return 0;
-                case 'in-progress': return 1;
-                case 'completed': return 2;
-                case 'served': return 3;
-                default: console.error("Unknown status:", status); return -1; // Adding error handling
-            }
-        }
-
-        function mapStatusToEnumValue(status) {
-            switch (status.toLowerCase()) {
-                case 'pending': return 0;
                 case 'preparing': return 1;
                 case 'ready': return 2;
                 case 'served': return 3;
-                default: return undefined; // Make sure this is handled or logged
+                default:
+                    console.error("Unhandled status:", status); // Log unhandled statuses
+                    return undefined;
             }
         }
+
     });
 
     function updateOrderStatus(orderId, newStatus) {

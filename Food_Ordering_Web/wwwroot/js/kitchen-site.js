@@ -8,7 +8,6 @@
         default: return "black"; // Unknown status or the default color
     }
 };
-// Define mapEnumToStatusText globally
 window.mapEnumToStatusText = function (statusValue) {
     switch (statusValue) {
         case 0: return "Pending";

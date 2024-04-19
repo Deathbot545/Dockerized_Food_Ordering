@@ -1,5 +1,4 @@
-﻿
-@using Microsoft.AspNetCore.Html;
+﻿@using Microsoft.AspNetCore.Html;
 @using System.Text;
 @using Kitchen_Web.DTO;
 @model Kitchen_Web.ViewModel.OutletViewModel;
@@ -223,7 +222,21 @@
     });
 
     function updateOrderStatus(orderId, newStatus) {
-        let statusEnumValue = mapStatusToEnum(newStatus);
+        let statusEnumValue;
+        switch (newStatus.toLowerCase()) {  // Convert to lowercase to match expected values
+            case 'pending': statusEnumValue = 0; break;
+            case 'preparing': statusEnumValue = 1; break;
+            case 'ready': statusEnumValue = 2; break;
+            case 'served': statusEnumValue = 3; break;
+            default:
+                console.error("Unknown status:", newStatus);
+                return; // Early return on unknown status
+        }
+
+        const requestData = JSON.stringify({
+            OrderId: orderId,
+            Status: statusEnumValue
+        });
 
         console.log("Sending update request with data:", requestData);
 

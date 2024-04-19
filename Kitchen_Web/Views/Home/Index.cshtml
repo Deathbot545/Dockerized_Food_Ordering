@@ -120,6 +120,7 @@
             addNewOrderToDOM(order);
         });
 
+
         connection.on("ReceiveOrderUpdate", function (order) {
             var $orderCard = $(`.order-card[data-order-id="${order.id}"]`);
             if ($orderCard.length) {
@@ -154,26 +155,14 @@
         }
 
         function createOrderHtml(order) {
-            console.log("Creating HTML for order:", order);
-            var statusText = mapEnumToStatusText(order.status);
-            var color = getStatusColor(order.status); // Ensure the color is determined based on the status
-
-
-            // Date formatting
-            let orderDate = new Date(order.orderTime); // Adjust based on the actual property name
-            let formattedDate = orderDate.toLocaleDateString('en-US') + ' ' + orderDate.toLocaleTimeString('en-US');
-
-            // Generate order details HTML
-            let detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
-
-            var statusText = mapEnumToStatusText(order.status);
-            var color = getStatusColor(order.status);
+            var tableIdentifier = order.tableId ? `Table: ${order.tableId}` : "Table: Unknown";
+            var formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
             return `
         <div class="card mb-3 order-card bg-light" data-order-id="${order.id}">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: ${color};">
-                <span>Order #${order.id} | Date: ${formattedDate}</span>
-                <span>STATUS: ${statusText}</span>
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: ${getStatusColor(order.status)};">
+                <span>Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate}</span>
+                <span>STATUS: ${mapEnumToStatusText(order.status)}</span>
             </div>
             <div class="card-body">
                 <ul class="mb-3">${detailsHtml}</ul>
@@ -222,40 +211,18 @@
     });
 
     function updateOrderStatus(orderId, newStatus) {
-        let statusEnumValue;
-        switch (newStatus.toLowerCase()) {  // Convert to lowercase to match expected values
-            case 'pending': statusEnumValue = 0; break;
-            case 'preparing': statusEnumValue = 1; break;
-            case 'ready': statusEnumValue = 2; break;
-            case 'served': statusEnumValue = 3; break;
-            default:
-                console.error("Unknown status:", newStatus);
-                return; // Early return on unknown status
-        }
-
-        const requestData = JSON.stringify({
-            OrderId: orderId,
-            Status: statusEnumValue
-        });
-
-        console.log("Sending update request with data:", requestData);
+        let statusEnumValue = mapStatusToEnum(newStatus); // Ensure this function returns a number
 
         $.ajax({
-            headers: {
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val(), // Check this token
-                'Content-Type': 'application/json' // Ensure content type is set to application/json
-            },
             url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
             type: 'POST',
-            data: requestData,
+            contentType: 'application/json',
+            data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
             success: function (response) {
-                console.log("Order status updated successfully, response:", response);
-                location.reload(); // Refresh page to reflect changes
+                console.log("Order status updated successfully.");
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.error("AJAX Error:", textStatus);
-                console.error("Response Text:", jqXHR.responseText);
-                console.error("Error Thrown:", errorThrown);
+                console.error("Error updating order status:", textStatus, jqXHR.responseText);
             }
         });
 

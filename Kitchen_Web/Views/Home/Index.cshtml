@@ -96,13 +96,12 @@
 
         // Ensuring mapEnumToStatusText is also within $(document).ready
         function mapEnumToStatusText(status) {
-            console.log(`mapEnumToStatusText called with status: ${status}`);
             switch (status) {
-                case 0: return 'Pending';
-                case 1: return 'Preparing';
-                case 2: return 'Ready';
-                case 3: return 'Served';
-                default: return 'Unknown'; // Handle cases where status is outside known values
+                case 0: return 'pending';
+                case 1: return 'preparing';
+                case 2: return 'ready';
+                case 3: return 'served';
+                default: console.error("Unknown status code:", status); return 'unknown';
             }
         }
 
@@ -224,11 +223,14 @@
 
     function updateOrderStatus(orderId, newStatus) {
         let statusEnumValue;
-        switch (newStatus) {
+        switch (newStatus.toLowerCase()) {  // Convert to lowercase to match expected values
             case 'pending': statusEnumValue = 0; break;
-            case 'in-progress': statusEnumValue = 1; break;
-            case 'completed': statusEnumValue = 2; break;
-            default: console.error("Unknown status:", newStatus); return; // Adds error logging for unknown status
+            case 'preparing': statusEnumValue = 1; break;
+            case 'ready': statusEnumValue = 2; break;
+            case 'served': statusEnumValue = 3; break;
+            default:
+                console.error("Unknown status:", newStatus);
+                return; // Early return on unknown status
         }
 
         const requestData = JSON.stringify({

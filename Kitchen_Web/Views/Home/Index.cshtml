@@ -89,13 +89,16 @@
 
         connection.on("NewOrderPlaced", addNewOrderToDOM);
         connection.on("ReceiveOrderUpdate", updateOrderInDOM);
-
         connection.start().catch(err => console.error("SignalR connection error:", err));
 
-        // Delegated event to handle status updates on dynamic elements
+        // Bind event handler for button clicks to handle both dynamically added and existing orders
         $(document).on('click', '.btn-group .btn', function () {
-            const orderId = $(this).closest('.order-card').data('order-id');
-            const newStatus = $(this).data('status');
+            const $btn = $(this);
+            const $card = $btn.closest('.order-card');
+            const orderId = $card.data('order-id');
+            const newStatus = $btn.data('status');
+
+            console.log("Updating order:", orderId, "to status:", newStatus);  // Debugging line
             updateOrderStatus(orderId, newStatus);
         });
 
@@ -114,18 +117,17 @@
             }
         }
 
-        function updateOrderStatus(orderId, status) {
-            const statusEnumValue = mapStatusToEnumValue(status);
-            const requestData = JSON.stringify({ OrderId: orderId, Status: statusEnumValue });
+        function updateOrderStatus(orderId, newStatus) {
+            const statusEnumValue = mapStatusToEnumValue(newStatus);
+            console.log("Sending update request with data:", { OrderId: orderId, Status: statusEnumValue });  // Debugging line
 
             $.ajax({
                 url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
                 type: 'POST',
                 contentType: 'application/json',
-                data: requestData,
+                data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
                 success: function () {
                     console.log("Order status updated successfully.");
-                    // Update UI here if needed instead of reloading the page
                 },
                 error: function (jqXHR) {
                     console.error("Error updating order status:", jqXHR.responseText);
@@ -165,13 +167,13 @@
             }
         }
 
-        function mapEnumToStatusText(statusValue) {
-            switch (statusValue) {
-                case 0: return "Pending";
-                case 1: return "Preparing";
-                case 2: return "Ready";
-                case 3: return "Served";
-                default: return "Unknown";
+        function mapStatusToEnumValue(status) {
+            switch (status.toLowerCase()) {
+                case 'pending': return 0;
+                case 'in-progress': return 1;
+                case 'completed': return 2;
+                case 'served': return 3;
+                default: console.error("Unknown status:", status); return -1; // Adding error handling
             }
         }
 

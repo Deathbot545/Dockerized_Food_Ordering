@@ -223,34 +223,31 @@
     });
 
     function updateOrderStatus(orderId, newStatus) {
-        // Convert string status to your OrderStatus enum
         let statusEnumValue;
         switch (newStatus) {
-            case 'pending':
-                statusEnumValue = 0;
-                break;
-            case 'in-progress':
-                statusEnumValue = 1;
-                break;
-            case 'completed':
-                statusEnumValue = 2;
-                break;
+            case 'pending': statusEnumValue = 0; break;
+            case 'in-progress': statusEnumValue = 1; break;
+            case 'completed': statusEnumValue = 2; break;
+            default: console.error("Unknown status:", newStatus); return; // Adds error logging for unknown status
         }
+
+        const requestData = JSON.stringify({
+            OrderId: orderId,
+            Status: statusEnumValue
+        });
+
+        console.log("Sending update request with data:", requestData);
 
         $.ajax({
             headers: {
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val(), // Check this token
+                'Content-Type': 'application/json' // Ensure content type is set to application/json
             },
             url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
             type: 'POST',
-            data: JSON.stringify({
-                OrderId: orderId,
-                Status: statusEnumValue
-            }),
-            contentType: 'application/json',
-            crossDomain: true,
+            data: requestData,
             success: function (response) {
-                console.log("Order status updated successfully.");
+                console.log("Order status updated successfully, response:", response);
                 location.reload(); // Refresh page to reflect changes
             },
             error: function (jqXHR, textStatus, errorThrown) {

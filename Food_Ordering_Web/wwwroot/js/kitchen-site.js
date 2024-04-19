@@ -1,13 +1,14 @@
 ﻿window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);
     switch (status) {
-        case "Pending": return "orange";
-        case "Preparing": return "blue";
-        case "Ready": return "green";
-        case "Served": return "grey";
+        case 0: return "orange"; // Pending
+        case 1: return "blue";   // Preparing
+        case 2: return "green";  // Ready
+        case 3: return "grey";   // Served
         default: return "black"; // Unknown status or the default color
     }
 };
+
 
 // Define mapEnumToStatusText globally
 window.mapEnumToStatusText = function (statusValue) {

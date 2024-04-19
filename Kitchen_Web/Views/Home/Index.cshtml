@@ -96,12 +96,13 @@
 
         // Ensuring mapEnumToStatusText is also within $(document).ready
         function mapEnumToStatusText(status) {
+            console.log(`mapEnumToStatusText called with status: ${status}`);
             switch (status) {
-                case 0: return 'pending';
-                case 1: return 'preparing';
-                case 2: return 'ready';
-                case 3: return 'served';
-                default: console.error("Unknown status code:", status); return 'unknown';
+                case 0: return 'Pending';
+                case 1: return 'Preparing';
+                case 2: return 'Ready';
+                case 3: return 'Served';
+                default: return 'Unknown'; // Handle cases where status is outside known values
             }
         }
 
@@ -222,34 +223,34 @@
     });
 
     function updateOrderStatus(orderId, newStatus) {
+        // Convert string status to your OrderStatus enum
         let statusEnumValue;
-        switch (newStatus.toLowerCase()) {  // Convert to lowercase to match expected values
-            case 'pending': statusEnumValue = 0; break;
-            case 'preparing': statusEnumValue = 1; break;
-            case 'ready': statusEnumValue = 2; break;
-            case 'served': statusEnumValue = 3; break;
-            default:
-                console.error("Unknown status:", newStatus);
-                return; // Early return on unknown status
+        switch (newStatus) {
+            case 'pending':
+                statusEnumValue = 0;
+                break;
+            case 'in-progress':
+                statusEnumValue = 1;
+                break;
+            case 'completed':
+                statusEnumValue = 2;
+                break;
         }
-
-        const requestData = JSON.stringify({
-            OrderId: orderId,
-            Status: statusEnumValue
-        });
-
-        console.log("Sending update request with data:", requestData);
 
         $.ajax({
             headers: {
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val(), // Check this token
-                'Content-Type': 'application/json' // Ensure content type is set to application/json
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
             },
             url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
             type: 'POST',
-            data: requestData,
+            data: JSON.stringify({
+                OrderId: orderId,
+                Status: statusEnumValue
+            }),
+            contentType: 'application/json',
+            crossDomain: true,
             success: function (response) {
-                console.log("Order status updated successfully, response:", response);
+                console.log("Order status updated successfully.");
                 location.reload(); // Refresh page to reflect changes
             },
             error: function (jqXHR, textStatus, errorThrown) {

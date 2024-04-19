@@ -30,19 +30,21 @@ namespace Kitchen_Web.Controllers
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                var response = await httpClient.GetAsync($"https://restosolutionssaas.com/api/OrderApi/GetOrdersForOutlet/{outletId.Value}");
+                var responseOrders = await httpClient.GetAsync($"https://restosolutionssaas.com/api/OrderApi/GetOrdersForOutlet/{outletId.Value}");
+                var responseTables = await httpClient.GetAsync($"https://restosolutionssaas.com/api/TableApi/GetTablesForOutlet/{outletId.Value}");
 
-                if (!response.IsSuccessStatusCode)
+                if (!responseOrders.IsSuccessStatusCode || !responseTables.IsSuccessStatusCode)
                 {
-                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    var errorResponse = await responseOrders.Content.ReadAsStringAsync();
                     _logger.LogError("API Error fetching orders: {ErrorResponse}", errorResponse);
                     return View("Error", new ErrorViewModel { Message = $"API Error: {errorResponse}" });
                 }
 
-                var orders = await response.Content.ReadAsAsync<List<OrderDTO>>();
-                _logger.LogInformation("Orders successfully fetched and parsed, Count: {Count}", orders.Count);
+                var orders = await responseOrders.Content.ReadAsAsync<List<OrderDTO>>();
+                var tables = await responseTables.Content.ReadAsAsync<List<TableDTO>>();
+                _logger.LogInformation("Orders and Tables successfully fetched and parsed.");
 
-                var model = new OutletViewModel { Orders = orders };
+                var model = new OutletViewModel { Orders = orders, Tables = tables };
                 return View("~/Views/Home/Index.cshtml", model);
             }
             catch (Exception ex)
@@ -51,6 +53,7 @@ namespace Kitchen_Web.Controllers
                 return View("Error", new ErrorViewModel { Message = "An error occurred." });
             }
         }
+
 
     }
 }

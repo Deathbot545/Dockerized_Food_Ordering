@@ -122,9 +122,18 @@
         });
 
         connection.on("ReceiveOrderUpdate", function (order) {
-            console.log("Order status update received", order);
-            updateOrderInDOM(order);
+            var $orderCard = $(`.order-card[data-order-id="${order.id}"]`);
+            if ($orderCard.length) {
+                var statusText = mapEnumToStatusText(order.status);
+                var color = getStatusColor(order.status);
+                $orderCard.css("background-color", color);
+                $orderCard.find('.card-header').text(statusText);
+            } else {
+                // If the order card does not exist, it needs to be added
+                addNewOrderToDOM(order);
+            }
         });
+
 
         connection.start().catch(function (err) {
             console.error(err.toString());
@@ -147,12 +156,9 @@
 
         function createOrderHtml(order) {
             console.log("Creating HTML for order:", order);
+            var statusText = mapEnumToStatusText(order.status);
+            var color = getStatusColor(order.status); // Ensure the color is determined based on the status
 
-            // Check if 'orderDetails' is defined and is an array
-            if (!Array.isArray(order.orderDetails)) {
-                console.error("Order details are not provided or malformed:", order.orderDetails);
-                return ''; // Return empty string or some error message in HTML
-            }
 
             // Date formatting
             let orderDate = new Date(order.orderTime); // Adjust based on the actual property name

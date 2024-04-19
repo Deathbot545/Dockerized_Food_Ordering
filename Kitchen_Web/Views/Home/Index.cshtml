@@ -19,8 +19,11 @@
         var html = new StringBuilder();
         html.Append($"<div class=\"card mb-3 order-card bg-light\" data-order-id=\"{order.Id}\">");
         html.Append($"<div class=\"card-header d-flex justify-content-between align-items-center bg-warning text-dark\">");
-        html.Append($"<span>Order #{order.Id} | Table: {tableIdentifier} | Date: {orderTimeInIST} | STATUS: {statusText}</span>");
+        html.Append($"<span>Order #{order.Id} | Table: {tableIdentifier} (ID: {order.TableId}) | Date: {orderTimeInIST} | STATUS: {statusText}</span>");
         html.Append("</div><div class=\"card-body\"><ul class=\"mb-3\">");
+
+        // Debugging: Output all tables to confirm they're loaded correctly
+        html.Append($"<div>Available Tables: {string.Join(", ", tables.Select(t => t.Id + " - " + t.TableIdentifier))}</div>");
 
         foreach (var detail in order.OrderDetails)
         {
@@ -35,6 +38,7 @@
 
         return html.ToString();
     }
+
 
 }
 

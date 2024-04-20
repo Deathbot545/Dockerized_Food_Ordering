@@ -31,7 +31,7 @@
         html.Append($"<button type=\"button\" class=\"btn btn-warning {(order.Status == OrderStatus.Pending ? "active" : "")}\" data-status=\"pending\">Pending</button>");
         html.Append($"<button type=\"button\" class=\"btn btn-primary {(order.Status == OrderStatus.Preparing ? "active" : "")}\" data-status=\"preparing\">In Progress</button>");
         html.Append($"<button type=\"button\" class=\"btn btn-success {(order.Status == OrderStatus.Ready ? "active" : "")}\" data-status=\"completed\">Completed</button>");
-        html.Append($"<button type=\"button\" class=\"btn btn-danger {(order.Status == OrderStatus.Ready || order.Status == OrderStatus.Served ? "disabled" : "")}\" data-status=\"cancelled\">Cancel</button>");
+        html.Append($"<button type=\"button\" class=\"btn btn-danger {(order.Status == OrderStatus.Ready || order.Status == OrderStatus.Served ? "active" : "")}\" data-status=\"cancelled\">Cancel</button>");
 
         html.Append("</div></div></div>");
 

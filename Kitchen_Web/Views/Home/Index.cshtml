@@ -212,7 +212,6 @@
 
         connection.on("ReceiveOrderUpdate", function (order) {
             updateOrderInDOM(order); // Assumes updateOrderInDOM is defined to handle updating orders
-            fetchTableNamesAndUpdateDOM();
         });
         function mapStatusToSectionId(status) {
             switch (status) {

@@ -200,9 +200,6 @@
                 }
             });
         }
-
-        fetchTableNamesAndUpdateDOM(); // Call this function on document ready to update all initially loaded orders
-
         connection.on("NewOrderPlaced", function (order) {
             let orderHtml = createOrderHtml(order); // Assumes createOrderHtml is defined to output HTML similar to RenderOrderCard
             const sectionId = mapStatusToSectionId(order.status);

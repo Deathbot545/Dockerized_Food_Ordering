@@ -160,9 +160,14 @@
             } else {
                 addNewOrderToDOM(order);
             }
-        } function updateOrderStatus(orderId, newStatus) {
-            const statusEnumValue = mapStatusToEnumValue(newStatus);
+        } 
+        function updateOrderStatus(orderId, newStatus) {
+            let statusEnumValue = mapStatusToEnumValue(newStatus);
             console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
+            if (statusEnumValue === undefined) {
+                console.error("Invalid status value for update:", newStatus);
+                return; // Exit if status is invalid
+            }
 
             $.ajax({
                 url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
@@ -171,9 +176,20 @@
                 data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
                 success: function () {
                     console.log("Successfully updated status for Order ID:", orderId);
+                    const orderCard = $(`.order-card[data-order-id="${orderId}"]`);
+                    if (orderCard.length) {
+                        const formattedDate = new Date(orderCard.find('.card-header').text().split('|')[2].trim()).toLocaleString('en-US', { hour12: false });
+                        const tableName = orderCard.find('.card-header').text().split('|')[1].trim();
+                        orderCard.find('.card-header').html(
+                            `Order #${orderId} | ${tableName} | Date: ${formattedDate} | STATUS: ${mapEnumToStatusText(statusEnumValue)}`
+                        );
+                        // Optionally, move the card to the correct section if status changes
+                        const sectionId = mapStatusToSectionId(statusEnumValue);
+                        orderCard.detach().appendTo(`#${sectionId}`);
+                    }
                 },
-                error: function (jqXHR) {
-                    console.error("Failed to update status for Order ID:", orderId, "Error:", jqXHR.responseText);
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX Error:", textStatus, "Response Text:", jqXHR.responseText, "Error Thrown:", errorThrown);
                 }
             });
         }
@@ -244,15 +260,24 @@
         }
 
         function mapStatusToEnumValue(status) {
-            switch (status.toLowerCase()) {
-                case 'pending': return 0;
-                case 'in-progress': return 1;
-                case 'completed': return 2;
-                case 'ready': return 2; // Ready is considered as completed
-                case 'served': return 3;
-                default: return undefined; // Handle undefined status
+            status = status.toLowerCase(); // Normalize to lower case for comparison
+            switch (status) {
+                case 'pending':
+                    return 0;
+                case 'in-progress':
+                case 'preparing': // Ensure both 'in-progress' and 'preparing' map to the same value
+                    return 1;
+                case 'completed':
+                case 'ready': // 'completed' and 'ready' both map to the same value
+                    return 2;
+                case 'served':
+                    return 3;
+                default:
+                    console.error("Received unhandled status:", status);
+                    return undefined; // Explicitly return undefined for unhandled cases
             }
         }
+
 
        
     });

@@ -11,24 +11,28 @@ namespace Order_API.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            var orderId = Context.GetHttpContext().Request.Query["orderId"];
+            string orderId = Context.GetHttpContext().Request.Query["orderId"].ToString();
+
             if (!string.IsNullOrEmpty(orderId) && int.TryParse(orderId, out int orderIdInt))
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"Order-{orderIdInt}");
+                lock (_connectionOrderMap) // Ensure thread safety when modifying the dictionary
+                {
+                    _connectionOrderMap[Context.ConnectionId] = orderIdInt;
+                }
             }
+
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var orderId = Context.GetHttpContext().Request.Query["orderId"];
-            if (!string.IsNullOrEmpty(orderId) && int.TryParse(orderId, out int orderIdInt))
+            lock (_connectionOrderMap) // Ensure thread safety when modifying the dictionary
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Order-{orderIdInt}");
+                _connectionOrderMap.Remove(Context.ConnectionId);
             }
+
             await base.OnDisconnectedAsync(exception);
         }
-
 
         // Method to get the connection ID based on order ID (you can use this in your API)
         public static string GetConnectionIdForOrder(int orderId)

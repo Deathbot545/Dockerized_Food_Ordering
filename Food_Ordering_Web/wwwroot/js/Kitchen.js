@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateOrderStatusUI(order) {
+        console.log("Order status update received:", order);
         let currentOrder = JSON.parse(localStorage.getItem('currentOrder')) || {};
         currentOrder.status = order.status; // Store the numeric value
         localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
@@ -81,22 +82,27 @@ document.addEventListener("DOMContentLoaded", function () {
         let orderStatusElement = document.getElementById("orderStatus");
         if (orderStatusElement) {
             orderStatusElement.innerHTML = `<span style="color: ${color};">${statusText}</span>`; // Apply color
+            console.log(`Updated UI with new status: ${statusText}`);
         }
     }
 
+
     function updateKitchenOrderStatusUI(order) {
+        console.log("Received kitchen update for order ID:", order.OrderId, "with new status:", order.Status);
         let orderStatusText = mapEnumToStatusText(order.Status);
 
-        // Find the order card that corresponds to the updated order.
         let $orderCard = $(`.order-card[data-order-id="${order.OrderId}"]`);
-
-        if (!$orderCard.length) return;
+        if (!$orderCard.length) {
+            console.log("No order card found for order ID:", order.OrderId);
+            return;
+        }
 
         $orderCard.find('.btn').removeClass('active');
         $orderCard.find(`.btn[data-status="${orderStatusText.toLowerCase()}"]`).addClass('active');
-
         $orderCard.find('.card-header span:last-child').text(`STATUS: ${orderStatusText.toUpperCase()}`);
+        console.log(`Order ${order.OrderId} UI updated to ${orderStatusText}`);
     }
+
 
     function getOrderStatusText(status) {
         switch (status) {

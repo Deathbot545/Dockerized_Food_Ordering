@@ -52,31 +52,25 @@ namespace Order_API.Controllers
          }
 
 
-         [HttpPost("UpdateOrderStatus")]
-         public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusDto updateOrderDto)
-         {
-             // Validate the DTO
-             if (updateOrderDto == null || updateOrderDto.OrderId <= 0)
-             {
-                 return BadRequest("Invalid request data.");
-             }
+        [HttpPost("UpdateOrderStatus")]
+        public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusDto updateOrderDto)
+        {
+            if (updateOrderDto == null || updateOrderDto.OrderId <= 0)
+            {
+                return BadRequest("Invalid request data.");
+            }
 
-             // Use your service to update the order status in the database.
-             await _orderService.UpdateOrderStatusAsync(updateOrderDto.OrderId, updateOrderDto.Status);
+            await _orderService.UpdateOrderStatusAsync(updateOrderDto.OrderId, updateOrderDto.Status);
 
-             // Fetch the connection ID for the order ID
-             var connectionId = OrderStatusHub.GetConnectionIdForOrder(updateOrderDto.OrderId);
+            // Notify all clients watching this order, including kitchen
+            await _hubContext.Clients.Group("OrderGroup" + updateOrderDto.OrderId).SendAsync("ReceiveOrderUpdate", updateOrderDto);
+            await _hubContext.Clients.Group("KitchenGroup").SendAsync("ReceiveOrderUpdate", updateOrderDto);
 
-             // If a connection ID is found for the order ID, notify that specific client.
-             if (!string.IsNullOrEmpty(connectionId))
-             {
-                 await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveOrderUpdate", updateOrderDto);
-             }
+            return Ok();
+        }
 
-             return Ok();
-         }
 
-         [HttpGet("GetOrdersForOutlet/{outletId}")]
+        [HttpGet("GetOrdersForOutlet/{outletId}")]
         public async Task<IActionResult> GetOrdersForOutlet(int outletId)
         {
             try

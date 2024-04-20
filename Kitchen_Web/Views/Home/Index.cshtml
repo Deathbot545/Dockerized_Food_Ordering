@@ -109,7 +109,7 @@
 
             updateOrderStatus(orderId, newStatus);
         });
-       
+        updateAllTableNames();
         // Handle new orders and updates
         connection.on("NewOrderPlaced", function (order) {
             handleOrder(order, false);
@@ -278,8 +278,25 @@
                     return undefined; // Explicitly return undefined for unhandled cases
             }
         }
-
-
-       
     });
+
+    function updateAllTableNames() {
+        $('.order-card').each(function () {
+            const $card = $(this);
+            const tableId = $card.data('table-id');
+            if (tableId && tableId !== 'Unknown' && !$card.data('table-name-updated')) {
+                fetchTableName(tableId).then(tableName => {
+                    $card.find('.card-header span').text(function (index, text) {
+                        return text.replace(/Table: [^|]*/, `Table: ${tableName}`);
+                    });
+                    $card.data('table-name-updated', true);
+                }).catch(() => {
+                    $card.find('.card-header span').text(function (index, text) {
+                        return text.replace(/Table: [^|]*/, "Table: Unknown");
+                    });
+                });
+            }
+        });
+    }
+
 </script>

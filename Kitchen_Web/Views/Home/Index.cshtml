@@ -95,12 +95,7 @@
             .withAutomaticReconnect()
             .build();
 
-        connection.on("NewOrderPlaced", function (order) {
-            let orderHtml = createOrderHtml(order); // Assumes createOrderHtml is defined to output HTML similar to RenderOrderCard
-            const sectionId = mapStatusToSectionId(order.status);
-            $('#' + sectionId).append(orderHtml);
-            fetchTableNamesAndUpdateDOM(); // Re-fetch table names when a new order is added
-        });
+        connection.on("NewOrderPlaced", addNewOrderToDOM);
         connection.on("ReceiveOrderUpdate", updateOrderInDOM);
         connection.start().catch(err => console.error("SignalR connection error:", err));
 
@@ -120,7 +115,20 @@
             updateOrderStatus(orderId, newStatus);
         });
 
-       
+        function addNewOrderToDOM(order) {
+            const orderHtml = createOrderHtml(order);
+            const sectionId = mapStatusToSectionId(order.status);
+            $('#' + sectionId).append(orderHtml);
+        }
+
+        function updateOrderInDOM(order) {
+            const orderCard = $(`.order-card[data-order-id="${order.id}"]`);
+            if (orderCard.length) {
+                updateOrderCard(order, orderCard);
+            } else {
+                addNewOrderToDOM(order);
+            }
+        }
 
         function updateOrderStatus(orderId, newStatus) {
             const statusEnumValue = mapStatusToEnumValue(newStatus);
@@ -192,7 +200,12 @@
                 }
             });
         }
-
+        connection.on("NewOrderPlaced", function (order) {
+            let orderHtml = createOrderHtml(order); // Assumes createOrderHtml is defined to output HTML similar to RenderOrderCard
+            const sectionId = mapStatusToSectionId(order.status);
+            $('#' + sectionId).append(orderHtml);
+            fetchTableNamesAndUpdateDOM(); // Re-fetch table names when a new order is added
+        });
 
         function mapStatusToSectionId(status) {
             switch (status) {

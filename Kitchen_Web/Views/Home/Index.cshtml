@@ -13,17 +13,14 @@
 
     public static string RenderOrderCard(OrderDTO order, List<TableDTO> tables)
     {
-        var tableIdentifier = tables.FirstOrDefault(t => t.Id == order.TableId)?.TableIdentifier ?? "Unknown";
+        var tableIdentifier = tables.FirstOrDefault(t => t.Id == order.TableId)?.TableIdentifier ?? $"Unknown (ID: {order.TableId})";
         var orderTimeInIST = ConvertToCorrectTimeZone(order.OrderTime).ToString("yyyy-MM-dd HH:mm:ss");
         var statusText = order.Status.ToString().ToUpper();
         var html = new StringBuilder();
-        html.Append($"<div class=\"card mb-3 order-card bg-light\" data-order-id=\"{order.Id}\">");
+        html.Append($"<div class=\"card mb-3 order-card bg-light\" data-order-id=\"{order.Id}\" data-table-id=\"{order.TableId}\">");
         html.Append($"<div class=\"card-header d-flex justify-content-between align-items-center bg-warning text-dark\">");
-        html.Append($"<span>Order #{order.Id} | Table: {tableIdentifier} (ID: {order.TableId}) | Date: {orderTimeInIST} | STATUS: {statusText}</span>");
+        html.Append($"<span>Order #{order.Id} | Table: {tableIdentifier} | Date: {orderTimeInIST} | STATUS: {statusText}</span>");
         html.Append("</div><div class=\"card-body\"><ul class=\"mb-3\">");
-
-        // Debugging: Output all tables to confirm they're loaded correctly
-        html.Append($"<div>Available Tables: {string.Join(", ", tables.Select(t => t.Id + " - " + t.TableIdentifier))}</div>");
 
         foreach (var detail in order.OrderDetails)
         {
@@ -39,6 +36,7 @@
         return html.ToString();
     }
 }
+
 
 @{
     Func<OrderDTO, string> renderOrderCard = (order) =>
@@ -194,7 +192,37 @@
                     return "Unknown";
                 });
         }
+        function fetchTableNamesAndUpdateDOM() {
+            $('.order-card').each(function () {
+                let $card = $(this);
+                let tableId = $card.data('table-id');
+                if (tableId && tableId !== 'Unknown') {
+                    fetchTableName(tableId).then(tableName => {
+                        $card.find('.card-header span').html(
+                            `Order #${$card.data('order-id')} | Table: ${tableName} | Date: ${$card.find('.card-header span').text().split('|')[2].split('|')[0]} | STATUS: ${$card.find('.card-header span').text().split('|')[2].split('|')[1]}`
+                        );
+                    }).catch(() => {
+                        $card.find('.card-header span').html(
+                            `Order #${$card.data('order-id')} | Table: Unknown | Date: ${$card.find('.card-header span').text().split('|')[2].split('|')[0]} | STATUS: ${$card.find('.card-header span').text().split('|')[2].split('|')[1]}`
+                        );
+                    });
+                }
+            });
+        }
 
+        fetchTableNamesAndUpdateDOM(); // Call this function on document ready to update all initially loaded orders
+
+        connection.on("NewOrderPlaced", function (order) {
+            let orderHtml = createOrderHtml(order); // Assumes createOrderHtml is defined to output HTML similar to RenderOrderCard
+            const sectionId = mapStatusToSectionId(order.status);
+            $('#' + sectionId).append(orderHtml);
+            fetchTableNamesAndUpdateDOM(); // Re-fetch table names when a new order is added
+        });
+
+        connection.on("ReceiveOrderUpdate", function (order) {
+            updateOrderInDOM(order); // Assumes updateOrderInDOM is defined to handle updating orders
+            fetchTableNamesAndUpdateDOM();
+        });
         function mapStatusToSectionId(status) {
             switch (status) {
                 case 0: return 'pendingOrders';

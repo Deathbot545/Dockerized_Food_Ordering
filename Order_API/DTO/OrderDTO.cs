@@ -21,6 +21,7 @@ namespace Order_API.DTO
         // Changed to string to match the Order model and represent the customer as a user ID
         public string Customer { get; set; }
         public int TableId { get; set; }
+        public string TableName { get; set; }
         public int OutletId { get; set; }
         public OrderStatus Status { get; set; }
         public List<OrderDetailDTO> OrderDetails { get; set; }

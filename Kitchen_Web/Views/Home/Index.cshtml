@@ -172,7 +172,29 @@
                     return "Unknown";
                 });
         }
-      
+        function fetchTableNamesAndUpdateDOM() {
+            $('.order-card').each(function () {
+                let $card = $(this);
+                let tableId = $card.data('table-id');
+                if (tableId && tableId !== 'Unknown') {
+                    fetchTableName(tableId).then(tableName => {
+                        $card.find('.card-header span').html(
+                            `Order #${$card.data('order-id')} | Table: ${tableName} | Date: ${$card.find('.card-header span').text().split('|')[2].split('|')[0]} | STATUS: ${$card.find('.card-header span').text().split('|')[2].split('|')[1]}`
+                        );
+                    }).catch(() => {
+                        $card.find('.card-header span').html(
+                            `Order #${$card.data('order-id')} | Table: Unknown | Date: ${$card.find('.card-header span').text().split('|')[2].split('|')[0]} | STATUS: ${$card.find('.card-header span').text().split('|')[2].split('|')[1]}`
+                        );
+                    });
+                }
+            });
+        }
+        connection.on("NewOrderPlaced", function (order) {
+            let orderHtml = createOrderHtml(order); // Assumes createOrderHtml is defined to output HTML similar to RenderOrderCard
+            const sectionId = mapStatusToSectionId(order.status);
+            $('#' + sectionId).append(orderHtml);
+            fetchTableNamesAndUpdateDOM(); // Re-fetch table names when a new order is added
+        });
 
         function mapStatusToSectionId(status) {
             switch (status) {

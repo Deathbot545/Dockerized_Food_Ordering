@@ -86,66 +86,33 @@
     </div>
 </footer>
 <script>
-    
+
     $(document).ready(function () {
-        // Setup SignalR connection
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub")
             .configureLogging(signalR.LogLevel.Information)
             .withAutomaticReconnect()
             .build();
 
-        connection.on("NewOrderPlaced", addNewOrderToDOM);
-        connection.on("ReceiveOrderUpdate", updateOrderInDOM);
         connection.start().catch(err => console.error("SignalR connection error:", err));
 
-        // Bind event handler for button clicks to handle both dynamically added and existing orders
-        $(document).on('click', '.btn-group .btn', function () {
-            const $btn = $(this);
-            const orderId = $btn.closest('.order-card').data('order-id');
-            const newStatus = $btn.data('status');
-
-            console.log("Clicked button:", $btn.text().trim(), "for order ID:", orderId, "to change status to:", newStatus);
-
-            if (newStatus === undefined) {
-                console.error("Undefined status for order ID:", orderId);
-                return; // Prevent sending undefined status
-            }
-
-            updateOrderStatus(orderId, newStatus);
+        connection.on("NewOrderPlaced", function (order) {
+            addOrUpdateOrder(order, false);
         });
 
-        function addNewOrderToDOM(order) {
-            const orderHtml = createOrderHtml(order);
-            const sectionId = mapStatusToSectionId(order.status);
-            $('#' + sectionId).append(orderHtml);
-        }
+        connection.on("ReceiveOrderUpdate", function (order) {
+            addOrUpdateOrder(order, true);
+        });
 
-        function updateOrderInDOM(order) {
-            const orderCard = $(`.order-card[data-order-id="${order.id}"]`);
-            if (orderCard.length) {
-                updateOrderCard(order, orderCard);
-            } else {
-                addNewOrderToDOM(order);
+        function addOrUpdateOrder(order, isUpdate) {
+            const existingCard = $(`.order-card[data-order-id="${order.id}"]`);
+            if (existingCard.length > 0 && isUpdate) {
+                updateOrderCard(order, existingCard);
+            } else if (!existingCard.length) {
+                const orderHtml = createOrderHtml(order);
+                const sectionId = mapStatusToSectionId(order.status);
+                $(`#${sectionId}`).append(orderHtml);
             }
-        }
-
-        function updateOrderStatus(orderId, newStatus) {
-            const statusEnumValue = mapStatusToEnumValue(newStatus);
-            console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
-
-            $.ajax({
-                url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
-                success: function () {
-                    console.log("Successfully updated status for Order ID:", orderId);
-                },
-                error: function (jqXHR) {
-                    console.error("Failed to update status for Order ID:", orderId, "Error:", jqXHR.responseText);
-                }
-            });
         }
 
         function createOrderHtml(order) {
@@ -154,24 +121,61 @@
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
             const detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
 
-            // Initially set table identifier, fetch more details if necessary
             let tableIdentifier = `Table: ${order.tableId}`;
-          
+            fetchTableName(order.tableId).then(tableName => {
+                $(`.order-card[data-order-id="${order.id}"] .card-header`).html(
+                    `Order #${order.id} | ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
+                );
+            });
+
             return `
-        <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" style="background-color: ${color};">
-            <div class="card-header">
-                Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
-            </div>
-            <div class="card-body">
-                <ul>${detailsHtml}</ul>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                    <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
-                    <button type="button" class="btn btn-success" data-status="completed">Completed</button>
+            <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
+                <div class="card-header">
+                    Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
                 </div>
-            </div>
-        </div>`;
+                <div class="card-body">
+                    <ul>${detailsHtml}</ul>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
+                        <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
+                        <button type="button" the "btn btn-success" data-status="completed">Completed</button>
+                    </div>
+                </div>
+            </div>`;
         }
+
+        function updateOrderCard(order, orderCard) {
+            const statusText = mapEnumToStatusText(order.status);
+            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
+            const sectionId = mapStatusToSectionId(order.status);
+
+            orderCard.detach().appendTo(`#${sectionId}`); // Move to correct section if status changed
+            fetchTableName(order.tableId).then(tableName => {
+                orderCard.find('.card-header').html(
+                    `Order #${order.id} | Table: ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
+                );
+            });
+            updateOrderStatus(order.id, order.status); // Update status
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            let statusEnumValue = mapStatusToEnumValue(newStatus);
+            console.log("Updating order status for Order ID:", orderId, "to", newStatus);
+
+            $.ajax({
+                url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
+                success: function (response) {
+                    console.log("Order status updated successfully for Order ID:", orderId);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Failed to update status for Order ID:", orderId, "Error:", textStatus, jqXHR.responseText);
+                }
+            });
+        }
+
         function fetchTableName(tableId) {
             return fetch(`https://restosolutionssaas.com/api/TablesApi/GetTableName/${tableId}`)
                 .then(response => {
@@ -183,29 +187,6 @@
                     return "Unknown";
                 });
         }
-        function fetchTableNamesAndUpdateDOM() {
-            $('.order-card').each(function () {
-                let $card = $(this);
-                let tableId = $card.data('table-id');
-                if (tableId && tableId !== 'Unknown') {
-                    fetchTableName(tableId).then(tableName => {
-                        $card.find('.card-header span').html(
-                            `Order #${$card.data('order-id')} | Table: ${tableName} | Date: ${$card.find('.card-header span').text().split('|')[2].split('|')[0]} | STATUS: ${$card.find('.card-header span').text().split('|')[2].split('|')[1]}`
-                        );
-                    }).catch(() => {
-                        $card.find('.card-header span').html(
-                            `Order #${$card.data('order-id')} | Table: Unknown | Date: ${$card.find('.card-header span').text().split('|')[2].split('|')[0]} | STATUS: ${$card.find('.card-header span').text().split('|')[2].split('|')[1]}`
-                        );
-                    });
-                }
-            });
-        }
-        connection.on("NewOrderPlaced", function (order) {
-            let orderHtml = createOrderHtml(order); // Assumes createOrderHtml is defined to output HTML similar to RenderOrderCard
-            const sectionId = mapStatusToSectionId(order.status);
-            $('#' + sectionId).append(orderHtml);
-            fetchTableNamesAndUpdateDOM(); // Re-fetch table names when a new order is added
-        });
 
         function mapStatusToSectionId(status) {
             switch (status) {
@@ -217,17 +198,34 @@
             }
         }
 
+        function mapEnumToStatusText(status) {
+            switch (status) {
+                case 0: return "Pending";
+                case 1: return "In Progress";
+                case 2: return "Completed";
+                case 3: return "Served";
+                default: return "Unknown";
+            }
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 0: return "#FFDDC1"; // Light orange for pending
+                case 1: return "#C1CEFF"; // Light blue for in progress
+                case 2: return "#C1FFD7"; // Light green for completed
+                case 3: return "#FFC1C1"; // Light red for served
+                default: return "#FFFFFF"; // White for unknown
+            }
+        }
+
         function mapStatusToEnumValue(status) {
-            switch (status.toLowerCase()) {
+            switch (status) {
                 case 'pending': return 0;
-                case 'in-progress':
-                case 'preparing': return 1;
-                case 'completed':
-                case 'ready': return 2; // Ensure mapping for both completed and ready
+                case 'in-progress': return 1;
+                case 'completed': return 2;
+                case 'ready': return 2; // ready is considered as completed
                 case 'served': return 3;
-                default:
-                    console.error("Received unhandled status:", status);
-                    return undefined;
+                default: return undefined; // Handle undefined status
             }
         }
     });

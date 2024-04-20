@@ -29,9 +29,18 @@ document.addEventListener("DOMContentLoaded", function () {
         // If 'currentOrder' exists in local storage, establish a SignalR connection.
 
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?orderId=${currentOrder.orderId}`)
+            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub")
             .configureLogging(signalR.LogLevel.Information)
             .build();
+
+        connection.on("ReceiveOrderUpdate", function (orderUpdate) {
+            console.log("Update received for order", orderUpdate.orderId);
+            updateKitchenOrderStatusUI(orderUpdate); // This function should update the UI component that reflects order status in the kitchen
+        });
+
+        connection.start().catch(function (err) {
+            console.error("SignalR connection error:", err);
+        });
 
 
         connection.on("NewOrderPlaced", function (order) {

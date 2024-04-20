@@ -124,6 +124,7 @@
         });
 
         connection.on("ReceiveOrderUpdate", function (order) {
+            console.log("Order update received", order);
             handleOrder(order, true);
         });
 

@@ -91,10 +91,19 @@ async function setupSignalRConnection() {
 
     console.log("Establishing SignalR connection for order status updates.");
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?orderId=${currentOrder.orderId}`)
+        .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?orderId=" + orderId)
         .configureLogging(signalR.LogLevel.Information)
-        .withAutomaticReconnect()
         .build();
+
+    connection.on("ReceiveOrderUpdate", function (orderUpdate) {
+        if (orderUpdate.orderId === orderId) {
+            updateOrderStatusUI(orderUpdate); // This function should visually reflect the order's update on the customer's UI
+        }
+    });
+
+    connection.start().catch(function (err) {
+        console.error("SignalR connection error:", err);
+    });
 
     connection.on("NewOrderPlaced", order => console.log("SignalR: New order placed", order));
     connection.on("ReceiveOrderUpdate", updateOrderStatusUI);

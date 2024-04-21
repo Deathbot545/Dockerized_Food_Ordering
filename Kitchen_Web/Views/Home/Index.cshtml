@@ -78,6 +78,10 @@
         }
     </section>
 </div>
+<div class="container mt-3" id="cancelledOrdersSection">
+    <h2>Recent Cancellations</h2>
+    <div id="cancelledOrders"></div>
+</div>
 
 
 <!-- Footer -->
@@ -105,8 +109,6 @@
                 console.error("Order update is missing required properties", order);
             }
         });
-
-
         connection.start().catch(function (err) {
             console.error("SignalR connection error:", err);
         });
@@ -116,11 +118,23 @@
             console.log("Updating UI for order:", order);
             // Update UI elements here
         }
-
         function updateKitchenOrderStatusUI(order) {
             let orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
             if (order.status === 4) { // Assuming 4 means 'Cancelled'
-                orderCard.remove();}
+                const cancellationAlert = `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    Order #${order.orderId} has been cancelled by the customer.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>`;
+                $('#cancelledOrders').prepend(cancellationAlert);
+                setTimeout(() => {
+                    $('#cancelledOrders .alert').first().alert('close');
+                }, 300000); // Alerts will be closed after 5 minutes
+
+                orderCard.remove(); // Remove the order from the current UI
+            }
             // Update kitchen specific UI elements here
         }
         $(document).on('click', '.btn-group .btn', function () {

@@ -86,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
     function updateKitchenOrderStatusUI(order) {
         console.log("Received kitchen update for order ID:", order.OrderId, "with new status:", order.Status);
         let orderStatusText = mapEnumToStatusText(order.Status);
@@ -102,7 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
         $orderCard.find('.card-header span:last-child').text(`STATUS: ${orderStatusText.toUpperCase()}`);
         console.log(`Order ${order.OrderId} UI updated to ${orderStatusText}`);
     }
-
 
     function getOrderStatusText(status) {
         switch (status) {

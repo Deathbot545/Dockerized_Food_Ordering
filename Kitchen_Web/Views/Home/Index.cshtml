@@ -124,7 +124,9 @@
         });
 
         connection.on("ReceiveOrderUpdate", function (order) {
-            handleOrder(order, true);
+            console.log("Update received for order", order.orderId, "New status:", order.Status);
+            updateOrderStatusUI(order);
+            updateKitchenOrderStatusUI(order);
         });
 
         // Function to handle new orders and updates

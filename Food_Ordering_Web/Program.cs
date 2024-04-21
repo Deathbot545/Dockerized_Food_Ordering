@@ -16,8 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // Listen for HTTP connections on port 80
-    // Consider configuring HTTPS options if you're running in
+    serverOptions.ListenAnyIP(80); 
 });
 // Data Protection Keys 
 var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";

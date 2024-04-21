@@ -94,48 +94,48 @@
 <script>
     $(document).ready(function () {
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")  // Correct usage for kitchen
+            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
             .configureLogging(signalR.LogLevel.Information)
             .withAutomaticReconnect()
             .build();
 
-        // Listening to updates about any order changes
+        // Object to track which orders have been notified as cancelled
+        const notifiedCancellations = {};
+
         connection.on("ReceiveOrderUpdate", function (order) {
             console.log("Received order update:", order);
             if (order && order.orderId && typeof order.status !== 'undefined') {
+                if (order.status === 4) { // Assuming 4 means 'Cancelled'
+                    handleCancellationAlert(order);
+                }
                 updateOrderStatusUI(order);
                 updateKitchenOrderStatusUI(order);
             } else {
                 console.error("Order update is missing required properties", order);
             }
         });
+
         connection.start().catch(function (err) {
             console.error("SignalR connection error:", err);
         });
 
-        // Define these functions if not already defined
-        function updateOrderStatusUI(order) {
-            console.log("Updating UI for order:", order);
-            // Update UI elements here
-        }
-        function updateKitchenOrderStatusUI(order) {
-            let orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
-            if (order.status === 4) { // Assuming 4 means 'Cancelled'
+        function handleCancellationAlert(order) {
+            if (!notifiedCancellations[order.orderId]) { // Check if this order hasn't been notified as cancelled
                 const cancellationAlert = `
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    Order #${order.orderId} has been cancelled by the customer.
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>`;
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        Order #${order.orderId} has been cancelled by the customer.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>`;
                 $('#cancelledOrders').prepend(cancellationAlert);
-                setTimeout(() => {
-                    $('#cancelledOrders .alert').first().alert('close');
-                }, 300000); // Alerts will be closed after 5 minutes
+                notifiedCancellations[order.orderId] = true; // Mark as notified
 
-                orderCard.remove(); // Remove the order from the current UI
+                setTimeout(() => {
+                    $(`.alert:contains('Order #${order.orderId}')`).alert('close');
+                    delete notifiedCancellations[order.orderId]; // Clean up after alert closes
+                }, 300000); // Close alert after 5 minutes
             }
-            // Update kitchen specific UI elements here
         }
         $(document).on('click', '.btn-group .btn', function () {
             const $btn = $(this);

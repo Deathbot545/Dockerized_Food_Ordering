@@ -90,12 +90,20 @@
 <script>
     $(document).ready(function () {
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub")
+            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")  // Notice the query parameter
             .configureLogging(signalR.LogLevel.Information)
             .withAutomaticReconnect()
             .build();
 
-        connection.start().catch(err => console.error("SignalR connection error:", err));
+        connection.on("ReceiveOrderUpdate", function (order) {
+            console.log("Update received for order", order.orderId, "New status:", order.Status);
+            updateOrderStatusUI(order);
+            updateKitchenOrderStatusUI(order);
+        });
+
+        connection.start().catch(function (err) {
+            console.error("SignalR connection error:", err);
+        });
 
         $(document).on('click', '.btn-group .btn', function () {
             const $btn = $(this);

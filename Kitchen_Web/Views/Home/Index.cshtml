@@ -90,21 +90,36 @@
 <script>
     $(document).ready(function () {
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")  // Notice the query parameter
+            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")  // Correct usage for kitchen
             .configureLogging(signalR.LogLevel.Information)
             .withAutomaticReconnect()
             .build();
 
+        // Listening to updates about any order changes
         connection.on("ReceiveOrderUpdate", function (order) {
             console.log("Update received for order", order.orderId, "New status:", order.Status);
-            updateOrderStatusUI(order);
-            updateKitchenOrderStatusUI(order);
+            if (order && order.Status !== undefined) {
+                updateOrderStatusUI(order);
+                updateKitchenOrderStatusUI(order);
+            } else {
+                console.error("Order update is missing required properties", order);
+            }
         });
 
         connection.start().catch(function (err) {
             console.error("SignalR connection error:", err);
         });
 
+        // Define these functions if not already defined
+        function updateOrderStatusUI(order) {
+            console.log("Updating UI for order:", order);
+            // Update UI elements here
+        }
+
+        function updateKitchenOrderStatusUI(order) {
+            console.log("Updating Kitchen UI for order:", order);
+            // Update kitchen specific UI elements here
+        }
         $(document).on('click', '.btn-group .btn', function () {
             const $btn = $(this);
             const orderId = $btn.closest('.order-card').data('order-id');

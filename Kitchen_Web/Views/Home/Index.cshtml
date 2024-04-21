@@ -97,14 +97,15 @@
 
         // Listening to updates about any order changes
         connection.on("ReceiveOrderUpdate", function (order) {
-            console.log("Update received for order", order.orderId, "New status:", order.Status);
-            if (order && order.Status !== undefined) {
+            console.log("Received order update:", order);
+            if (order && order.orderId && typeof order.status !== 'undefined') {
                 updateOrderStatusUI(order);
                 updateKitchenOrderStatusUI(order);
             } else {
                 console.error("Order update is missing required properties", order);
             }
         });
+
 
         connection.start().catch(function (err) {
             console.error("SignalR connection error:", err);
@@ -117,7 +118,9 @@
         }
 
         function updateKitchenOrderStatusUI(order) {
-            console.log("Updating Kitchen UI for order:", order);
+            let orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
+            if (order.status === 4) { // Assuming 4 means 'Cancelled'
+                orderCard.remove();}
             // Update kitchen specific UI elements here
         }
         $(document).on('click', '.btn-group .btn', function () {

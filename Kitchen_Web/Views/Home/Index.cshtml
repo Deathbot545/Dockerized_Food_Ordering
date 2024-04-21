@@ -99,7 +99,6 @@
             .withAutomaticReconnect()
             .build();
 
-        // Object to track which orders have been notified as cancelled
         const notifiedCancellations = {};
 
         connection.on("ReceiveOrderUpdate", function (order) {
@@ -120,7 +119,7 @@
         });
 
         function handleCancellationAlert(order) {
-            if (!notifiedCancellations[order.orderId]) { // Check if this order hasn't been notified as cancelled
+            if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         Order #${order.orderId} has been cancelled by the customer.
@@ -129,12 +128,24 @@
                         </button>
                     </div>`;
                 $('#cancelledOrders').prepend(cancellationAlert);
-                notifiedCancellations[order.orderId] = true; // Mark as notified
+                notifiedCancellations[order.orderId] = true;
 
                 setTimeout(() => {
                     $(`.alert:contains('Order #${order.orderId}')`).alert('close');
-                    delete notifiedCancellations[order.orderId]; // Clean up after alert closes
-                }, 300000); // Close alert after 5 minutes
+                    delete notifiedCancellations[order.orderId];
+                }, 300000); // 5 minutes
+            }
+        }
+
+        function updateOrderStatusUI(order) {
+            const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
+            const sectionId = mapStatusToSectionId(order.status);
+            if (order.status === 4) { // Cancelled
+                orderCard.remove(); // Remove from current section
+            } else {
+                if (!orderCard.closest(`#${sectionId}`).length) {
+                    orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
+                }
             }
         }
         $(document).on('click', '.btn-group .btn', function () {

@@ -194,6 +194,7 @@
 
         function addNewOrderToDOM(order) {
             const orderHtml = createOrderHtml(order);
+            updateAllTableNames();
             const sectionId = mapStatusToSectionId(order.status);
             $('#' + sectionId).append(orderHtml);
         }
@@ -282,7 +283,6 @@
                 </div>
             </div>`;
         }
-
 
         function fetchTableName(tableId) {
             return fetch(`https://restosolutionssaas.com/api/TablesApi/GetTableName/${tableId}`)

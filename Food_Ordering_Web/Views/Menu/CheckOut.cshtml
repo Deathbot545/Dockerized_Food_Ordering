@@ -132,9 +132,14 @@
         </div>`;
         });
 
+        let deliveryFee = $("input[name='delivery']:checked").attr("id") === "priority" ? 0 : 0;
+        let taxes = subTotal * 0;
 
         $("#order-summary-section").html(itemsHtml);
         $(".subtotal").text(`LKR ${subTotal.toFixed(2)}`);
+        $(".delivery-fee").text(`LKR ${deliveryFee.toFixed(2)}`);
+        $(".taxes").text(`LKR ${taxes.toFixed(2)}`);
+        $(".total").text(`LKR ${(subTotal + deliveryFee + taxes).toFixed(2)}`);
     }
     $(document).ready(function () {
         console.log("Document ready. Loading checkout page.");

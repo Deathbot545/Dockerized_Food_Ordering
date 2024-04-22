@@ -21,7 +21,6 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // SignalR for real-time 
 builder.Services.AddSignalR();
 
-// Controllers
 builder.Services.AddControllers();
 
 ConfigureSwagger(builder);

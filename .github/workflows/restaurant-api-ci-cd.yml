@@ -40,7 +40,7 @@ jobs:
 
     - name: Deploy to AWS EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-13-60-49-122.eu-north-1.compute.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-13-51-195-100.eu-north-1.compute.amazonaws.com << 'EOF'
         # Pull the latest Docker image for the API
         sudo docker pull deathbot545/restaurantapi:latest
 

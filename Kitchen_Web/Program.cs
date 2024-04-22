@@ -12,7 +12,7 @@ builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true
 // Setup WebHost
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // 0
+    serverOptions.ListenAnyIP(80); 
 });
 
 // Setup Data Protection

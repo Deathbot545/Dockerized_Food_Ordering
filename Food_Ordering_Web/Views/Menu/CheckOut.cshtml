@@ -114,6 +114,33 @@
 <!-- Include your external JS file here or inline your JS code below -->
 
 <script>
+    function loadCheckoutPage() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let itemsHtml = '';
+        let subTotal = 0;
+
+        console.log("Cart loaded from localStorage:", cart);
+
+        cart.forEach(item => {
+            let itemTotal = item.qty * item.price;
+            subTotal += itemTotal;
+
+            itemsHtml += `<div class="mb-3">
+        <span>${item.name} (x${item.qty})</span>
+        <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
+                <button class="btn btn-sm remove-item" data-item-id="${item.id.toString()}">&times;</button>
+        </div>`;
+        });
+
+        let deliveryFee = $("input[name='delivery']:checked").attr("id") === "priority" ? 129 : 0;
+        let taxes = subTotal * 0.15;
+
+        $("#order-summary-section").html(itemsHtml);
+        $(".subtotal").text(`LKR ${subTotal.toFixed(2)}`);
+        $(".delivery-fee").text(`LKR ${deliveryFee.toFixed(2)}`);
+        $(".taxes").text(`LKR ${taxes.toFixed(2)}`);
+        $(".total").text(`LKR ${(subTotal + deliveryFee + taxes).toFixed(2)}`);
+    }
     $(document).ready(function () {
         console.log("Document ready. Loading checkout page.");
         loadCheckoutPage();
@@ -129,30 +156,77 @@
         });
     });
 
-    function loadCheckoutPage() {
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let itemsHtml = '';
-        let subTotal = 0;
+    function submitOrderForm() {
 
-        cart.forEach(item => {
-            let itemTotal = item.qty * item.price;
-            subTotal += itemTotal;
-            itemsHtml += `<div class="mb-3">
-                    <span>${item.name} (x${item.qty})</span>
-                    <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                    <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
-                </div>`;
+        showLoadingOverlay();
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (cart.length === 0) {
+            console.error("Attempted to submit order form with an empty cart.");
+            return; // Optionally show an error message to the user
+        }
+
+        const formData = new FormData();
+        formData.append('tableId', cart[0].tableId);
+        formData.append('outletId', cart[0].outletId);
+        cart.forEach((item, index) => {
+            formData.append(`items[${index}].id`, item.id);
+            formData.append(`items[${index}].qty`, item.qty);
+            formData.append(`items[${index}].price`, item.price);
+            formData.append(`items[${index}].name`, item.name);
         });
 
-        $("#order-summary-section").html(itemsHtml);
-        $(".subtotal").text(`LKR ${subTotal.toFixed(2)}`);
-        $(".total").text(`LKR ${subTotal.toFixed(2)}`); // Total is now directly linked to subtotal without additional fees
+        fetch('/Order/CreateOrUpdateOrder', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.orderId) {
+
+                    // Clear the existing cart
+                    localStorage.removeItem('cart');
+
+                    // Create a new local storage item for the current order
+                    localStorage.setItem('currentOrder', JSON.stringify({ orderId: data.orderId, status: 0 }));
+                    setupSignalRConnection(data.orderId);
+                    hideLoadingOverlay();
+                    checkAndUpdateOrderStatus();
+
+                    // Redirect or update UI as needed
+                    console.log("Order placed successfully with orderId: ", data.orderId);
+                    // Optional: Redirect to order confirmation page or update UI
+                } else {
+                    console.error("Order placement failed or orderId missing in response");
+                    // Handle error or missing orderId in response
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting order form:', error);
+                hideLoadingOverlay();
+                // Handle network or server error
+            });
+
+        // Prevent the default form submission behavior
+        return false;
     }
 
+
+    function createHiddenInput(name, value) {
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        return input;
+    }
     function removeItemFromCart(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        console.log(`Before removal, cart contains:`, cart);
+
         cart = cart.filter(item => item.id !== itemId.toString());
+        console.log(`After removal, cart now contains:`, cart);
+
         localStorage.setItem('cart', JSON.stringify(cart));
-        loadCheckoutPage(); // Update the page to reflect the item removal
+        loadCheckoutPage();
     }
 </script>

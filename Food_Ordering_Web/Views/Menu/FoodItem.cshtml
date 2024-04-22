@@ -114,9 +114,8 @@
                 // Handle quantity change
                 $('#quantity-selector').change(function () {
                     let quantity = $(this).val();
-                    let total = data.Price * quantity;
+                    let total = data.price * quantity; // Use lowercase 'price' here
                     $('#order-button').text(`Add ${quantity} to order • LKR ${total.toFixed(2)}`);
-
                 }).trigger('change');
 
 

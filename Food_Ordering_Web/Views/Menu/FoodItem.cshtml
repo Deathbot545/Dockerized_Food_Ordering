@@ -36,16 +36,21 @@
         <div class="col-md-6" style="position: relative;">
             <!-- Back Button -->
             <a href="javascript:void(0)" onclick="goBack()" class="btn btn-link back-button">← Back to @ViewBag.CustomerFacingName</a>
+
             <!-- Image -->
             <img class="img-fluid rounded food-image" alt="Food Image">
+
         </div>
         <div class="col-md-6">
             <!-- Title and Price -->
             <h2 class="mb-3">Loading... <span class="text-primary">LKR 0.00</span></h2>
+
             <!-- Description -->
             <p id="food-description">Loading...</p>
+
             <!-- Rating -->
             <p><span class="text-success">👍 Loading...</span> (0)</p>
+
             <!-- Packaging Charges Section -->
             <div class="mb-3">
                 <label><strong>Packaging Charges</strong></label>
@@ -53,6 +58,7 @@
                     <label><input type="radio" name="packaging" required> Additional Charges <span class="ml-2">+LKR 109.00</span></label>
                 </div>
             </div>
+
             <!-- Quantity Selector -->
             <div class="mb-3">
                 <label for="inputQuantitySelector" class="form-label"><strong>Quantity:</strong></label>
@@ -66,8 +72,9 @@
                     </button>
                 </div>
             </div>
+
             <!-- Order Button -->
-            <button class="btn btn-dark btn-lg btn-block" id="order-button">Add 1 LKR 0.00</button>
+            <button class="btn btn-dark btn-lg btn-block" id="order-button">Add 1  LKR 0.00</button>
         </div>
     </div>
 </div>
@@ -76,55 +83,98 @@
 </div>
 
 
+<script>
 
+    function incrementQuantity() {
 
-    <script>
-        function incrementQuantity() {
-            var input = document.getElementById('inputQuantitySelector');
-            var currentValue = parseInt(input.value, 10);
-            if (currentValue < 100) {
-                input.value = currentValue + 1;
-                updateOrderButton();
-            }
+        var input = document.getElementById('inputQuantitySelector');
+
+        var currentValue = parseInt(input.value, 10);
+
+        if (currentValue < 100) {
+
+            input.value = currentValue + 1;
+
+            updateOrderButton();
+
         }
+
+    }
 
     function decrementQuantity() {
+
         var input = document.getElementById('inputQuantitySelector');
+
         var currentValue = parseInt(input.value, 10);
+
         if (currentValue > 1) {
+
             input.value = currentValue - 1;
+
             updateOrderButton();
+
         }
+
     }
 
     function updateOrderButton() {
+
         let quantity = parseInt($('#inputQuantitySelector').val());
+
         let total = parseFloat($('h2 span').text().replace('LKR ', '').trim()) * quantity;
+
         $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
+
     }
+
+
 
     function goBack() {
+
         window.history.back();
+
     }
 
+
+
     $(document).ready(function () {
+
         const menuItemId = '@ViewBag.ItemId';
+
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}`;
+
         $('#inputQuantitySelector').on('input change', updateOrderButton);
 
+
+        // Fetch the data from the API
         $.ajax({
             url: apiEndpoint,
             method: 'GET',
             success: function (data) {
+                // Populate the HTML elements with the fetched data
                 if (data && data.image) {
                     $('img').attr('src', 'data:image/png;base64,' + data.image);
+                } else {
+                    console.error("Image data is missing or invalid:", data);
                 }
+
                 if (data && data.price) {
                     $('h2').html(data.name + ' <span class="text-primary">LKR ' + data.price.toFixed(2) + '</span>');
+                } else {
+                    console.error("Price data is missing or invalid:", data);
                 }
+
                 $('#food-description').text(data.description);
-                $('p').eq(2).html('<span class="text-success">👍 ' + data.rating + '%</span> (' + data.votes + ')');
-                updateOrderButton(); // Update order button after loading data
+
+
+                // For the rating, I am assuming you'll provide the rating and total votes in your data, for now I'm hardcoding
+                $('p').eq(2).html('<span class="text-success">👍 ' + data.Rating + '%</span> (' + data.Votes + ')');  // Adjust as per your API data
+
+                // Handle quantity change
+               
+
+
+                // If there are more data to be populated, you can continue here.
             },
             error: function (error) {
                 console.error("Error fetching data:", error);

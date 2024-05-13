@@ -98,7 +98,7 @@
     function incrementQuantity() {
         var input = document.getElementById('inputQuantitySelector');
         var currentValue = parseInt(input.value, 10);
-        if (currentValue < 100) {
+        if (currentValue < 100) { // Assuming 100 is the max value
             input.value = currentValue + 1;
             updateOrderButton();
         }
@@ -107,74 +107,79 @@
     function decrementQuantity() {
         var input = document.getElementById('inputQuantitySelector');
         var currentValue = parseInt(input.value, 10);
-        if (currentValue > 1) {
+        if (currentValue > 1) { // Assuming 1 is the min value
             input.value = currentValue - 1;
             updateOrderButton();
         }
     }
 
+    // Update the order button text
     function updateOrderButton() {
         let quantity = parseInt($('#inputQuantitySelector').val());
         let total = parseFloat($('h2 span').text().replace('LKR ', '').trim()) * quantity;
-        $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
+        $('#order-toggle').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
     }
 
     function goBack() {
         window.history.back();
     }
-
     $(document).ready(function () {
         const menuItemId = '@ViewBag.ItemId';
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}`;
         $('#inputQuantitySelector').change(updateOrderButton);
         updateOrderButton();
 
+        // Fetch the data from the API
         $.ajax({
             url: apiEndpoint,
             method: 'GET',
             success: function (data) {
+                // Populate the HTML elements with the fetched data
                 if (data && data.image) {
                     $('img').attr('src', 'data:image/png;base64,' + data.image);
+                } else {
+                    console.error("Image data is missing or invalid:", data);
                 }
+
                 if (data && data.price) {
                     $('h2').html(data.name + ' <span class="text-primary">LKR ' + data.price.toFixed(2) + '</span>');
+                } else {
+                    console.error("Price data is missing or invalid:", data);
                 }
+
                 $('#food-description').text(data.description);
-                $('p').eq(2).html('<span class="text-success">👍 ' + data.Rating + '%</span> (' + data.Votes + ')');
+
+
+                // For the rating, I am assuming you'll provide the rating and total votes in your data, for now I'm hardcoding
+                $('p').eq(2).html('<span class="text-success">👍 ' + data.Rating + '%</span> (' + data.Votes + ')');  // Adjust as per your API data
+
+                // Handle quantity change
+                $('#quantity-selector').change(function () {
+                    let quantity = $(this).val();
+                    let total = data.price * quantity; // Use lowercase 'price' here
+                    $('#order-button').text(`Add ${quantity} to order • LKR ${total.toFixed(2)}`);
+                }).trigger('change');
+
+
+                // If there are more data to be populated, you can continue here.
             },
             error: function (error) {
                 console.error("Error fetching data:", error);
             }
         });
-
-        $('#order-button').click(function () {
-            const qty = parseInt($('#inputQuantitySelector').val());
-            const price = parseFloat($('h2 span').text().replace('LKR', '').trim());
-            const h2Text = $('h2').text();
-            const priceText = $('h2 span').text();
-            const name = h2Text.replace(priceText, '').trim();
-            const tableId = '@ViewBag.TableId';
-            const outletId = '@ViewBag.OutletId';
-
-            addToCart({
-                id: '@ViewBag.ItemId'.toString(),
-                name: name,
-                qty: qty,
-                price: price,
-                tableId: tableId,
-                outletId: outletId
-            });
-        });
-
-        updateCartButton();
     });
 
+
+    // Cart functions
     function updateCartButton() {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let currentTime = new Date().getTime();
-        let durationLimit = 24 * 60 * 60 * 1000;
+        let durationLimit = 24 * 60 * 60 * 1000; // Duration limit in milliseconds (e.g., 24 hours)
 
+        // Filter out items that are older than the duration limit
         cart = cart.filter(item => currentTime - item.timestamp < durationLimit);
+
+        // Update the cart in local storage after filtering out old items
         localStorage.setItem('cart', JSON.stringify(cart));
 
         let itemCount = cart.reduce((count, item) => count + item.qty, 0);
@@ -190,23 +195,57 @@
         }
     }
 
+
+    // This will be called when an item is added to the cart
+    $('#order-button').click(function () {
+        const qty = parseInt($('#quantity-selector').val());
+        const price = parseFloat($('h2 span').text().replace('LKR', '').trim());
+        const h2Text = $('h2').text();
+        const priceText = $('h2 span').text();
+        const name = h2Text.replace(priceText, '').trim();
+        const tableId = '@ViewBag.TableId';
+        const outletId = '@ViewBag.OutletId'; // Get outletId from ViewBag
+
+        addToCart({
+            id: '@ViewBag.ItemId'.toString(),
+            name: name,
+            qty: qty,
+            price: price,
+            tableId: tableId, // Including tableId in the item data
+            outletId: outletId // Including outletId in the item data
+        });
+    });
+
+
+
     function addToCart(item) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let existingItem = cart.find(x => x.id === item.id);
-        let timestamp = new Date().getTime();
+        let timestamp = new Date().getTime(); // Current timestamp in milliseconds
 
-        if (existing
+        // Check if the item already exists in the cart
+        if (existingItem) {
             existingItem.qty += item.qty;
-        existingItem.timestamp = timestamp;
-    } else {
-        item.timestamp = timestamp;
-        cart.push(item);
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartButton();
+            existingItem.timestamp = timestamp; // Update timestamp
+            existingItem.tableId = item.tableId; // Ensure tableId is updated if necessary
+            existingItem.outletId = item.outletId; // Ensure outletId is included and updated if necessary
+        } else {
+            // If the item is new, include tableId and outletId
+            item.timestamp = timestamp; // Add timestamp
+            cart.push({
+                ...item,
+                outletId: '@ViewBag.OutletId' // Include outletId when adding a new item
+            });
         }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartButton();
+    }
 
     $('#cart-button').click(function () {
         window.location.href = '/Order/Checkout';
+    });
+    // Initialization
+    $(document).ready(function () {
+        updateCartButton();
     });
 </script>

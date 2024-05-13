@@ -29,15 +29,6 @@
         left: 10px;
         z-index: 10;
     }
-
-    .input-group {
-        width: auto; /* Adjust width to fit content */
-    }
-
-    .btn-icon {
-        padding: 0.375rem 0.75rem; /* Standard padding for Bootstrap buttons, adjust size as needed */
-    }
-
 </style>
 <div class="container my-5" style="padding-top: 50px;">
     <!-- Added padding to the container -->
@@ -95,30 +86,6 @@
 
 
 <script>
-    function incrementQuantity() {
-        var input = document.getElementById('inputQuantitySelector');
-        var currentValue = parseInt(input.value, 10);
-        if (currentValue < 100) { // Assuming 100 is the max value
-            input.value = currentValue + 1;
-            updateOrderButton();
-        }
-    }
-
-    function decrementQuantity() {
-        var input = document.getElementById('inputQuantitySelector');
-        var currentValue = parseInt(input.value, 10);
-        if (currentValue > 1) { // Assuming 1 is the min value
-            input.value = currentValue - 1;
-            updateOrderButton();
-        }
-    }
-
-    // Update the order button text
-    function updateOrderButton() {
-        let quantity = parseInt($('#inputQuantitySelector').val());
-        let total = parseFloat($('h2 span').text().replace('LKR ', '').trim()) * quantity;
-        $('#order-toggle').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
-    }
 
     function goBack() {
         window.history.back();
@@ -126,8 +93,6 @@
     $(document).ready(function () {
         const menuItemId = '@ViewBag.ItemId';
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}`;
-        $('#inputQuantitySelector').change(updateOrderButton);
-        updateOrderButton();
 
         // Fetch the data from the API
         $.ajax({

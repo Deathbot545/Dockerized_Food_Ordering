@@ -8,7 +8,7 @@ builder.Configuration.AddJsonFile("Menu_API_appsettings.json", optional: true, r
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // Listen for HTTP connections
+    serverOptions.ListenAnyIP(80); // Listen for HTTP conne
 
 });
 builder.Services.AddHttpClient();

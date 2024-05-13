@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowMyOrigins", builder =>
     {
         builder.WithOrigins(
-                 "https://restosolutionssaas.com:8443", // The first web application origin
+                 "https://restosolutionssaas.com:8443", // The first web application or
                  "https://restosolutionssaas.com" 
                )
                .AllowAnyMethod()

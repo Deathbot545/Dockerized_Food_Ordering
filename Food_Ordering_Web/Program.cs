@@ -18,7 +18,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); 
 });
-// Data Protection Keys 
+// Data Protection
 var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))

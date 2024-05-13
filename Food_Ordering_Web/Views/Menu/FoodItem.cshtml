@@ -60,20 +60,14 @@
             </div>
 
             <!-- Quantity Selector -->
-            <!-- Quantity Selector -->
             <div class="mb-3">
-                <label for="inputQuantitySelector" class="form-label"><strong>Quantity:</strong></label>
-                <div class="input-group">
-                    <button type="button" class="btn btn-icon btn-secondary" onclick="decrementQuantity()">
-                        &#8722; <!-- Minus symbol -->
-                    </button>
-                    <input type="number" id="inputQuantitySelector" class="form-control text-center" name="quantity" aria-label="Quantity" value="1" min="1" max="100">
-                    <button type="button" class="btn btn-icon btn-secondary" onclick="incrementQuantity()">
-                        &#43; <!-- Plus symbol -->
-                    </button>
-                </div>
+                <select class="form-control w-auto" id="quantity-selector">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <!-- Add more options as needed -->
+                </select>
             </div>
-
 
             <!-- Order Button -->
             <button class="btn btn-dark btn-lg btn-block" id="order-button">Add 1  LKR 0.00</button>
@@ -86,7 +80,6 @@
 
 
 <script>
-
     function goBack() {
         window.history.back();
     }

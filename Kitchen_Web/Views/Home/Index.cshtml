@@ -132,13 +132,16 @@
             .withAutomaticReconnect()
             .build();
 
-        const notifiedCancellations = {};
+        // Add logging to verify if the connection object has the method
+        console.log("Connection object before adding method:", connection);
 
-        // Define the ReceiveWaiterCall method before starting the connection
         connection.on("ReceiveWaiterCall", function (tableId) {
             console.log("Received waiter call for table:", tableId);
             addWaiterCallToTable(tableId);
         });
+
+        // Log after defining the method to ensure it's added
+        console.log("Connection object after adding method:", connection);
 
         connection.on("ReceiveOrderUpdate", function (order) {
             console.log("Received order update:", order);
@@ -322,20 +325,20 @@
                 `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
 
             return `
-                    <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
-                        <div class="card-header">
-                            Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
-                        </div>
-                        <div class="card-body">
-                            <ul>${detailsHtml}</ul>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                                <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
-                                <button type="button" class="btn btn-success" data-status="completed">Completed</button>
-                                ${cancelButtonHtml}
+                        <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
+                            <div class="card-header">
+                                Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
                             </div>
-                        </div>
-                    </div>`;
+                            <div class="card-body">
+                                <ul>${detailsHtml}</ul>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
+                                    <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
+                                    <button type="button" class="btn btn-success" data-status="completed">Completed</button>
+                                    ${cancelButtonHtml}
+                                </div>
+                            </div>
+                        </div>`;
         }
 
         function fetchTableName(tableId) {

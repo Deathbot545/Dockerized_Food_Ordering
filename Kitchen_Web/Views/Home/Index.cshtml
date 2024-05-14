@@ -159,6 +159,15 @@
             console.error("SignalR connection error:", err);
         });
 
+        const statusMappings = {
+            0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
+            1: { text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
+            2: { text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
+            3: { text: "Served", color: "#FFC1C1", section: 'servedOrders' },
+            4: { text: "Cancelled", color: "grey" },
+            default: { text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
+        };
+
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
@@ -180,7 +189,7 @@
 
         function updateOrderStatusUI(order) {
             const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
-            const sectionId = mapStatusToSectionId(order.status);
+            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
             if (order.status === 4) { // Cancelled
                 orderCard.remove(); // Remove from current section
             } else {
@@ -238,12 +247,12 @@
 
         function addNewOrderToDOM(order) {
             const orderHtml = createOrderHtml(order);
-            const sectionId = mapStatusToSectionId(order.status);
+            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
             $('#' + sectionId).append(orderHtml);
         }
 
         function updateOrderCard(order, orderCard) {
-            const statusText = mapEnumToStatusText(order.status);
+            const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
@@ -253,7 +262,7 @@
                     `Order #${order.id} | Table: ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
                 );
             });
-            const sectionId = mapStatusToSectionId(order.status);
+            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
             if (!orderCard.closest(`#${sectionId}`).length) {
                 orderCard.detach().appendTo(`#${sectionId}`);
             }
@@ -269,7 +278,7 @@
         }
 
         function updateOrderStatus(orderId, newStatus) {
-            let statusEnumValue = mapStatusToEnumValue(newStatus);
+            let statusEnumValue = Object.keys(statusMappings).find(key => statusMappings[key].text.toLowerCase() === newStatus);
             console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
             if (statusEnumValue === undefined) {
                 console.error("Invalid status value for update:", newStatus);
@@ -288,10 +297,10 @@
                         const formattedDate = new Date(orderCard.find('.card-header').text().split('|')[2].trim()).toLocaleString('en-US', { hour12: false });
                         const tableName = orderCard.find('.card-header').text().split('|')[1].trim();
                         orderCard.find('.card-header').html(
-                            `Order #${orderId} | ${tableName} | Date: ${formattedDate} | STATUS: ${mapEnumToStatusText(statusEnumValue)}`
+                            `Order #${orderId} | ${tableName} | Date: ${formattedDate} | STATUS: ${statusMappings[statusEnumValue].text}`
                         );
                         // Optionally, move the card to the correct section if status changes
-                        const sectionId = mapStatusToSectionId(statusEnumValue);
+                        const sectionId = statusMappings[statusEnumValue]?.section || statusMappings.default.section;
                         orderCard.detach().appendTo(`#${sectionId}`);
                     }
                 },
@@ -302,8 +311,8 @@
         }
 
         function createOrderHtml(order) {
-            const statusText = mapEnumToStatusText(order.status);
-            const color = getStatusColor(order.status);
+            const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
+            const color = statusMappings[order.status]?.color || statusMappings.default.color;
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
             const detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
             const tableIdentifier = `Table: ${order.tableId}`;
@@ -339,55 +348,6 @@
                     console.error('Error fetching table name:', error);
                     return "Unknown";
                 });
-        }
-
-        function mapStatusToSectionId(status) {
-            switch (status) {
-                case 0: return 'pendingOrders';
-                case 1: return 'preparingOrders';
-                case 2: return 'readyOrders';
-                case 3: return 'servedOrders';
-                default: return 'unknownOrders';
-            }
-        }
-
-        function mapEnumToStatusText(status) {
-            switch (status) {
-                case 0: return "Pending";
-                case 1: return "In Progress";
-                case 2: return "Completed";
-                case 3: return "Served";
-                default: return "Unknown";
-            }
-        }
-
-        function getStatusColor(status) {
-            switch (status) {
-                case 0: return "#FFDDC1"; // Light orange for pending
-                case 1: return "#C1CEFF"; // Light blue for in progress
-                case 2: return "#C1FFD7"; // Light green for completed
-                case 3: return "#FFC1C1"; // Light red for served
-                default: return "#FFFFFF"; // White for unknown
-            }
-        }
-
-        function mapStatusToEnumValue(status) {
-            status = status.toLowerCase(); // Normalize to lower case for comparison
-            switch (status) {
-                case 'pending':
-                    return 0;
-                case 'in-progress':
-                case 'preparing': // Ensure both 'in-progress' and 'preparing' map to the same value
-                    return 1;
-                case 'completed':
-                case 'ready': // 'completed' and 'ready' both map to the same value
-                    return 2;
-                case 'served':
-                    return 3;
-                default:
-                    console.error("Received unhandled status:", status);
-                    return undefined; // Explicitly return undefined for unhandled cases
-            }
         }
 
         function updateAllTableNames() {
@@ -448,3 +408,4 @@
         }
     });
 </script>
+

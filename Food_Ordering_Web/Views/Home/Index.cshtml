@@ -11,22 +11,43 @@
     .jumbotron-custom {
         background-image: url('/Images/background.jpg'); /* Replace with path to your hero image */
         background-size: cover;
+        background-position: center;
         color: #f7f3f3;
+        padding: 100px 25px; /* Increased padding for more spacing */
+        border-radius: 10px; /* Rounded corners for a modern look */
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Text shadow for better readability */
     }
 
     .qr-scan-button {
         background-color: #007bff;
         color: white;
+        border-radius: 30px; /* Rounded button for a modern look */
+        padding: 15px 30px; /* Increased padding for a larger button */
+        font-size: 1.25em; /* Larger font size */
+        transition: background-color 0.3s ease;
     }
+
+        .qr-scan-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
 
     .shop-register, .customer-register {
         background-color: #4CAF50;
         color: white;
+        border-radius: 30px; /* Rounded button for a modern look */
+        padding: 10px 20px; /* Increased padding */
+        font-size: 1em; /* Larger font size */
+        transition: background-color 0.3s ease;
     }
+
+        .shop-register:hover, .customer-register:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
 
     .icon-image {
         width: 100px; /* Adjust as needed */
         height: auto;
+        margin-bottom: 20px; /* Space between image and text */
     }
 
     .qr-scanner-modal {
@@ -48,6 +69,7 @@
         padding: 20px;
         border: 1px solid #888;
         width: 80%; /* Could be more or less, depending on screen size */
+        border-radius: 10px; /* Rounded corners for a modern look */
     }
 
     .close-button {
@@ -64,6 +86,40 @@
             cursor: pointer;
         }
 
+    .feature-box {
+        padding: 40px;
+        border-radius: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .feature-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+    .feature-title {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+        color: #343a40;
+    }
+
+    .feature-description {
+        font-size: 1.1em;
+        color: #6c757d;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .modal-title {
+        font-size: 1.75em;
+        color: #343a40;
+    }
 </style>
 <!-- QR Code Scanner Modal -->
 <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
@@ -80,8 +136,6 @@
     </div>
 </div>
 
-
-
 <div class="p-5 mb-4 jumbotron-custom rounded-3">
     <div class="container-fluid py-5 text-center">
         <h1 class="display-5 fw-bold">Welcome to Restro</h1>
@@ -95,23 +149,24 @@
 <div class="container">
     <div class="row align-items-stretch">
         <div class="col-md-6 mb-3">
-            <div class="p-5 bg-light border rounded-3 text-center">
+            <div class="feature-box p-5 bg-light border rounded-3 text-center">
                 <img src="path-to-customer-icon.png" alt="Customer Icon" class="icon-image"> <!-- Replace with path to customer icon -->
-                <h2>Customer</h2>
-                <p>Order food quickly and easily.</p>
+                <h2 class="feature-title">Customer</h2>
+                <p class="feature-description">Order food quickly and easily.</p>
                 <a href="@Url.Action("Register", "Customer")" class="btn customer-register">Register as Customer</a>
             </div>
         </div>
         <div class="col-md-6 mb-3">
-            <div class="p-5 bg-dark text-white rounded-3 text-center">
+            <div class="feature-box p-5 bg-dark text-white rounded-3 text-center">
                 <img src="path-to-shop-icon.png" alt="Shop Icon" class="icon-image"> <!-- Replace with path to shop icon -->
-                <h2>Add Your Own Shop</h2>
-                <p>Manage your restaurant's orders.</p>
+                <h2 class="feature-title text-white">Add Your Own Shop</h2>
+                <p class="feature-description">Manage your restaurant's orders.</p>
                 <a href="@Url.Action("Register", "Shop")" class="btn shop-register">Register as Shop</a>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     document.getElementById('orderButton').addEventListener('click', function () {
         // Show the modal

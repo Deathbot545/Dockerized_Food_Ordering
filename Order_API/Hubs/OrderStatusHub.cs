@@ -31,22 +31,28 @@ namespace Order_API.Hubs
             await base.OnConnectedAsync();
         }
 
-
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            lock (_connectionOrderMap) 
+            lock (_connectionOrderMap)
             {
                 _connectionOrderMap.Remove(Context.ConnectionId);
             }
 
             await base.OnDisconnectedAsync(exception);
         }
+
         public static string GetConnectionIdForOrder(int orderId)
         {
-            lock (_connectionOrderMap) 
+            lock (_connectionOrderMap)
             {
                 return _connectionOrderMap.FirstOrDefault(x => x.Value == orderId).Key;
             }
         }
+
+        public async Task CallWaiter(string tableId)
+        {
+            await Clients.Group("KitchenGroup").SendAsync("ReceiveWaiterCall", tableId);
+        }
     }
+
 }

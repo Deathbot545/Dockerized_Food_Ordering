@@ -171,17 +171,24 @@ namespace Order_API.Controllers
         {
             if (string.IsNullOrEmpty(request.TableId))
             {
+                _logger.LogError("CallWaiter: Table ID is required.");
                 return BadRequest("Table ID is required.");
             }
 
+            _logger.LogInformation($"CallWaiter: Received request to call waiter for table ID {request.TableId}.");
+
             await _hubContext.Clients.Group("KitchenGroup").SendAsync("ReceiveWaiterCall", request.TableId);
+
+            _logger.LogInformation($"CallWaiter: Sent waiter call for table ID {request.TableId} to KitchenGroup.");
+
             return Ok(new { message = "Waiter call sent successfully." });
         }
-
-        public class CallWaiterRequest
-        {
-            public string TableId { get; set; }
-        }
-
     }
+
+    public class CallWaiterRequest
+    {
+        public string TableId { get; set; }
+    }
+
+}
 }

@@ -174,18 +174,18 @@
                     categoryMap[category].forEach(menuItem => {
                         const imageBase64 = menuItem.image;
                         menuHtml += `<div class="col-md-4">
-                                          <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
-                                       <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
-                                       <div class="card-body">
-                                         <h5 class="card-title">${menuItem.name} - $${menuItem.price.toFixed(2)}</h5>
-                                         <p class="card-text">${menuItem.description}</p>
-                                       </div>
-                                     </div>
-                                   </div>`;
+                                      <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
+                                   <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
+                                   <div class="card-body">
+                                     <h5 class="card-title">${menuItem.name} - $${menuItem.price.toFixed(2)}</h5>
+                                     <p class="card-text">${menuItem.description}</p>
+                                   </div>
+                                 </div>
+                               </div>`;
                     });
 
                     menuHtml += ` </div>
-                                </div>`;
+                            </div>`;
                 });
 
                 $('#category-navbar').html(navbarItems);
@@ -234,12 +234,20 @@
 
         // Add functionality for the Call Waiter button
         $('#cart-button').on('click', '.call-waiter-button', function () {
-            $.post('https://restosolutionssaas.com/api/OrderApi/CallWaiter', { tableId: tableId })
-                .done(function () {
+            console.log("Call Waiter button clicked. Table ID:", tableId); // Log the button click and table ID
+            $.ajax({
+                url: 'https://restosolutionssaas.com/api/OrderApi/CallWaiter',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ tableId: tableId }),
+                success: function () {
+                    console.log("Waiter call sent successfully."); // Log successful response
                     alert("Waiter has been called!");
-                }).fail(function (err) {
-                    console.error("Error calling waiter:", err);
-                });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error calling waiter:", textStatus, errorThrown); // Log error details
+                }
+            });
         });
 
         $('#menu-container').on('click', '.card', function () {

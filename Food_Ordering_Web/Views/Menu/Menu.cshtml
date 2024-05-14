@@ -19,36 +19,62 @@
 
     /* Navbar styles */
     .custom-navbar {
-        background-color: #ff6347; /* Tomato color for a vibrant look */
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
-        border-radius: 15px; /* Rounded corners */
+        background-color: #ffffff; /* White background for a clean look */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        border-radius: 10px; /* Rounded corners */
         margin-bottom: 20px;
+        padding: 10px 20px; /* Added padding */
     }
 
         .custom-navbar .navbar-nav .nav-link {
             font-family: 'Roboto', sans-serif;
-            color: #FFFFFF; /* White color for text */
+            color: #333333; /* Dark gray color for text */
             font-weight: 500;
             transition: color 0.3s ease, background-color 0.3s ease;
-            padding: 10px 20px; /* Added padding for better spacing */
-            border-radius: 10px; /* Rounded corners for links */
-            background-color: #ff7f50; /* Coral color to differentiate from navbar */
-            border: 2px solid #ff6347; /* Tomato color border */
+            padding: 10px 15px; /* Increased padding for better spacing */
+            border-radius: 5px; /* Slightly rounded corners for links */
+            margin: 5px; /* Margin for spacing between links */
         }
 
             .custom-navbar .navbar-nav .nav-link:hover,
             .custom-navbar .navbar-nav .nav-link:focus {
-                color: #ff6347; /* Tomato color for hover effect */
-                background-color: #FFFFFF; /* White background for hover effect */
+                color: #ffffff; /* White text color on hover */
+                background-color: #ff6347; /* Tomato color background on hover */
             }
+
+        .custom-navbar .navbar-toggler {
+            border: none; /* Remove border from toggler button */
+            background-color: #ff6347; /* Tomato color for toggler button */
+            color: #ffffff; /* White color for toggler icon */
+        }
 
         .custom-navbar .navbar-toggler-icon {
             filter: invert(100%); /* White color for toggler icon */
         }
 
-        .custom-navbar .navbar-toggler {
-            border-color: #FFFFFF; /* White border for toggler button */
+        /* Additional styling for a modern look */
+        .custom-navbar .navbar-nav .nav-link {
+            position: relative;
         }
+
+            .custom-navbar .navbar-nav .nav-link::before {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -5px;
+                left: 50%;
+                background-color: #ff6347; /* Tomato color for underline */
+                visibility: hidden;
+                transition: all 0.3s ease-in-out;
+            }
+
+            .custom-navbar .navbar-nav .nav-link:hover::before,
+            .custom-navbar .navbar-nav .nav-link:focus::before {
+                visibility: visible;
+                width: 100%;
+                left: 0;
+            }
 
     /* Card styles */
     .card {

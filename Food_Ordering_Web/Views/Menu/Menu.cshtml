@@ -25,36 +25,39 @@
         margin-bottom: 20px;
     }
 
-        .custom-navbar .navbar-nav .nav-link {
-            font-family: 'Roboto', sans-serif;
-            color: #FFFFFF; /* Changed color to white */
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
+    .custom-navbar .navbar-nav .nav-link {
+        font-family: 'Roboto', sans-serif;
+        color: #FFFFFF; /* Changed color to white */
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
 
-            .custom-navbar .navbar-nav .nav-link:hover, .custom-navbar .navbar-nav .nav-link:focus {
-                color: #3498DB; /* Bright blue color for hover effect */
-            }
+    .custom-navbar .navbar-nav .nav-link:hover, .custom-navbar .navbar-nav .nav-link:focus {
+        color: #3498DB; /* Bright blue color for hover effect */
+    }
 
-        .custom-navbar .navbar-toggler-icon {
-            filter: invert(80%); /* Adjust color for better visibility against dark background */
-        }
+    .custom-navbar .navbar-toggler-icon {
+        filter: invert(80%); /* Adjust color for better visibility against dark background */
+    }
 
     /* Card styles */
     .card {
         margin-bottom: 30px;
         transition: all 0.3s ease;
+        border: none;
     }
 
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
-        }
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
 
     .card-img-top {
         width: 100%;
         height: 200px;
         object-fit: cover;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
     }
 
     .card-title {
@@ -68,11 +71,12 @@
 
     /* Category Heading */
     #menu-container > div > h2 {
-        border-bottom: 2px solid #333;
+        border-bottom: 2px solid #3498DB;
         padding-bottom: 10px;
         margin-bottom: 20px;
         font-size: 1.5em;
         font-family: 'Roboto', sans-serif;
+        color: #2C3E50;
     }
 
     .outlet-header {
@@ -82,7 +86,7 @@
     #outlet-name {
         font-family: 'Roboto', sans-serif;
         text-align: center;
-        font-size: 2em;
+        font-size: 2.5em;
         font-weight: 700;
         margin-bottom: 15px;
     }
@@ -104,9 +108,21 @@
         transition: background-color 0.3s ease;
     }
 
-        .call-waiter-button:hover {
-            background-color: #2980B9;
+    .call-waiter-button:hover {
+        background-color: #2980B9;
+    }
+
+    /* Ensure the cart button is always on top */
+    #cart-button {
+        z-index: 1000;
+    }
+
+    /* Style adjustments for better mobile responsiveness */
+    @media (max-width: 768px) {
+        .custom-navbar {
+            border-radius: 0;
         }
+    }
 </style>
 <div class="outlet-header d-flex flex-column justify-content-center align-items-center">
     <h1 id="outlet-name" class="mb-3"></h1>
@@ -177,7 +193,7 @@
                                       <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
                                    <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
                                    <div class="card-body">
-                                     <h5 class="card-title">${menuItem.name} - $${menuItem.price.toFixed(2)}</h5>
+                                     <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
                                      <p class="card-text">${menuItem.description}</p>
                                    </div>
                                  </div>
@@ -191,9 +207,9 @@
                 $('#category-navbar').html(navbarItems);
                 $('#menu-container').html(menuHtml);
             })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed:", textStatus, errorThrown);
-                });
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log("Request failed:", textStatus, errorThrown);
+            });
         }
 
         function fetchAndDisplayOutletInfo() {
@@ -223,9 +239,9 @@
                     console.error("Logo data is undefined or empty");
                 }
             })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed for outlet info:", textStatus, errorThrown);
-                });
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                console.log("Request failed for outlet info:", textStatus, errorThrown);
+            });
         }
 
         // Initially populate the menu items

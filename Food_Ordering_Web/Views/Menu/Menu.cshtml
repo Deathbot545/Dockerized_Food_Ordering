@@ -19,7 +19,7 @@
 
     /* Navbar styles */
     .custom-navbar {
-        background-color: #2C3E50; /* Dark blue color */
+        background-color: #ff6347; /* Tomato color for a vibrant look */
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
         border-radius: 15px; /* Rounded corners */
         margin-bottom: 20px;
@@ -27,18 +27,25 @@
 
         .custom-navbar .navbar-nav .nav-link {
             font-family: 'Roboto', sans-serif;
-            color: #FFFFFF; /* Changed color to white */
+            color: #FFFFFF; /* White color for text */
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            padding: 10px 20px; /* Added padding for better spacing */
+            border-radius: 10px; /* Rounded corners for links */
         }
 
             .custom-navbar .navbar-nav .nav-link:hover,
             .custom-navbar .navbar-nav .nav-link:focus {
-                color: #3498DB; /* Bright blue color for hover effect */
+                color: #ff6347; /* Tomato color for hover effect */
+                background-color: #FFFFFF; /* White background for hover effect */
             }
 
         .custom-navbar .navbar-toggler-icon {
-            filter: invert(80%); /* Adjust color for better visibility against dark background */
+            filter: invert(100%); /* White color for toggler icon */
+        }
+
+        .custom-navbar .navbar-toggler {
+            border-color: #FFFFFF; /* White border for toggler button */
         }
 
     /* Card styles */

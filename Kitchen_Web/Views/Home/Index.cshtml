@@ -1,9 +1,4 @@
-﻿@using Microsoft.AspNetCore.Html;
-@using System.Text;
-@using Kitchen_Web.DTO;
-@model Kitchen_Web.ViewModel.OutletViewModel;
-
-@functions {
+﻿@functions {
     public static DateTime ConvertToCorrectTimeZone(DateTime dateTimeWithOffset)
     {
         TimeZoneInfo istTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
@@ -37,12 +32,33 @@
 
         return html.ToString();
     }
-}
 
+    public static string RenderWaiterCallCard(int callId, int tableId, string tableIdentifier)
+    {
+        var html = new StringBuilder();
+        html.Append($"<div class=\"card mb-3 waiter-call-card bg-light\" data-call-id=\"{callId}\" data-table-id=\"{tableId}\">");
+        html.Append($"<div class=\"card-header d-flex justify-content-between align-items-center bg-info text-dark\">");
+        html.Append($"<span>Call #{callId} | Table: {tableIdentifier}</span>");
+        html.Append("</div></div>");
+
+        return html.ToString();
+    }
+}
 
 @{
     Func<OrderDTO, string> renderOrderCard = (order) =>
         RenderOrderCard(order, Model.Tables);
+
+    // Dummy data for waiter calls
+    var waiterCalls = new List<(int CallId, int TableId, string TableIdentifier)>
+    {
+        (1, 101, "Table 1"),
+        (2, 102, "Table 2"),
+        (3, 103, "Table 3")
+    };
+
+    Func<int, int, string, string> renderWaiterCallCard = (callId, tableId, tableIdentifier) =>
+        RenderWaiterCallCard(callId, tableId, tableIdentifier);
 }
 
 <div class="container mt-5">
@@ -77,12 +93,20 @@
             @Html.Raw(renderOrderCard(order))
         }
     </section>
+
+    <section id="waiterCalls" class="mt-5">
+        <h2>Waiter Calls</h2>
+        @foreach (var call in waiterCalls)
+        {
+            @Html.Raw(renderWaiterCallCard(call.CallId, call.TableId, call.TableIdentifier))
+        }
+    </section>
 </div>
+
 <div class="container mt-3" id="cancelledOrdersSection">
     <h2>Recent Cancellations</h2>
     <div id="cancelledOrders"></div>
 </div>
-
 
 <!-- Footer -->
 <footer class="footer mt-auto py-3 bg-dark text-white">
@@ -121,12 +145,12 @@
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        Order #${order.orderId} has been cancelled by the customer.
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>`;
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            Order #${order.orderId} has been cancelled by the customer.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>`;
                 $('#cancelledOrders').prepend(cancellationAlert);
                 notifiedCancellations[order.orderId] = true;
 
@@ -148,6 +172,7 @@
                 }
             }
         }
+
         $(document).on('click', '.btn-group .btn', function () {
             const $btn = $(this);
             const orderId = $btn.closest('.order-card').data('order-id');
@@ -168,7 +193,9 @@
                 console.error("Undefined status for order ID:", orderId);
             }
         });
+
         updateAllTableNames();
+
         // Handle new orders and updates
         connection.on("NewOrderPlaced", function (order) {
             handleOrder(order, false);
@@ -214,6 +241,7 @@
                 orderCard.detach().appendTo(`#${sectionId}`);
             }
         }
+
         function updateOrderInDOM(order) {
             const orderCard = $(`.order-card[data-order-id="${order.id}"]`);
             if (orderCard.length) {
@@ -221,7 +249,8 @@
             } else {
                 addNewOrderToDOM(order);
             }
-        } 
+        }
+
         function updateOrderStatus(orderId, newStatus) {
             let statusEnumValue = mapStatusToEnumValue(newStatus);
             console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
@@ -267,20 +296,20 @@
                 `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
 
             return `
-            <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
-                <div class="card-header">
-                    Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
-                </div>
-                <div class="card-body">
-                    <ul>${detailsHtml}</ul>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                        <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
-                        <button type="button" class="btn btn-success" data-status="completed">Completed</button>
-                        ${cancelButtonHtml}
+                <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
+                    <div class="card-header">
+                        Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
                     </div>
-                </div>
-            </div>`;
+                    <div class="card-body">
+                        <ul>${detailsHtml}</ul>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
+                            <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
+                            <button type="button" class="btn btn-success" data-status="completed">Completed</button>
+                            ${cancelButtonHtml}
+                        </div>
+                    </div>
+                </div>`;
         }
 
         function fetchTableName(tableId) {
@@ -343,6 +372,7 @@
                     return undefined; // Explicitly return undefined for unhandled cases
             }
         }
+
         function updateAllTableNames() {
             $('.order-card').each(function () {
                 const $card = $(this);
@@ -361,6 +391,7 @@
                 }
             });
         }
+
         async function updateOrderStatusToCancelled(orderId) {
             const cancelledStatus = 4; // Assuming 4 represents "Cancelled"
             try {

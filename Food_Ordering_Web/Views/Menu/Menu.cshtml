@@ -11,7 +11,9 @@
         color: white;
         padding: 10px 20px;
         text-align: center;
-        display: none; /* Initially hidden */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         cursor: pointer;
     }
 
@@ -20,8 +22,8 @@
         background-color: #2C3E50; /* Dark blue color */
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
         border-radius: 15px; /* Rounded corners */
+        margin-bottom: 20px;
     }
-
 
         .custom-navbar .navbar-nav .nav-link {
             font-family: 'Roboto', sans-serif;
@@ -46,12 +48,12 @@
 
         .card:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
         }
 
     .card-img-top {
         width: 100%;
-        height: auto;
+        height: 200px;
         object-fit: cover;
     }
 
@@ -64,18 +66,13 @@
         color: #666;
     }
 
-    .card-img-top {
-        width: 100%;
-        height: 200px; /* You can set this to whatever height you prefer */
-        object-fit: cover;
-    }
-
     /* Category Heading */
     #menu-container > div > h2 {
         border-bottom: 2px solid #333;
         padding-bottom: 10px;
         margin-bottom: 20px;
         font-size: 1.5em;
+        font-family: 'Roboto', sans-serif;
     }
 
     .outlet-header {
@@ -92,14 +89,28 @@
 
     #outlet-logo {
         border-radius: 50%; /* Makes the logo circular, remove if not desired */
-        box-shadow: 0px 0px 15px rgba(0,0,0,0.1); /* Adds a subtle shadow to the logo for depth */
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow to the logo for depth */
     }
 
+    /* Style for the Call Waiter button */
+    .call-waiter-button {
+        background-color: #3498DB;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .call-waiter-button:hover {
+            background-color: #2980B9;
+        }
 </style>
 <div class="outlet-header d-flex flex-column justify-content-center align-items-center">
     <h1 id="outlet-name" class="mb-3"></h1>
     <img id="outlet-logo" src="" alt="Outlet Logo" style="display: none; max-width: 150px; margin-top: 20px;">
-    <h1>Test</h1>
 </div>
 <nav class="navbar navbar-expand-lg custom-navbar">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -112,11 +123,14 @@
     </div>
 </nav>
 <!-- Container for menu items -->
-<div id="menu-container">
+<div id="menu-container" class="container">
     <!-- This will be populated by JavaScript -->
 </div>
 <div id="cart-button" class="cart-fixed-bottom">
-    <span id="cart-items-count">0</span> Items - LKR <span id="cart-total">0.00</span>
+    <div>
+        <span id="cart-items-count">0</span> Items - LKR <span id="cart-total">0.00</span>
+    </div>
+    <button class="btn btn-primary call-waiter-button">Call Waiter</button>
 </div>
 
 <script>
@@ -142,27 +156,26 @@
                     navbarItems += `<li class="nav-item"><a class="nav-link" href="#${category}">${category}</a></li>`;
 
                     menuHtml += `<div id="${category}">
-                               <h2>${category}</h2>
-                               <div class="row">`;
+                                   <h2>${category}</h2>
+                                   <div class="row">`;
 
                     categoryMap[category].forEach(menuItem => {
                         const imageBase64 = menuItem.image;
                         const outletId = '@ViewBag.OutletId';
                         const tableId = '@ViewBag.TableId';
                         menuHtml += `<div class="col-md-4">
-                                      <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
-                                   <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
-                                   <div class="card-body">
-                                     <h5 class="card-title">${menuItem.name} - $${menuItem.price.toFixed(2)}</h5>
-                                     <p class="card-text">${menuItem.description}</p>
-                                     <button class="btn btn-primary call-waiter-button">Call Waiter</button>
-                                   </div>
-                                 </div>
-                               </div>`;
+                                          <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
+                                       <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
+                                       <div class="card-body">
+                                         <h5 class="card-title">${menuItem.name} - $${menuItem.price.toFixed(2)}</h5>
+                                         <p class="card-text">${menuItem.description}</p>
+                                       </div>
+                                     </div>
+                                   </div>`;
                     });
 
                     menuHtml += ` </div>
-                            </div>`;
+                                </div>`;
                 });
 
                 $('#category-navbar').html(navbarItems);
@@ -210,7 +223,7 @@
         fetchAndDisplayOutletInfo();
 
         // Add dummy functionality for the Call Waiter button
-        $('#menu-container').on('click', '.call-waiter-button', function () {
+        $('#cart-button').on('click', '.call-waiter-button', function () {
             alert("Waiter has been called!");
         });
 
@@ -289,4 +302,3 @@
         updateCartButton();
     });
 </script>
-

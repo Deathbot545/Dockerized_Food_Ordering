@@ -15,6 +15,7 @@
         justify-content: space-between;
         align-items: center;
         cursor: pointer;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     }
 
     /* Navbar styles */
@@ -74,6 +75,24 @@
         visibility: visible;
         width: 100%;
         left: 0;
+    }
+
+    /* Call Waiter button in the navbar */
+    .call-waiter-nav-button {
+        background-color: #3498DB;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border-radius: 5px; /* Matching the navbar link style */
+        margin-left: 10px; /* Slight margin to separate from nav links */
+    }
+
+    .call-waiter-nav-button:hover {
+        background-color: #2980B9;
     }
 
     /* Card styles */
@@ -153,6 +172,7 @@
         font-weight: bold;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        border-radius: 5px; /* Rounded corners for the button */
     }
 
     .call-waiter-button:hover {
@@ -162,6 +182,11 @@
     /* Ensure the cart button is always on top */
     #cart-button {
         z-index: 1000;
+        background-color: #ff6347; /* Tomato color for the cart button */
+        border-radius: 10px; /* Rounded corners for the cart button */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        padding: 10px 20px; /* Added padding */
+        color: white; /* White text color */
     }
 
     /* Style adjustments for better mobile responsiveness */
@@ -190,10 +215,11 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse d-flex justify-content-center" id="navbarNav">
+    <div class="collapse navbar-collapse d-flex justify-content-between align-items-center" id="navbarNav">
         <ul class="navbar-nav" id="category-navbar">
             <!-- Categories will be filled here by JavaScript -->
         </ul>
+        <button class="btn call-waiter-nav-button">Call Waiter</button>
     </div>
 </nav>
 <!-- Container for menu items -->
@@ -243,24 +269,24 @@
                     navbarItems += `<li class="nav-item"><a class="nav-link" href="#${category}">${category}</a></li>`;
 
                     menuHtml += `<div id="${category}">
-                                       <h2>${category}</h2>
-                                       <div class="row">`;
+                                           <h2>${category}</h2>
+                                           <div class="row">`;
 
                     categoryMap[category].forEach(menuItem => {
                         const imageBase64 = menuItem.image;
                         menuHtml += `<div class="col-md-4">
-                                          <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
-                                       <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
-                                       <div class="card-body">
-                                         <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
-                                         <p class="card-text">${menuItem.description}</p>
-                                       </div>
-                                     </div>
-                                   </div>`;
+                                              <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
+                                           <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
+                                           <div class="card-body">
+                                             <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
+                                             <p class="card-text">${menuItem.description}</p>
+                                           </div>
+                                         </div>
+                                       </div>`;
                     });
 
                     menuHtml += ` </div>
-                                </div>`;
+                                    </div>`;
                 });
 
                 $('#category-navbar').html(navbarItems);
@@ -307,8 +333,8 @@
         fetchAndDisplayMenuItems();
         fetchAndDisplayOutletInfo();
 
-        // Add functionality for the Call Waiter button
-        $('#cart-button').on('click', '.call-waiter-button', function () {
+        // Add functionality for the Call Waiter button in the cart button and nav bar
+        $('.call-waiter-button, .call-waiter-nav-button').on('click', function () {
             console.log("Call Waiter button clicked. Table ID:", tableId); // Log the button click and table ID
             $.ajax({
                 url: 'https://restosolutionssaas.com/api/OrderApi/CallWaiter',

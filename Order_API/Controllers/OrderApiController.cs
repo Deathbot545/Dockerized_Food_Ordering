@@ -166,5 +166,22 @@ namespace Order_API.Controllers
              }
          }
 
+        [HttpPost("CallWaiter")]
+        public async Task<IActionResult> CallWaiter([FromBody] CallWaiterRequest request)
+        {
+            if (string.IsNullOrEmpty(request.TableId))
+            {
+                return BadRequest("Table ID is required.");
+            }
+
+            await _hubContext.Clients.Group("KitchenGroup").SendAsync("ReceiveWaiterCall", request.TableId);
+            return Ok(new { message = "Waiter call sent successfully." });
+        }
+
+        public class CallWaiterRequest
+        {
+            public string TableId { get; set; }
+        }
+
     }
 }

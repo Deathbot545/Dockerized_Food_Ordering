@@ -37,17 +37,6 @@
 
         return html.ToString();
     }
-
-    public static string RenderWaiterCallCard(int callId, int tableId, string tableIdentifier)
-    {
-        var html = new StringBuilder();
-        html.Append($"<div class=\"card mb-3 waiter-call-card bg-light\" data-call-id=\"{callId}\" data-table-id=\"{tableId}\">");
-        html.Append($"<div class=\"card-header d-flex justify-content-between align-items-center bg-info text-dark\">");
-        html.Append($"<span>Call #{callId} | Table: {tableIdentifier}</span>");
-        html.Append("</div></div>");
-
-        return html.ToString();
-    }
 }
 
 @{
@@ -61,51 +50,66 @@
         (2, 102, "Table 2"),
         (3, 103, "Table 3")
     };
-
-    Func<int, int, string, string> renderWaiterCallCard = (callId, tableId, tableIdentifier) =>
-        RenderWaiterCallCard(callId, tableId, tableIdentifier);
 }
 
 <div class="container mt-5">
-    <section id="pendingOrders">
-        <h2>Pending Orders</h2>
-        @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Pending))
-        {
-            @Html.Raw(renderOrderCard(order))
-        }
-    </section>
+    <div class="row">
+        <div class="col-md-9">
+            <section id="pendingOrders">
+                <h2>Pending Orders</h2>
+                @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Pending))
+                {
+                    @Html.Raw(renderOrderCard(order))
+                }
+            </section>
 
-    <section id="preparingOrders">
-        <h2>Preparing Orders</h2>
-        @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Preparing))
-        {
-            @Html.Raw(renderOrderCard(order))
-        }
-    </section>
+            <section id="preparingOrders">
+                <h2>Preparing Orders</h2>
+                @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Preparing))
+                {
+                    @Html.Raw(renderOrderCard(order))
+                }
+            </section>
 
-    <section id="readyOrders">
-        <h2>Ready Orders</h2>
-        @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Ready))
-        {
-            @Html.Raw(renderOrderCard(order))
-        }
-    </section>
+            <section id="readyOrders">
+                <h2>Ready Orders</h2>
+                @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Ready))
+                {
+                    @Html.Raw(renderOrderCard(order))
+                }
+            </section>
 
-    <section id="servedOrders">
-        <h2>Served Orders</h2>
-        @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Served))
-        {
-            @Html.Raw(renderOrderCard(order))
-        }
-    </section>
-
-    <section id="waiterCalls" class="mt-5">
-        <h2>Waiter Calls</h2>
-        @foreach (var call in waiterCalls)
-        {
-            @Html.Raw(renderWaiterCallCard(call.CallId, call.TableId, call.TableIdentifier))
-        }
-    </section>
+            <section id="servedOrders">
+                <h2>Served Orders</h2>
+                @foreach (var order in Model.Orders.Where(o => o.Status == OrderStatus.Served))
+                {
+                    @Html.Raw(renderOrderCard(order))
+                }
+            </section>
+        </div>
+        <div class="col-md-3">
+            <section id="waiterCalls">
+                <h2>Waiter Calls</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Call ID</th>
+                            <th>Table</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var call in waiterCalls)
+                        {
+                            <tr>
+                                <td>@call.CallId</td>
+                                <td>@call.TableIdentifier</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
 </div>
 
 <div class="container mt-3" id="cancelledOrdersSection">

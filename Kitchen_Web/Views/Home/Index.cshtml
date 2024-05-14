@@ -1,4 +1,9 @@
-﻿@functions {
+﻿@using Microsoft.AspNetCore.Html;
+@using System.Text;
+@using Kitchen_Web.DTO;
+@model Kitchen_Web.ViewModel.OutletViewModel;
+
+@functions {
     public static DateTime ConvertToCorrectTimeZone(DateTime dateTimeWithOffset)
     {
         TimeZoneInfo istTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");

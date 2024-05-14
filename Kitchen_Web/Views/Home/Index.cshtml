@@ -134,6 +134,12 @@
 
         const notifiedCancellations = {};
 
+        // Define the ReceiveWaiterCall method before starting the connection
+        connection.on("ReceiveWaiterCall", function (tableId) {
+            console.log("Received waiter call for table:", tableId);
+            addWaiterCallToTable(tableId);
+        });
+
         connection.on("ReceiveOrderUpdate", function (order) {
             console.log("Received order update:", order);
             if (order && order.orderId && typeof order.status !== 'undefined') {
@@ -147,12 +153,9 @@
             }
         });
 
-        connection.on("ReceiveWaiterCall", function (tableId) {
-            console.log("Received waiter call for table:", tableId);
-            addWaiterCallToTable(tableId);
-        });
-
-        connection.start().catch(function (err) {
+        connection.start().then(function () {
+            console.log("SignalR connection established");
+        }).catch(function (err) {
             console.error("SignalR connection error:", err);
         });
 

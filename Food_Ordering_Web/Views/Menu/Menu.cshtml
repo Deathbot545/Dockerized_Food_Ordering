@@ -26,55 +26,55 @@
         padding: 10px 20px; /* Added padding */
     }
 
-        .custom-navbar .navbar-nav .nav-link {
-            font-family: 'Roboto', sans-serif;
-            color: #333333; /* Dark gray color for text */
-            font-weight: 500;
-            transition: color 0.3s ease, background-color 0.3s ease;
-            padding: 10px 15px; /* Increased padding for better spacing */
-            border-radius: 5px; /* Slightly rounded corners for links */
-            margin: 5px; /* Margin for spacing between links */
-        }
+    .custom-navbar .navbar-nav .nav-link {
+        font-family: 'Roboto', sans-serif;
+        color: #333333; /* Dark gray color for text */
+        font-weight: 500;
+        transition: color 0.3s ease, background-color 0.3s ease;
+        padding: 10px 15px; /* Increased padding for better spacing */
+        border-radius: 5px; /* Slightly rounded corners for links */
+        margin: 5px; /* Margin for spacing between links */
+    }
 
-            .custom-navbar .navbar-nav .nav-link:hover,
-            .custom-navbar .navbar-nav .nav-link:focus {
-                color: #ffffff; /* White text color on hover */
-                background-color: #ff6347; /* Tomato color background on hover */
-            }
+    .custom-navbar .navbar-nav .nav-link:hover,
+    .custom-navbar .navbar-nav .nav-link:focus {
+        color: #ffffff; /* White text color on hover */
+        background-color: #ff6347; /* Tomato color background on hover */
+    }
 
-        .custom-navbar .navbar-toggler {
-            border: none; /* Remove border from toggler button */
-            background-color: #ff6347; /* Tomato color for toggler button */
-            color: #ffffff; /* White color for toggler icon */
-        }
+    .custom-navbar .navbar-toggler {
+        border: none; /* Remove border from toggler button */
+        background-color: #ff6347; /* Tomato color for toggler button */
+        color: #ffffff; /* White color for toggler icon */
+    }
 
-        .custom-navbar .navbar-toggler-icon {
-            filter: invert(100%); /* White color for toggler icon */
-        }
+    .custom-navbar .navbar-toggler-icon {
+        filter: invert(100%); /* White color for toggler icon */
+    }
 
-        /* Additional styling for a modern look */
-        .custom-navbar .navbar-nav .nav-link {
-            position: relative;
-        }
+    /* Additional styling for a modern look */
+    .custom-navbar .navbar-nav .nav-link {
+        position: relative;
+    }
 
-            .custom-navbar .navbar-nav .nav-link::before {
-                content: '';
-                position: absolute;
-                width: 0;
-                height: 2px;
-                bottom: -5px;
-                left: 50%;
-                background-color: #ff6347; /* Tomato color for underline */
-                visibility: hidden;
-                transition: all 0.3s ease-in-out;
-            }
+    .custom-navbar .navbar-nav .nav-link::before {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -5px;
+        left: 50%;
+        background-color: #ff6347; /* Tomato color for underline */
+        visibility: hidden;
+        transition: all 0.3s ease-in-out;
+    }
 
-            .custom-navbar .navbar-nav .nav-link:hover::before,
-            .custom-navbar .navbar-nav .nav-link:focus::before {
-                visibility: visible;
-                width: 100%;
-                left: 0;
-            }
+    .custom-navbar .navbar-nav .nav-link:hover::before,
+    .custom-navbar .navbar-nav .nav-link:focus::before {
+        visibility: visible;
+        width: 100%;
+        left: 0;
+    }
 
     /* Card styles */
     .card {
@@ -83,10 +83,10 @@
         border: none;
     }
 
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-        }
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
 
     .card-img-top {
         width: 100%;
@@ -117,19 +117,30 @@
 
     .outlet-header {
         margin: 40px 0; /* Adds a bit of space above and below */
+        position: relative;
+        text-align: center;
+        color: white;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('your-background-image.jpg');
+        background-size: cover;
+        background-position: center;
+        border-radius: 15px;
+        padding: 60px 20px; /* Increased padding for better spacing */
     }
 
     #outlet-name {
         font-family: 'Roboto', sans-serif;
-        text-align: center;
-        font-size: 2.5em;
+        font-size: 3em;
         font-weight: 700;
         margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Subtle text shadow for better readability */
     }
 
     #outlet-logo {
         border-radius: 50%; /* Makes the logo circular, remove if not desired */
         box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow to the logo for depth */
+        max-width: 150px;
+        margin-top: 20px;
+        display: block;
     }
 
     /* Style for the Call Waiter button */
@@ -144,9 +155,9 @@
         transition: background-color 0.3s ease;
     }
 
-        .call-waiter-button:hover {
-            background-color: #2980B9;
-        }
+    .call-waiter-button:hover {
+        background-color: #2980B9;
+    }
 
     /* Ensure the cart button is always on top */
     #cart-button {
@@ -158,12 +169,23 @@
         .custom-navbar {
             border-radius: 0;
         }
+
+        .outlet-header {
+            padding: 40px 20px;
+            font-size: 1.5em;
+        }
+
+        #outlet-name {
+            font-size: 2em;
+        }
     }
 </style>
+
 <div class="outlet-header d-flex flex-column justify-content-center align-items-center">
-    <h1 id="outlet-name" class="mb-3"></h1>
-    <img id="outlet-logo" src="" alt="Outlet Logo" style="display: none; max-width: 150px; margin-top: 20px;">
+    <h1 id="outlet-name" class="mb-3">Outlet Name</h1>
+    <img id="outlet-logo" src="your-logo-url.jpg" alt="Outlet Logo">
 </div>
+
 <nav class="navbar navbar-expand-lg custom-navbar">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -184,6 +206,7 @@
     </div>
     <button class="btn btn-primary call-waiter-button">Call Waiter</button>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.7/signalr.min.js"></script>
 <script>

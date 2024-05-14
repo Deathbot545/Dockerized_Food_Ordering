@@ -8,6 +8,7 @@ window.getStatusColor = function (status) {
         default: return "black"; // Unknown status or the default color
     }
 };
+
 window.mapEnumToStatusText = function (statusValue) {
     switch (statusValue) {
         case 0: return "Pending";
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // If 'currentOrder' exists in local storage, establish a SignalR connection.
 
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?orderId=${currentOrder.orderId}`)
+            .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?orderId=${currentOrder.orderId}&isKitchen=true`)
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
@@ -43,6 +44,11 @@ document.addEventListener("DOMContentLoaded", function () {
             // Use camelCase for accessing properties
             updateOrderStatusUI(order);
             updateKitchenOrderStatusUI(order);
+        });
+
+        connection.on("ReceiveWaiterCall", function (tableId) {
+            console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
+            addWaiterCallToTable(tableId);
         });
 
         // Handle reconnection events
@@ -111,6 +117,22 @@ document.addEventListener("DOMContentLoaded", function () {
             case 'Delivered': return "Your order has been delivered."; // Note: This status is not in mapEnumToStatusText
             default: return "Order status: " + status;
         }
+    }
+
+    function addWaiterCallToTable(tableId) {
+        const tableIdentifier = `Table: ${tableId}`;
+        const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
+
+        const newCallHtml = `
+            <tr>
+                <td>${callId}</td>
+                <td>${tableIdentifier}</td>
+            </tr>
+        `;
+
+        console.log("Adding new waiter call to table with HTML:", newCallHtml);
+
+        $('#waiterCalls tbody').append(newCallHtml);
     }
 
 });

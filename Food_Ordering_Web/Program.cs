@@ -10,15 +10,16 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.VisualStudio.Services.Users;
 using Stripe;
+using Food_Ordering_Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); 
+    serverOptions.ListenAnyIP(80);
 });
-// Data Protecti
+// Data Protection
 var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
@@ -91,14 +92,18 @@ app.UseCookiePolicy(new CookiePolicyOptions
     HttpOnly = HttpOnlyPolicy.Always,
     Secure = CookieSecurePolicy.Always
 });
-// Make sure this is above app.UseAuthentication() and app.UseAuthorization()
-
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
+
+// Add the custom middleware here
+app.UseMiddleware<JwtTokenMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -110,9 +115,6 @@ app.UseEndpoints(endpoints =>
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.MapRazorPages();
 
 app.Run();

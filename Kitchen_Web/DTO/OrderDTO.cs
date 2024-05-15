@@ -24,7 +24,7 @@ namespace Kitchen_Web.DTO
         public int Id { get; set; }
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
-        // Assuming MenuItemData is a simplified DTO for MenuItem; adjusted to not include a direct entity reference
+        public string Note { get; set; }    
         public MenuItemData MenuItem { get; set; }
         public int Quantity { get; set; }
     }

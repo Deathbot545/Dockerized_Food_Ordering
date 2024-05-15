@@ -24,7 +24,7 @@
 
         foreach (var detail in order.OrderDetails)
         {
-            html.Append($"<li>{detail.MenuItem?.Name} x {detail.Quantity}</li>");
+            html.Append($"<li>{detail.MenuItem?.Name} x {detail.Quantity} <br><small>Note: {detail.Note}</small></li>");
         }
 
         html.Append("</ul><div class=\"btn-group\" role=\"group\" aria-label=\"Order Status\">");
@@ -194,9 +194,11 @@
         function updateOrderStatusUI(order) {
             const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
             const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+
             if (order.status === 4) { // Cancelled
                 orderCard.remove(); // Remove from current section
             } else {
+                updateOrderCard(order, orderCard);
                 if (!orderCard.closest(`#${sectionId}`).length) {
                     orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
                 }
@@ -258,14 +260,23 @@
         function updateOrderCard(order, orderCard) {
             const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
+
+            const detailsHtml = order.orderDetails.map(detail => `
+                    <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note}</small></li>
+                `).join("");
+
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
             );
+
             fetchTableName(order.tableId).then(tableName => {
                 orderCard.find('.card-header').html(
                     `Order #${order.id} | Table: ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
                 );
             });
+
+            orderCard.find('.card-body ul').html(detailsHtml);
+
             const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
             if (!orderCard.closest(`#${sectionId}`).length) {
                 orderCard.detach().appendTo(`#${sectionId}`);
@@ -312,34 +323,6 @@
                     console.error("AJAX Error:", textStatus, "Response Text:", jqXHR.responseText, "Error Thrown:", errorThrown);
                 }
             });
-        }
-
-        function createOrderHtml(order) {
-            const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
-            const color = statusMappings[order.status]?.color || statusMappings.default.color;
-            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-            const detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
-            const tableIdentifier = `Table: ${order.tableId}`;
-
-            // Conditionally show the Cancel button if the status is not 'Completed' or 'Served'
-            const cancelButtonHtml = (order.status === 2 || order.status === 3) ? "" :
-                `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
-
-            return `
-                    <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
-                        <div class="card-header">
-                            Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
-                        </div>
-                        <div class="card-body">
-                            <ul>${detailsHtml}</ul>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                                <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
-                                <button type="button" class="btn btn-success" data-status="completed">Completed</button>
-                                ${cancelButtonHtml}
-                            </div>
-                        </div>
-                    </div>`;
         }
 
         function fetchTableName(tableId) {

@@ -49,5 +49,4 @@ namespace Order_API.DTO
         public string Image { get; set; } // Assuming this is a base64 encoded string for the image
     }
 
-
 }

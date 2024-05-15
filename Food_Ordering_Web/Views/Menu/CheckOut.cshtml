@@ -125,11 +125,13 @@
             let itemTotal = item.qty * item.price;
             subTotal += itemTotal;
 
-            itemsHtml += `<div class="mb-3">
-        <span>${item.name} (x${item.qty})</span>
-        <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                <button class="btn btn-sm remove-item" data-item-id="${item.id.toString()}">&times;</button>
-        </div>`;
+            itemsHtml += `
+                    <div class="mb-3">
+                        <span>${item.name} (x${item.qty})</span>
+                        <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
+                        <button class="btn btn-sm remove-item" data-item-id="${item.id.toString()}">&times;</button>
+                        ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
+                    </div>`;
         });
 
         let deliveryFee = $("input[name='delivery']:checked").attr("id") === "priority" ? 0 : 0;
@@ -141,6 +143,7 @@
         $(".taxes").text(`LKR ${taxes.toFixed(2)}`);
         $(".total").text(`LKR ${(subTotal + deliveryFee + taxes).toFixed(2)}`);
     }
+
     $(document).ready(function () {
         console.log("Document ready. Loading checkout page.");
         loadCheckoutPage();
@@ -157,7 +160,6 @@
     });
 
     function submitOrderForm() {
-
         showLoadingOverlay();
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -174,6 +176,7 @@
             formData.append(`items[${index}].qty`, item.qty);
             formData.append(`items[${index}].price`, item.price);
             formData.append(`items[${index}].name`, item.name);
+            formData.append(`items[${index}].note`, item.note); // Include the note in the form data
         });
 
         fetch('/Order/CreateOrUpdateOrder', {
@@ -183,7 +186,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.orderId) {
-
                     // Clear the existing cart
                     localStorage.removeItem('cart');
 
@@ -211,7 +213,6 @@
         return false;
     }
 
-
     function createHiddenInput(name, value) {
         let input = document.createElement('input');
         input.type = 'hidden';
@@ -219,6 +220,7 @@
         input.value = value;
         return input;
     }
+
     function removeItemFromCart(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         console.log(`Before removal, cart contains:`, cart);

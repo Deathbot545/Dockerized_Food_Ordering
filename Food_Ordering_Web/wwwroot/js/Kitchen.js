@@ -223,11 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
         const color = statusMappings[order.status]?.color || statusMappings.default.color;
         const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-
-        const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note}</small></li>
-        `).join("");
-
+        const detailsHtml = order.orderDetails.map(detail => `<li>${detail.menuItem.name} x ${detail.quantity}</li>`).join("");
         const tableIdentifier = `Table: ${order.tableId}`;
 
         // Conditionally show the Cancel button if the status is not 'Completed' or 'Served'
@@ -304,13 +300,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Error updating order status to cancelled:', error);
             alert('Error cancelling order. Please try again.');
         }
-    }
-
-    function updateKitchenUIWithNewOrder(order) {
-        console.log("Updating kitchen UI with new order:", order);
-        const orderHtml = createOrderHtml(order);
-        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-        $('#' + sectionId).append(orderHtml);
     }
 
     // Clear existing dummy data from the table

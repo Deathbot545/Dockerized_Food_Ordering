@@ -21,7 +21,7 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
     .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
 
-// Setup HTTP client services
+// Setup HTTP client servic
 builder.Services.AddHttpClient("namedClient", c =>
 {
     c.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);

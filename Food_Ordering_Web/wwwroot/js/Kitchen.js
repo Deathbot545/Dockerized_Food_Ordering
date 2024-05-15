@@ -224,9 +224,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const color = statusMappings[order.status]?.color || statusMappings.default.color;
         const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
-        const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note}</small></li>
-        `).join("");
+        const detailsHtml = order.orderDetails.map(detail => {
+            console.log("Order detail:", detail); // Log each order detail to check its properties
+            return `
+                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'None'}</small></li>
+            `;
+        }).join("");
 
         const tableIdentifier = `Table: ${order.tableId}`;
 

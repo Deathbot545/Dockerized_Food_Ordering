@@ -186,30 +186,21 @@
             .then(response => response.json())
             .then(data => {
                 if (data.orderId) {
-                    // Clear the existing cart
                     localStorage.removeItem('cart');
-
-                    // Create a new local storage item for the current order
                     localStorage.setItem('currentOrder', JSON.stringify({ orderId: data.orderId, status: 0 }));
                     setupSignalRConnection(data.orderId);
                     hideLoadingOverlay();
                     checkAndUpdateOrderStatus();
-
-                    // Redirect or update UI as needed
                     console.log("Order placed successfully with orderId: ", data.orderId);
-                    // Optional: Redirect to order confirmation page or update UI
                 } else {
                     console.error("Order placement failed or orderId missing in response");
-                    // Handle error or missing orderId in response
                 }
             })
             .catch(error => {
                 console.error('Error submitting order form:', error);
                 hideLoadingOverlay();
-                // Handle network or server error
             });
 
-        // Prevent the default form submission behavior
         return false;
     }
 

@@ -25,31 +25,31 @@ namespace Order_API.Controllers
              _logger = logger;
          }
         //ll
-         // Add item to cart
-         [HttpPost("AddOrder")]
-         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
-         {
-             try
-             {
-                 int orderId = await _orderService.ProcessOrderRequestAsync(request);
-                 var orderDto = await _orderService.GetOrderDetailsAsync(orderId); // Assuming this returns the detailed order DTO
+        // Add item to cart
+        [HttpPost("AddOrder")]
+        public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
+        {
+            try
+            {
+                int orderId = await _orderService.ProcessOrderRequestAsync(request);
+                var orderDto = await _orderService.GetOrderDetailsAsync(orderId);
 
-                 if (orderDto != null)
-                 {
-                     await _hubContext.Clients.All.SendAsync("NewOrderPlaced", orderDto);
-                     return Ok(new { orderId = orderId, message = "Order processed successfully." });
-                 }
-                 else
-                 {
-                     return NotFound(new { message = "Order not found after creation." });
-                 }
-             }
-             catch (Exception ex)
-             {
-                 _logger.LogError($"Error processing order: {ex.Message}");
-                 return BadRequest(new { message = ex.Message });
-             }
-         }
+                if (orderDto != null)
+                {
+                    await _hubContext.Clients.All.SendAsync("NewOrderPlaced", orderDto);
+                    return Ok(new { orderId = orderId, message = "Order processed successfully." });
+                }
+                else
+                {
+                    return NotFound(new { message = "Order not found after creation." });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error processing order: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
 
         [HttpPost("UpdateOrderStatus")]

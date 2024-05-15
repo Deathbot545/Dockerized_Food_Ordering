@@ -106,17 +106,19 @@ namespace Food_Ordering_Web.Controllers
                 if (int.TryParse(form[$"items[{i}].id"], out int itemId) &&
                     int.TryParse(form[$"items[{i}].qty"], out int qty) &&
                     decimal.TryParse(form[$"items[{i}].price"], out decimal price) &&
-                    form.TryGetValue($"items[{i}].name", out var name) && !string.IsNullOrWhiteSpace(name))
+                    form.TryGetValue($"items[{i}].name", out var name) && !string.IsNullOrWhiteSpace(name) &&
+                    form.TryGetValue($"items[{i}].note", out var note))
                 {
                     items.Add(new CartItem
                     {
                         Id = itemId,
                         Qty = qty,
                         Name = name,
-                        Price = price
+                        Price = price,
+                        Note = note
                     });
 
-                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}");
+                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}");
                 }
                 else
                 {
@@ -141,17 +143,14 @@ namespace Food_Ordering_Web.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<OrderResponse>();
-                // Instead of redirecting, return a JSON response with the order ID and possibly a confirmation URL
                 return Json(new { success = true, orderId = result.OrderId, redirectUrl = Url.Action("OrderConfirmation", "Order", new { orderId = result.OrderId }) });
             }
             else
             {
-                // Handle the error case
                 var errorResponse = await response.Content.ReadAsStringAsync();
                 _logger.LogError($"API call failed: {errorResponse}");
                 return Json(new { success = false, errorMessage = errorResponse });
             }
-
         }
 
         public class OrderResponse

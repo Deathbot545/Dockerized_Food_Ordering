@@ -31,18 +31,25 @@ namespace Order_API.Service.Orderser
         public async Task<int> ProcessOrderRequestAsync(CartRequest request)
         {
             _logger.LogInformation("Starting to process order request.");
-            int? orderId = null;
+
+            var order = new Order
+            {
+                OrderTime = DateTime.UtcNow,
+                Customer = request.UserId,
+                TableId = request.TableId,
+                OutletId = request.OutletId,
+                Status = OrderStatus.Pending,
+                OrderDetails = new List<OrderDetail>()
+            };
 
             foreach (var item in request.MenuItems)
             {
                 _logger.LogInformation($"Processing menu item with Id {item.Id}");
 
-                // Construct the URL to the Menu API endpoint
                 string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItem/{item.Id}";
 
                 try
                 {
-                    // Make the HTTP GET request to the Menu API
                     var response = await _httpClient.GetAsync(url);
                     if (!response.IsSuccessStatusCode)
                     {
@@ -57,20 +64,14 @@ namespace Order_API.Service.Orderser
                         throw new Exception($"Invalid data received for MenuItem with Id {item.Id}");
                     }
 
-                    // Assuming your Menu API returns a JSON object that matches the MenuItemDto structure
-                   
-
-                    MenuItem menuItem = new MenuItem
+                    var orderDetail = new OrderDetail
                     {
-                        Id = menuItemDto.id,
-                        Name = menuItemDto.Name,
-                        Description = menuItemDto.Description,
-                        Price = menuItemDto.Price,
-                        MenuCategoryId = menuItemDto.MenuCategoryId,
-                        Image = Convert.FromBase64String(menuItemDto.Image)
+                        MenuItemId = menuItemDto.id,
+                        Quantity = item.Qty,
+                        Note = item.Note
                     };
-                    orderId = await AddToCartAsync(menuItem, item.Qty, request.UserId, request.TableId, request.OutletId);
-                    _logger.LogInformation($"Added item to cart. Temporary orderId: {orderId}");
+
+                    order.OrderDetails.Add(orderDetail);
                 }
                 catch (Exception ex)
                 {
@@ -79,15 +80,13 @@ namespace Order_API.Service.Orderser
                 }
             }
 
-            if (!orderId.HasValue)
-            {
-                _logger.LogError("No items were processed for the cart.");
-                throw new Exception("No items were processed for the cart.");
-            }
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
 
-            _logger.LogInformation($"Order processed successfully with orderId: {orderId.Value}");
-            return orderId.Value;
+            _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
+            return order.Id;
         }
+
 
 
         public async Task<int> AddToCartAsync(MenuItem menuItem, int quantity, string userId = null, int tableId = 0, int outletId = 0)

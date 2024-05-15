@@ -114,6 +114,13 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(`Order ${order.orderId} UI updated to ${orderStatusText}`);
     }
 
+    function updateKitchenUIWithNewOrder(order) {
+        console.log("Updating kitchen UI with new order:", order);
+        const orderHtml = createOrderHtml(order);
+        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+        $('#' + sectionId).append(orderHtml);
+    }
+
     function getOrderStatusText(status) {
         switch (status) {
             case 'Pending': return "Your order is being prepared.";

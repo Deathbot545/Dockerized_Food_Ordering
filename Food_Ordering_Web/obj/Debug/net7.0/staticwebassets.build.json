@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "C6r9hETTj1hjvm5HilZqW5e6xV0dQsq8mV7FfI0XCRs=",
+  "Hash": "fj91k9Bc0XR6NwT9xi+7kThXeN3ZLc6M7t52OS4yjB0=",
   "Source": "Food_Ordering_Web",
   "BasePath": "_content/Food_Ordering_Web",
   "Mode": "Default",
@@ -2000,6 +2000,23 @@
       "OriginalItemSpec": "wwwroot\\js\\bootstrap.min.js.map"
     },
     {
+      "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\Kitchen.js",
+      "SourceId": "Food_Ordering_Web",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\",
+      "BasePath": "_content/Food_Ordering_Web",
+      "RelativePath": "js/Kitchen.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\Kitchen.js"
+    },
+    {
       "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\site.js",
       "SourceId": "Food_Ordering_Web",
       "SourceType": "Discovered",
@@ -2015,6 +2032,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\site.js"
+    },
+    {
+      "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\test.js",
+      "SourceId": "Food_Ordering_Web",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\",
+      "BasePath": "_content/Food_Ordering_Web",
+      "RelativePath": "js/test.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\test.js"
     },
     {
       "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",

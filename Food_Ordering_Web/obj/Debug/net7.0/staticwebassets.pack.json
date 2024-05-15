@@ -165,6 +165,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\Kitchen.js",
+      "PackagePath": "staticwebassets\\js\\Kitchen.js"
+    },
+    {
       "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\bootstrap.bundle.js",
       "PackagePath": "staticwebassets\\js\\bootstrap.bundle.js"
     },
@@ -215,6 +219,10 @@
     {
       "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\test.js",
+      "PackagePath": "staticwebassets\\js\\test.js"
     },
     {
       "Id": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\lib\\bootstrap\\LICENSE",

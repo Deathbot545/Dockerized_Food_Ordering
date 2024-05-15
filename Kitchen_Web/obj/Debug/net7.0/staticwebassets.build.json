@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "i4GQwZEBX5+MnUYiJQ0safQoi7XsezreGy9zV+pxNRk=",
+  "Hash": "MY+OywDVQql9kFTJAisoy94yNmEy/O18HgYkKzRgWG8=",
   "Source": "Kitchen_Web",
   "BasePath": "_content/Kitchen_Web",
   "Mode": "Default",
@@ -981,6 +981,23 @@
       "OriginalItemSpec": "wwwroot\\js\\bootstrap.min.js.map"
     },
     {
+      "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\Kitchen.js",
+      "SourceId": "Food_Ordering_Web",
+      "SourceType": "Project",
+      "ContentRoot": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\",
+      "BasePath": "_content/Food_Ordering_Web",
+      "RelativePath": "js/Kitchen.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\Kitchen.js"
+    },
+    {
       "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\site.js",
       "SourceId": "Food_Ordering_Web",
       "SourceType": "Project",
@@ -996,6 +1013,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\site.js"
+    },
+    {
+      "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\js\\test.js",
+      "SourceId": "Food_Ordering_Web",
+      "SourceType": "Project",
+      "ContentRoot": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\",
+      "BasePath": "_content/Food_Ordering_Web",
+      "RelativePath": "js/test.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\test.js"
     },
     {
       "Identity": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",

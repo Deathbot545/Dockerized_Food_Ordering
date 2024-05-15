@@ -51,7 +51,6 @@
 
             <!-- Image -->
             <img class="img-fluid rounded food-image" alt="Food Image">
-
         </div>
         <div class="col-md-6">
             <!-- Title and Price -->
@@ -85,6 +84,12 @@
                 </div>
             </div>
 
+            <!-- Note Input Field -->
+            <div class="mb-3">
+                <label for="inputNote" class="form-label"><strong>Note:</strong></label>
+                <textarea id="inputNote" class="form-control" rows="3" placeholder="Add your notes here (e.g., extra cheese, no tomato)"></textarea>
+            </div>
+
             <!-- Order Button -->
             <button class="btn btn-dark btn-lg btn-block" id="order-button">Add 1  LKR 0.00</button>
         </div>
@@ -106,6 +111,7 @@
             updateOrderButton();
         }
     }
+
     function decrementQuantity() {
         var input = document.getElementById('inputQuantitySelector');
         var currentValue = parseInt(input.value, 10);
@@ -114,14 +120,17 @@
             updateOrderButton();
         }
     }
+
     function updateOrderButton() {
         let quantity = parseInt($('#inputQuantitySelector').val());
         let total = parseFloat($('h2 span').text().replace('LKR ', '').trim()) * quantity;
         $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
     }
+
     function goBack() {
         window.history.back();
     }
+
     $(document).ready(function () {
         const menuItemId = '@ViewBag.ItemId';
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}`;
@@ -184,6 +193,7 @@
             const h2Text = $('h2').text();
             const priceText = $('h2 span').text();
             const name = h2Text.replace(priceText, '').trim();
+            const note = $('#inputNote').val(); // Get the note from the input field
             const tableId = '@ViewBag.TableId';
             const outletId = '@ViewBag.OutletId'; // Get outletId from ViewBag
 
@@ -193,7 +203,8 @@
                 qty: qty,
                 price: price,
                 tableId: tableId, // Including tableId in the item data
-                outletId: outletId // Including outletId in the item data
+                outletId: outletId, // Including outletId in the item data
+                note: note // Add the note to the item data
             });
         });
 
@@ -208,12 +219,14 @@
                 existingItem.timestamp = timestamp; // Update timestamp
                 existingItem.tableId = item.tableId; // Ensure tableId is updated if necessary
                 existingItem.outletId = item.outletId; // Ensure outletId is included and updated if necessary
+                existingItem.note = item.note; // Ensure note is included and updated if necessary
             } else {
-                // If the item is new, include tableId and outletId
+                // If the item is new, include tableId, outletId, and note
                 item.timestamp = timestamp; // Add timestamp
                 cart.push({
                     ...item,
-                    outletId: '@ViewBag.OutletId' // Include outletId when adding a new item
+                    outletId: '@ViewBag.OutletId', // Include outletId when adding a new item
+                    note: item.note // Include note when adding a new item
                 });
             }
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -244,8 +257,6 @@
         });
 
         // Initialization
-        $(document).ready(function () {
-            updateCartButton();
-        });
+        updateCartButton();
     });
 </script>

@@ -94,19 +94,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateKitchenOrderStatusUI(order) {
-        console.log("Received kitchen update for order ID:", order.OrderId, "with new status:", order.Status);
-        let orderStatusText = mapEnumToStatusText(order.Status);
+        console.log("Received kitchen update for order ID:", order.orderId, "with new status:", order.status);
+        let orderStatusText = mapEnumToStatusText(order.status);
 
-        let $orderCard = $(`.order-card[data-order-id="${order.OrderId}"]`);
+        let $orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
         if (!$orderCard.length) {
-            console.log("No order card found for order ID:", order.OrderId);
+            console.log("No order card found for order ID:", order.orderId);
             return;
         }
 
+        const detailsHtml = order.orderDetails.map(detail => `
+            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
+
+        $orderCard.find('.card-body ul').html(detailsHtml);
         $orderCard.find('.btn').removeClass('active');
         $orderCard.find(`.btn[data-status="${orderStatusText.toLowerCase()}"]`).addClass('active');
         $orderCard.find('.card-header span:last-child').text(`STATUS: ${orderStatusText.toUpperCase()}`);
-        console.log(`Order ${order.OrderId} UI updated to ${orderStatusText}`);
+        console.log(`Order ${order.orderId} UI updated to ${orderStatusText}`);
     }
 
     function getOrderStatusText(status) {
@@ -207,9 +212,9 @@ document.addEventListener("DOMContentLoaded", function () {
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error("AJAX Error:", textStatus, "Response Text:", jqXHR.responseText, "Error Thrown:", errorThrown);
             }
-
         });
     }
+
     const statusMappings = {
         0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
         1: { text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
@@ -224,8 +229,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const color = statusMappings[order.status]?.color || statusMappings.default.color;
         const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
         const detailsHtml = order.orderDetails.map(detail => `
-        <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-    `).join("");
+            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
         const tableIdentifier = `Table: ${order.tableId}`;
 
         // Conditionally show the Cancel button if the status is not 'Completed' or 'Served'
@@ -233,20 +238,20 @@ document.addEventListener("DOMContentLoaded", function () {
             `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
 
         return `
-            <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
-                <div class="card-header">
-                    Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
-                </div>
-                <div class="card-body">
-                    <ul>${detailsHtml}</ul>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                        <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
-                        <button type="button" class="btn btn-success" data-status="completed">Completed</button>
-                        ${cancelButtonHtml}
+                <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
+                    <div class="card-header">
+                        Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
                     </div>
-                </div>
-            </div>`;
+                    <div class="card-body">
+                        <ul>${detailsHtml}</ul>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
+                            <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
+                            <button type="button" class="btn btn-success" data-status="completed">Completed</button>
+                            ${cancelButtonHtml}
+                        </div>
+                    </div>
+                </div>`;
     }
 
     function fetchTableName(tableId) {
@@ -306,3 +311,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Clear existing dummy data from the table
     $('#waiterCalls tbody').empty();
+});

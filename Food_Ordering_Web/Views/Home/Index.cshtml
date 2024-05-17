@@ -13,78 +13,42 @@
         background-size: cover;
         background-position: center;
         color: #f7f3f3;
-        padding: 100px 25px; /* Increased padding for more spacing */
-        border-radius: 10px; /* Rounded corners for a modern look */
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Text shadow for better readability */
+        padding: 100px 25px;
+        border-radius: 10px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
 
     .qr-scan-button {
         background-color: #007bff;
         color: white;
-        border-radius: 30px; /* Rounded button for a modern look */
-        padding: 15px 30px; /* Increased padding for a larger button */
-        font-size: 1.25em; /* Larger font size */
+        border-radius: 30px;
+        padding: 15px 30px;
+        font-size: 1.25em;
         transition: background-color 0.3s ease;
     }
 
-        .qr-scan-button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-        }
+    .qr-scan-button:hover {
+        background-color: #0056b3;
+    }
 
-    .shop-register, .customer-register {
+    .register-button {
         background-color: #4CAF50;
         color: white;
-        border-radius: 30px; /* Rounded button for a modern look */
-        padding: 10px 20px; /* Increased padding */
-        font-size: 1em; /* Larger font size */
+        border-radius: 30px;
+        padding: 10px 20px;
+        font-size: 1em;
         transition: background-color 0.3s ease;
     }
 
-        .shop-register:hover, .customer-register:hover {
-            background-color: #45a049; /* Darker green on hover */
-        }
+    .register-button:hover {
+        background-color: #45a049;
+    }
 
     .icon-image {
-        width: 100px; /* Adjust as needed */
+        width: 100px;
         height: auto;
-        margin-bottom: 20px; /* Space between image and text */
+        margin-bottom: 20px;
     }
-
-    .qr-scanner-modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    }
-
-    .qr-scanner-modal-content {
-        background-color: #fefefe;
-        margin: 15% auto; /* 15% from the top and centered */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* Could be more or less, depending on screen size */
-        border-radius: 10px; /* Rounded corners for a modern look */
-    }
-
-    .close-button {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
 
     .feature-box {
         padding: 40px;
@@ -92,10 +56,10 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-        .feature-box:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
+    .feature-box:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
 
     .feature-title {
         font-size: 1.5em;
@@ -121,6 +85,7 @@
         color: #343a40;
     }
 </style>
+
 <!-- QR Code Scanner Modal -->
 <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -136,6 +101,7 @@
     </div>
 </div>
 
+<!-- Hero Section -->
 <div class="p-5 mb-4 jumbotron-custom rounded-3">
     <div class="container-fluid py-5 text-center">
         <h1 class="display-5 fw-bold">Welcome to Restro</h1>
@@ -146,6 +112,7 @@
     </div>
 </div>
 
+<!-- Features Section -->
 <div class="container">
     <div class="row align-items-stretch">
         <div class="col-md-6 mb-3">
@@ -153,7 +120,7 @@
                 <img src="path-to-customer-icon.png" alt="Customer Icon" class="icon-image"> <!-- Replace with path to customer icon -->
                 <h2 class="feature-title">Customer</h2>
                 <p class="feature-description">Order food quickly and easily.</p>
-                <a href="@Url.Action("Register", "Account")" class="btn customer-register">Register as Customer</a>
+                <a href="@Url.Action("Register", "Account")" class="btn register-button">Register as Customer</a>
             </div>
         </div>
         <div class="col-md-6 mb-3">
@@ -161,7 +128,7 @@
                 <img src="path-to-shop-icon.png" alt="Shop Icon" class="icon-image"> <!-- Replace with path to shop icon -->
                 <h2 class="feature-title text-white">Add Your Own Shop</h2>
                 <p class="feature-description">Manage your restaurant's orders.</p>
-                <a href="@Url.Action("Regiser_Bussiness", "Home")" class="btn shop-register">Register as Shop</a>
+                <a href="@Url.Action("Register_Business", "Home")" class="btn register-button">Register as Shop</a>
             </div>
         </div>
     </div>

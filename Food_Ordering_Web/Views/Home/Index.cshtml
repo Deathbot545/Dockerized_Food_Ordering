@@ -5,84 +5,33 @@
 
 <style>
     body {
-        font-family: 'Open Sans', sans-serif;
+        font-family: 'Arial', sans-serif;
     }
 
-    .jumbotron-custom {
-        background-image: url('/Images/background.jpg'); /* Replace with path to your hero image */
+    .navbar {
+        margin-bottom: 20px;
+    }
+
+    .hero-section {
+        background: url('https://via.placeholder.com/1500x500') no-repeat center center;
         background-size: cover;
-        background-position: center;
-        color: #f7f3f3;
-        padding: 100px 25px;
-        border-radius: 10px;
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-    }
-
-    .qr-scan-button {
-        background-color: #007bff;
         color: white;
-        border-radius: 30px;
-        padding: 15px 30px;
-        font-size: 1.25em;
-        transition: background-color 0.3s ease;
+        padding: 100px 0;
+        text-align: center;
     }
 
-    .qr-scan-button:hover {
-        background-color: #0056b3;
+    .features-section, .cta-section, .testimonials-section {
+        padding: 50px 0;
     }
 
-    .register-button {
-        background-color: #4CAF50;
-        color: white;
-        border-radius: 30px;
-        padding: 10px 20px;
-        font-size: 1em;
-        transition: background-color 0.3s ease;
-    }
+        .features-section .feature-item, .testimonials-section .testimonial-item {
+            margin-bottom: 20px;
+        }
 
-    .register-button:hover {
-        background-color: #45a049;
-    }
-
-    .icon-image {
-        width: 100px;
-        height: auto;
-        margin-bottom: 20px;
-    }
-
-    .feature-box {
-        padding: 40px;
-        border-radius: 10px;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .feature-box:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .feature-title {
-        font-size: 1.5em;
-        margin-bottom: 20px;
-        color: #343a40;
-    }
-
-    .feature-description {
-        font-size: 1.1em;
-        color: #6c757d;
-    }
-
-    .modal-body {
-        padding: 2rem;
-    }
-
-    .modal-header {
-        border-bottom: none;
-    }
-
-    .modal-title {
-        font-size: 1.75em;
-        color: #343a40;
+    .footer {
+        background-color: #f8f9fa;
+        padding: 20px 0;
+        text-align: center;
     }
 </style>
 
@@ -102,37 +51,94 @@
 </div>
 
 <!-- Hero Section -->
-<div class="p-5 mb-4 jumbotron-custom rounded-3">
-    <div class="container-fluid py-5 text-center">
-        <h1 class="display-5 fw-bold">Welcome to Restro</h1>
-        <p class="fs-4">Your Easy Food Ordering App! Scan the QR code below to place your order.</p>
-        <button id="orderButton" class="btn qr-scan-button btn-lg mt-3" type="button">
+<div class="hero-section">
+    <div class="container">
+        <h1>Welcome to Restro</h1>
+        <p>Your ultimate online restaurant ordering solution</p>
+        <button id="orderButton" class="btn btn-lg btn-primary" type="button">
             Scan QR Code <i class="fas fa-qrcode ml-2"></i>
         </button>
     </div>
 </div>
 
 <!-- Features Section -->
-<div class="container">
-    <div class="row align-items-stretch">
-        <div class="col-md-6 mb-3">
-            <div class="feature-box p-5 bg-light border rounded-3 text-center">
-                <img src="path-to-customer-icon.png" alt="Customer Icon" class="icon-image"> <!-- Replace with path to customer icon -->
-                <h2 class="feature-title">Customer</h2>
-                <p class="feature-description">Order food quickly and easily.</p>
-                <a href="@Url.Action("Register", "Account")" class="btn register-button">Register as Customer</a>
+<div class="features-section container">
+    <div class="row">
+        <div class="col-md-4 feature-item">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Easy to Use</h5>
+                    <p class="card-text">User-friendly interface for both restaurant owners and customers.</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
-            <div class="feature-box p-5 bg-dark text-white rounded-3 text-center">
-                <img src="path-to-shop-icon.png" alt="Shop Icon" class="icon-image"> <!-- Replace with path to shop icon -->
-                <h2 class="feature-title text-white">Add Your Own Shop</h2>
-                <p class="feature-description">Manage your restaurant's orders.</p>
-                <a href="@Url.Action("Register_Business", "Home")" class="btn register-button">Register as Shop</a>
+        <div class="col-md-4 feature-item">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Customizable Menus</h5>
+                    <p class="card-text">Create and manage your restaurant's menu with ease.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 feature-item">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Quick Ordering</h5>
+                    <p class="card-text">Customers can place orders quickly through QR codes.</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Call to Action Section -->
+<div class="cta-section text-center bg-primary text-white">
+    <div class="container">
+        <h2>Ready to revolutionize your restaurant business?</h2>
+        <p>Join Restro today and streamline your ordering process.</p>
+        <a href="#" class="btn btn-lg btn-light">Sign Up Now</a>
+    </div>
+</div>
+
+<!-- Testimonials Section -->
+<div class="testimonials-section container">
+    <div class="row">
+        <div class="col-md-4 testimonial-item">
+            <div class="card">
+                <div class="card-body text-center">
+                    <p class="card-text">"Restro has completely transformed how we handle orders. It's fast and reliable!"</p>
+                    <h5 class="card-title">- John Doe, Restaurant Owner</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 testimonial-item">
+            <div class="card">
+                <div class="card-body text-center">
+                    <p class="card-text">"I love how easy it is to place orders with Restro. Highly recommended!"</p>
+                    <h5 class="card-title">- Jane Smith, Customer</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 testimonial-item">
+            <div class="card">
+                <div class="card-body text-center">
+                    <p class="card-text">"The QR code system is a game-changer for our busy restaurant."</p>
+                    <h5 class="card-title">- Mike Johnson, Restaurant Owner</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>&copy; 2024 Restro. All rights reserved.</p>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
     document.getElementById('orderButton').addEventListener('click', function () {

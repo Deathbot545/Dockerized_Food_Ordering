@@ -44,9 +44,6 @@ namespace Order_API.DTO
         public string Description { get; set; }
         public double Price { get; set; }
         public int MenuCategoryId { get; set; }
-        // This should be a simplified category information if needed, otherwise consider removing or adjusting based on actual usage
-       
         public string Image { get; set; } // Assuming this is a base64 encoded string for the image
     }
-
 }

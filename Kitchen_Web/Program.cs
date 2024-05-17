@@ -25,7 +25,7 @@ builder.Services.AddDataProtection()
 builder.Services.AddHttpClient("namedClient", c =>
 {
     c.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
-    c.Timeout = TimeSpan.FromSeconds(200); // Set the desired timeout here
+    c.Timeout = TimeSpan.FromSeconds(200); // Set the desired timeout 
 })
 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {

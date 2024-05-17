@@ -54,6 +54,4 @@ namespace Order_API.Hubs
             await Clients.Group("KitchenGroup").SendAsync("ReceiveWaiterCall", tableId);
         }
     }
-
-
 }

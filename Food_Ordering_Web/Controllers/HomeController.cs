@@ -40,9 +40,9 @@ namespace Food_Ordering_Web.Controllers
             }
 
         }
-        private IActionResult AboutUs()
+        public IActionResult AboutUs()
         {
-            return View("Views/Home/Index.cshtml");
+            return View("Views/Home/AboutUs.cshtml");
         }
 
         private IActionResult RedirectToRoleBasedView(string userRole)

@@ -126,43 +126,41 @@
 </footer>
 <script>
     $(document).ready(function () {
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
-            .configureLogging(signalR.LogLevel.Information)
-            .withAutomaticReconnect()
-            .build();
+        let connection;
 
-        // Log connection object to ensure it includes methods
-        console.log("SignalR connection object before adding method:", connection);
+        if (!connection) {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
+                .configureLogging(signalR.LogLevel.Information)
+                .withAutomaticReconnect()
+                .build();
 
-        // Define the ReceiveWaiterCall method before starting the connection
-        connection.on("ReceiveWaiterCall", function (tableId) {
-            console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
-            addWaiterCallToTable(tableId);
-        });
+            // Define the ReceiveWaiterCall method before starting the connection
+            connection.on("ReceiveWaiterCall", function (tableId) {
+                console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
+                addWaiterCallToTable(tableId);
+            });
 
-        connection.on("ReceiveOrderUpdate", function (order) {
-            console.log("ReceiveOrderUpdate method triggered with order:", order);
-            console.log("Order details received:", order.orderDetails);
-            if (order && order.orderId && typeof order.status !== 'undefined') {
-                if (order.status === 4) { // Assuming 4 means 'Cancelled'
-                    handleCancellationAlert(order);
+            connection.on("ReceiveOrderUpdate", function (order) {
+                console.log("ReceiveOrderUpdate method triggered with order:", order);
+                console.log("Order details received:", order.orderDetails);
+                if (order && order.orderId && typeof order.status !== 'undefined') {
+                    if (order.status === 4) { // Assuming 4 means 'Cancelled'
+                        handleCancellationAlert(order);
+                    }
+                    updateOrderStatusUI(order);
+                    updateKitchenOrderStatusUI(order);
+                } else {
+                    console.error("Order update is missing required properties", order);
                 }
-                updateOrderStatusUI(order);
-                updateKitchenOrderStatusUI(order);
-            } else {
-                console.error("Order update is missing required properties", order);
-            }
-        });
+            });
 
-        // Log connection object after adding methods
-        console.log("SignalR connection object after adding methods:", connection);
-
-        connection.start().then(function () {
-            console.log("SignalR connection established");
-        }).catch(function (err) {
-            console.error("SignalR connection error:", err);
-        });
+            connection.start().then(function () {
+                console.log("SignalR connection established");
+            }).catch(function (err) {
+                console.error("SignalR connection error:", err);
+            });
+        }
 
         const statusMappings = {
             0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
@@ -176,12 +174,12 @@
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
-                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                    Order #${order.orderId} has been cancelled by the customer.
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>`;
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        Order #${order.orderId} has been cancelled by the customer.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>`;
                 $('#cancelledOrders').prepend(cancellationAlert);
                 notifiedCancellations[order.orderId] = true;
 
@@ -263,8 +261,8 @@
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
             const detailsHtml = order.orderDetails.map(detail => `
-                    <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-                `).join("");
+                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+            `).join("");
 
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
@@ -386,11 +384,11 @@
             const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
 
             const newCallHtml = `
-                            <tr>
-                                <td>${callId}</td>
-                                <td>${tableIdentifier}</td>
-                            </tr>
-                        `;
+                <tr>
+                    <td>${callId}</td>
+                    <td>${tableIdentifier}</td>
+                </tr>
+            `;
 
             console.log("Adding new waiter call to table with HTML:", newCallHtml);
 

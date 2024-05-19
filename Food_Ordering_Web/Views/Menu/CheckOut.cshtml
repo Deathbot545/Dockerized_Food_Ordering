@@ -172,12 +172,17 @@
         formData.append('tableId', cart[0].tableId);
         formData.append('outletId', cart[0].outletId);
         cart.forEach((item, index) => {
+            console.log(`Item ${index} Note:`, item.note); // Log the note
             formData.append(`items[${index}].id`, item.id);
             formData.append(`items[${index}].qty`, item.qty);
             formData.append(`items[${index}].price`, item.price);
             formData.append(`items[${index}].name`, item.name);
             formData.append(`items[${index}].note`, item.note); // Ensure note is included
         });
+
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`); // Log the FormData entries
+        }
 
         fetch('/Order/CreateOrUpdateOrder', {
             method: 'POST',
@@ -203,6 +208,7 @@
 
         return false;
     }
+
 
     function createHiddenInput(name, value) {
         let input = document.createElement('input');

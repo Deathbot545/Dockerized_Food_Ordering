@@ -143,6 +143,7 @@
 
         connection.on("ReceiveOrderUpdate", function (order) {
             console.log("ReceiveOrderUpdate method triggered with order:", order);
+            console.log("Order details received:", order.orderDetails);
             if (order && order.orderId && typeof order.status !== 'undefined') {
                 if (order.status === 4) { // Assuming 4 means 'Cancelled'
                     handleCancellationAlert(order);
@@ -262,8 +263,8 @@
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
             const detailsHtml = order.orderDetails.map(detail => `
-                    <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note}</small></li>
-                `).join("");
+            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
 
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`

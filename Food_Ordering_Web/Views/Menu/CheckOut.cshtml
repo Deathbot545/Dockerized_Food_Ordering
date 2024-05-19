@@ -176,7 +176,7 @@
             formData.append(`items[${index}].qty`, item.qty);
             formData.append(`items[${index}].price`, item.price);
             formData.append(`items[${index}].name`, item.name);
-            formData.append(`items[${index}].note`, item.note); // Include the note in the form data
+            formData.append(`items[${index}].note`, item.note); // Ensure note is included
         });
 
         fetch('/Order/CreateOrUpdateOrder', {

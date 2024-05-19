@@ -71,8 +71,7 @@ namespace Order_API.Service.Orderser
                         Note = item.Note
                     };
 
-                    _logger.LogInformation($"Adding order detail: {@orderDetail}", orderDetail);
-
+                    _logger.LogInformation($"Adding order detail: {@orderDetail}");
 
                     order.OrderDetails.Add(orderDetail);
                 }
@@ -91,6 +90,7 @@ namespace Order_API.Service.Orderser
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
+
 
 
 

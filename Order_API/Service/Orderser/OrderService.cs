@@ -141,7 +141,7 @@ namespace Order_API.Service.Orderser
             var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
 
             // Map to DTOs, converting MenuItemDto to MenuItemData
-            return orders.Select(o => new OrderDTO
+            var orderDtos = orders.Select(o => new OrderDTO
             {
                 Id = o.Id,
                 OrderTime = o.OrderTime,
@@ -164,10 +164,23 @@ namespace Order_API.Service.Orderser
                             MenuCategoryId = mi.MenuCategoryId,
                             Image = mi.Image
                         }).FirstOrDefault(),
-                    Quantity = od.Quantity
+                    Quantity = od.Quantity,
+                    Note = od.Note
                 }).ToList()
             }).ToList();
+
+            foreach (var orderDto in orderDtos)
+            {
+                _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
+                foreach (var detail in orderDto.OrderDetails)
+                {
+                    _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}");
+                }
+            }
+
+            return orderDtos;
         }
+
 
 
         private async Task<List<MenuItemDto>> FetchMenuItemsByOutletIdAsync(int outletId)
@@ -240,6 +253,7 @@ namespace Order_API.Service.Orderser
 
             if (order == null)
             {
+                _logger.LogWarning($"Order with orderId {orderId} not found.");
                 return null;
             }
 
@@ -268,12 +282,20 @@ namespace Order_API.Service.Orderser
                             MenuCategoryId = mi.MenuCategoryId,
                             Image = mi.Image
                         }).FirstOrDefault(),
-                    Quantity = od.Quantity
+                    Quantity = od.Quantity,
+                    Note = od.Note
                 }).ToList()
             };
 
+            _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
+            foreach (var detail in orderDto.OrderDetails)
+            {
+                _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}");
+            }
+
             return orderDto;
         }
+
 
         public async Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(string userId)
         {
@@ -306,11 +328,12 @@ namespace Order_API.Service.Orderser
                             Price = (double)menuItemData.Price,
                             MenuCategoryId = menuItemData.MenuCategoryId,
                             Image = menuItemData.Image
-                        } : null
+                        } : null,
+                        Note = od.Note
                     };
                 }).ToList();
 
-                orderDtos.Add(new OrderDTO
+                var orderDto = new OrderDTO
                 {
                     Id = order.Id,
                     OrderTime = order.OrderTime,
@@ -319,11 +342,20 @@ namespace Order_API.Service.Orderser
                     OutletId = order.OutletId,
                     Status = order.Status,
                     OrderDetails = orderDetailsDto
-                });
+                };
+
+                _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
+                foreach (var detail in orderDto.OrderDetails)
+                {
+                    _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}");
+                }
+
+                orderDtos.Add(orderDto);
             }
 
             return orderDtos;
         }
+
 
 
         // Assume FetchMenuItemsByOutletIdAsync and MenuItemData are defined similarly to your previous context.

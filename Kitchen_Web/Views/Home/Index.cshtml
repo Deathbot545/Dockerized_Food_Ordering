@@ -176,12 +176,12 @@
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                Order #${order.orderId} has been cancelled by the customer.
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>`;
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    Order #${order.orderId} has been cancelled by the customer.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>`;
                 $('#cancelledOrders').prepend(cancellationAlert);
                 notifiedCancellations[order.orderId] = true;
 
@@ -263,8 +263,8 @@
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
             const detailsHtml = order.orderDetails.map(detail => `
-                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-            `).join("");
+                    <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+                `).join("");
 
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
@@ -386,11 +386,11 @@
             const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
 
             const newCallHtml = `
-                        <tr>
-                            <td>${callId}</td>
-                            <td>${tableIdentifier}</td>
-                        </tr>
-                    `;
+                            <tr>
+                                <td>${callId}</td>
+                                <td>${tableIdentifier}</td>
+                            </tr>
+                        `;
 
             console.log("Adding new waiter call to table with HTML:", newCallHtml);
 

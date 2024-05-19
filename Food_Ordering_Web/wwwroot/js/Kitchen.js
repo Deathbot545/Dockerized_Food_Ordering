@@ -245,11 +245,11 @@ document.addEventListener("DOMContentLoaded", function () {
             `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
 
         return `
-                <div class="card mb-3 order-card bg-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
-                    <div class="card-header">
+                <div class="card mb-3 order-card bg-dark text-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
+                    <div class="card-header bg-dark text-light">
                         Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
                     </div>
-                    <div class="card-body">
+                    <div class="card-body bg-dark text-light">
                         <ul>${detailsHtml}</ul>
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-warning" data-status="pending">Pending</button>

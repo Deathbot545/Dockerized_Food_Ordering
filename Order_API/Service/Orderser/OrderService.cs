@@ -30,7 +30,7 @@ namespace Order_API.Service.Orderser
 
         public async Task<int> ProcessOrderRequestAsync(CartRequest request)
         {
-            _logger.LogInformation("Starting to process order request with details: {@Request}", request);
+            _logger.LogInformation("Starting to process order request.");
 
             var order = new Order
             {
@@ -44,7 +44,7 @@ namespace Order_API.Service.Orderser
 
             foreach (var item in request.MenuItems)
             {
-                _logger.LogInformation($"Processing menu item with Id {item.Id} and note: {item.Note}");
+                _logger.LogInformation($"Processing menu item with Id {item.Id}");
 
                 string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItem/{item.Id}";
 
@@ -86,47 +86,6 @@ namespace Order_API.Service.Orderser
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
-
-        public async Task<OrderDto> GetOrderDetailsAsync(int orderId)
-        {
-            var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.MenuItem)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
-
-            if (order == null) return null;
-
-            var orderDto = new OrderDto
-            {
-                Id = order.Id,
-                OrderTime = order.OrderTime,
-                Customer = order.Customer,
-                TableId = order.TableId,
-                TableName = order.Table?.Name,
-                OutletId = order.OutletId,
-                Status = order.Status,
-                OrderDetails = order.OrderDetails.Select(od => new OrderDetailDto
-                {
-                    Id = od.Id,
-                    MenuItemId = od.MenuItemId,
-                    Note = od.Note,
-                    Quantity = od.Quantity,
-                    MenuItem = new MenuItemData
-                    {
-                        Id = od.MenuItem.Id,
-                        Name = od.MenuItem.Name,
-                        Description = od.MenuItem.Description,
-                        Price = od.MenuItem.Price,
-                        MenuCategoryId = od.MenuItem.MenuCategoryId
-                    }
-                }).ToList()
-            };
-
-            _logger.LogInformation("Retrieved order details: {@OrderDto}", orderDto);
-
-            return orderDto;
-        }
-
 
 
 

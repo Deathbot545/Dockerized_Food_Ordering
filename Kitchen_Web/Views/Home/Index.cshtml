@@ -17,7 +17,7 @@
         var orderTimeInIST = ConvertToCorrectTimeZone(order.OrderTime).ToString("yyyy-MM-dd HH:mm:ss");
         var statusText = order.Status.ToString().ToUpper();
         var html = new StringBuilder();
-        html.Append($"<div class=\"card mb-3 order-card bg-light\" data-order-id=\"{order.Id}\" data-table-id=\"{order.TableId}\">");
+        html.Append($"<div class=\"card mb-3 order-card bg-dark text-light\" data-order-id=\"{order.Id}\" data-table-id=\"{order.TableId}\">");
         html.Append($"<div class=\"card-header d-flex justify-content-between align-items-center bg-warning text-dark\">");
         html.Append($"<span>Order #{order.Id} | Table: {tableIdentifier} | Date: {orderTimeInIST} | STATUS: {statusText}</span>");
         html.Append("</div><div class=\"card-body\"><ul class=\"mb-3\">");
@@ -90,7 +90,7 @@
         <div class="col-md-3">
             <section id="waiterCalls">
                 <h2>Waiter Calls</h2>
-                <table class="table table-striped">
+                <table class="table table-dark table-striped">
                     <thead>
                         <tr>
                             <th>Call ID</th>
@@ -176,12 +176,12 @@
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
-                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                            Order #${order.orderId} has been cancelled by the customer.
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>`;
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                Order #${order.orderId} has been cancelled by the customer.
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>`;
                 $('#cancelledOrders').prepend(cancellationAlert);
                 notifiedCancellations[order.orderId] = true;
 
@@ -263,8 +263,8 @@
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
             const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-        `).join("");
+                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+            `).join("");
 
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
@@ -386,11 +386,11 @@
             const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
 
             const newCallHtml = `
-                    <tr>
-                        <td>${callId}</td>
-                        <td>${tableIdentifier}</td>
-                    </tr>
-                `;
+                        <tr>
+                            <td>${callId}</td>
+                            <td>${tableIdentifier}</td>
+                        </tr>
+                    `;
 
             console.log("Adding new waiter call to table with HTML:", newCallHtml);
 

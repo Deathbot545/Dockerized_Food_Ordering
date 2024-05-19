@@ -30,7 +30,7 @@ namespace Order_API.Service.Orderser
 
         public async Task<int> ProcessOrderRequestAsync(CartRequest request)
         {
-            _logger.LogInformation("Starting to process order request.");
+            _logger.LogInformation("Starting to process order request with details: {@Request}", request);
 
             var order = new Order
             {
@@ -44,7 +44,7 @@ namespace Order_API.Service.Orderser
 
             foreach (var item in request.MenuItems)
             {
-                _logger.LogInformation($"Processing menu item with Id {item.Id}");
+                _logger.LogInformation($"Processing menu item with Id {item.Id} and note: {item.Note}");
 
                 string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItem/{item.Id}";
 
@@ -71,6 +71,9 @@ namespace Order_API.Service.Orderser
                         Note = item.Note
                     };
 
+                    _logger.LogInformation($"Adding order detail: {@orderDetail}", orderDetail);
+
+
                     order.OrderDetails.Add(orderDetail);
                 }
                 catch (Exception ex)
@@ -80,12 +83,15 @@ namespace Order_API.Service.Orderser
                 }
             }
 
+            _logger.LogInformation("Final order before saving to the database: {@Order}", order);
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
+
 
 
 

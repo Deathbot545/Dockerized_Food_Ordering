@@ -57,10 +57,9 @@ namespace Order_API.Hubs
         }
         public async Task SendOrderUpdate(OrderDTO orderDto)
         {
-            // Log the order details being sent
             _logger.LogInformation("Sending order update with details: {@OrderDto}", orderDto);
             await Clients.Group("KitchenGroup").SendAsync("ReceiveOrderUpdate", orderDto);
-
         }
+
     }
 }

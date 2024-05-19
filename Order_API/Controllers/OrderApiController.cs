@@ -29,7 +29,6 @@ namespace Order_API.Controllers
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
-            // Log the received request
             _logger.LogInformation("Received order request with details: {@Request}", request);
 
             try
@@ -55,6 +54,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
 
 

@@ -29,6 +29,9 @@ namespace Order_API.Controllers
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
+            // Log the received request
+            _logger.LogInformation("Received order request with details: {@Request}", request);
+
             try
             {
                 int orderId = await _orderService.ProcessOrderRequestAsync(request);
@@ -36,11 +39,13 @@ namespace Order_API.Controllers
 
                 if (orderDto != null)
                 {
+                    _logger.LogInformation("Order processed successfully. Order details: {@OrderDto}", orderDto);
                     await _hubContext.Clients.All.SendAsync("NewOrderPlaced", orderDto);
                     return Ok(new { orderId = orderId, message = "Order processed successfully." });
                 }
                 else
                 {
+                    _logger.LogWarning("Order not found after creation.");
                     return NotFound(new { message = "Order not found after creation." });
                 }
             }

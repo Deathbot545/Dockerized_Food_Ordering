@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.SignalR;
+using Order_API.DTO;
 
 namespace Order_API.Hubs
 {
@@ -7,6 +8,7 @@ namespace Order_API.Hubs
     public class OrderStatusHub : Hub
     {
         private static readonly Dictionary<string, int> _connectionOrderMap = new Dictionary<string, int>();
+        private readonly ILogger _logger;
 
         public override async Task OnConnectedAsync()
         {
@@ -52,6 +54,13 @@ namespace Order_API.Hubs
         public async Task CallWaiter(string tableId)
         {
             await Clients.Group("KitchenGroup").SendAsync("ReceiveWaiterCall", tableId);
+        }
+        public async Task SendOrderUpdate(OrderDTO orderDto)
+        {
+            // Log the order details being sent
+            _logger.LogInformation("Sending order update with details: {@OrderDto}", orderDto);
+            await Clients.Group("KitchenGroup").SendAsync("ReceiveOrderUpdate", orderDto);
+
         }
     }
 }

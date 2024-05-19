@@ -84,25 +84,18 @@ namespace Order_API.Service.Orderser
 
             _logger.LogInformation("Final order before saving to the database: {@Order}", order);
 
+            foreach (var detail in order.OrderDetails)
+            {
+                _logger.LogInformation($"Order detail before saving: {detail.MenuItemId}, {detail.Quantity}, {detail.Note}");
+            }
+
             _context.Orders.Add(order);
-
-            _logger.LogInformation("Order entity state before saving: {@OrderState}", _context.Entry(order).State);
-            foreach (var detail in order.OrderDetails)
-            {
-                _logger.LogInformation("OrderDetail entity state before saving: {@OrderDetailState}", _context.Entry(detail).State);
-            }
-
             await _context.SaveChangesAsync();
-
-            _logger.LogInformation("Order entity state after saving: {@OrderState}", _context.Entry(order).State);
-            foreach (var detail in order.OrderDetails)
-            {
-                _logger.LogInformation("OrderDetail entity state after saving: {@OrderDetailState}", _context.Entry(detail).State);
-            }
 
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
+
 
 
 

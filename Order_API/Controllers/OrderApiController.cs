@@ -33,13 +33,17 @@ namespace Order_API.Controllers
 
             try
             {
+                _logger.LogInformation("Calling ProcessOrderRequestAsync...");
                 int orderId = await _orderService.ProcessOrderRequestAsync(request);
-                var orderDto = await _orderService.GetOrderDetailsAsync(orderId);
+                _logger.LogInformation($"Order processed with orderId: {orderId}. Fetching order details...");
 
+                var orderDto = await _orderService.GetOrderDetailsAsync(orderId);
                 if (orderDto != null)
                 {
-                    _logger.LogInformation("Order processed successfully. Order details: {@OrderDto}", orderDto);
+                    _logger.LogInformation("Order details fetched successfully. Order details: {@OrderDto}", orderDto);
+                    _logger.LogInformation("Sending order details to clients via SignalR...");
                     await _hubContext.Clients.All.SendAsync("NewOrderPlaced", orderDto);
+                    _logger.LogInformation("Order details sent to clients successfully.");
                     return Ok(new { orderId = orderId, message = "Order processed successfully." });
                 }
                 else
@@ -54,6 +58,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
 
 

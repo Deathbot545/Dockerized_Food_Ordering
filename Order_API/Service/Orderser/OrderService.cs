@@ -85,7 +85,20 @@ namespace Order_API.Service.Orderser
             _logger.LogInformation("Final order before saving to the database: {@Order}", order);
 
             _context.Orders.Add(order);
+
+            _logger.LogInformation("Order entity state before saving: {@OrderState}", _context.Entry(order).State);
+            foreach (var detail in order.OrderDetails)
+            {
+                _logger.LogInformation("OrderDetail entity state before saving: {@OrderDetailState}", _context.Entry(detail).State);
+            }
+
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Order entity state after saving: {@OrderState}", _context.Entry(order).State);
+            foreach (var detail in order.OrderDetails)
+            {
+                _logger.LogInformation("OrderDetail entity state after saving: {@OrderDetailState}", _context.Entry(detail).State);
+            }
 
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
@@ -95,91 +108,14 @@ namespace Order_API.Service.Orderser
 
 
 
-        public async Task<int> AddToCartAsync(MenuItem menuItem, int quantity, string userId = null, int tableId = 0, int outletId = 0)
-         {
-
-             if (string.IsNullOrEmpty(userId))
-             {
-                 return await AddToCartAsGuestAsync(menuItem, quantity, tableId, outletId);
-             }
-             else
-             {
-                 return await AddToCartAsAuthenticatedUserAsync(menuItem, quantity, userId, tableId, outletId);
-             }
-         }
-
-
-         private async Task<int> AddToCartAsGuestAsync(MenuItem menuItem, int quantity, int tableId, int outletId)
-         {
-             _logger.LogInformation("Creating a new order for guest.");
-
-             // Create a new order every time this method is called to ensure uniqueness
-             var newOrder = new Order
-             {
-                 OrderTime = DateTime.UtcNow,
-                 Status = OrderStatus.Pending,
-                 TableId = tableId,
-                 OutletId = outletId
-             };
-
-             // Prepare a new order detail for this order
-             var orderDetail = new OrderDetail
-             {
-                 MenuItemId = menuItem.Id,
-                 Quantity = quantity
-             };
-
-             // Adding the order detail to the new order
-             // Ensure that OrderDetails is initialized or check for null before adding to it
-             newOrder.OrderDetails = new List<OrderDetail> { orderDetail };
-
-             // Add the new order to the context and save changes
-             _context.Orders.Add(newOrder);
-             await _context.SaveChangesAsync();
-
-             _logger.LogInformation($"New order created successfully with OrderId: {newOrder.Id}");
-
-             return newOrder.Id; // Return the ID of the newly created order
-         }
-
-
-
-         private async Task<int> AddToCartAsAuthenticatedUserAsync(MenuItem menuItem, int quantity, string userId, int tableId, int outletId)
-         {
-             _logger.LogInformation("Creating new order for authenticated user.");
-
-
-
-             var currentOrder = new Order
-             {
-                 OrderTime = DateTime.UtcNow,
-                 Customer = userId,
-                 Status = OrderStatus.Pending,
-                 TableId = tableId,
-                 OutletId = outletId
-             };
-
-             _context.Orders.Add(currentOrder);
-
-             var orderDetail = new OrderDetail
-             {
-                 MenuItemId = menuItem.Id,
-                 Quantity = quantity
-             };
-
-             currentOrder.OrderDetails = new List<OrderDetail> { orderDetail };
-
-             await _context.SaveChangesAsync();
-             _logger.LogInformation($"Order for authenticated user saved successfully. OrderId: {currentOrder.Id}");
-
-             return currentOrder.Id;
-         }
 
 
 
 
 
-         public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
+
+
+        public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
          {
              // Retrieve the existing order from the database
              var existingOrder = await _context.Orders.FindAsync(orderId);

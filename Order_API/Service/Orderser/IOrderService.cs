@@ -16,7 +16,7 @@ namespace Order_API.Service.Orderser
         Task UpdateOrderStatusAsync(int orderId, OrderStatus status);
         Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId);
         Task<int> ProcessOrderRequestAsync(CartRequest request);
-        Task<int> AddToCartAsync(MenuItem menuItem, int quantity, string userId = null, int tableId = 0, int outletId = 0);
+       
         Task<bool> DeleteOrderAsync(int orderId);
         Task<int?> GetOrderStatusAsync(int orderId);
         Task<OrderDTO> GetOrderDetailsAsync(int orderId);

@@ -236,7 +236,6 @@
     <button class="btn btn-primary call-waiter-button">Call Waiter</button>
 </div>
 
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.7/signalr.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -332,9 +331,34 @@
                 });
         }
 
+        function updateCartButton() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let currentTime = new Date().getTime();
+            let durationLimit = 24 * 60 * 60 * 1000; // Duration limit in milliseconds (e.g., 24 hours)
+
+            // Filter out items that are older than the duration limit
+            cart = cart.filter(item => currentTime - item.timestamp < durationLimit);
+
+            // Update the cart in local storage after filtering out old items
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            let itemCount = cart.reduce((count, item) => count + item.qty, 0);
+            let total = cart.reduce((total, item) => total + (item.price * item.qty), 0).toFixed(2);
+
+            $("#cart-items-count").text(itemCount);
+            $("#cart-total").text(total);
+
+            if (itemCount > 0) {
+                $('#cart-button').show();
+            } else {
+                $('#cart-button').hide();
+            }
+        }
+
         // Initially populate the menu items
         fetchAndDisplayMenuItems();
         fetchAndDisplayOutletInfo();
+        updateCartButton(); // Call this function to update the cart button on page load
 
         // Add functionality for the Call Waiter button in the cart button and nav bar
         $('.call-waiter-button, .call-waiter-nav-button').on('click', function () {
@@ -372,6 +396,10 @@
                     console.error("Failed to redirect");
                 }
             });
+        });
+
+        $('#cart-button').click(function () {
+            window.location.href = '/Order/Checkout';
         });
     });
 </script>

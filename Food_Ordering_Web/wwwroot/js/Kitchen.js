@@ -22,65 +22,134 @@ window.mapEnumToStatusText = function (statusValue) {
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM content loaded");
 
-    if (!window.signalRConnection) {
-        window.signalRConnection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
-            .configureLogging(signalR.LogLevel.Information)
-            .withAutomaticReconnect()
-            .build();
-
-        window.signalRConnection.on("ReceiveWaiterCall", function (tableId) {
-            console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
-            addWaiterCallToTable(tableId);
-        });
-
-        window.signalRConnection.on("ReceiveOrderUpdate", function (order) {
-            console.log("ReceiveOrderUpdate method triggered with order:", order);
-            if (order && order.orderId && typeof order.status !== 'undefined') {
-                if (order.status === 4) { // Assuming 4 means 'Cancelled'
-                    handleCancellationAlert(order);
-                }
-                updateOrderStatusUI(order);
-                updateKitchenOrderStatusUI(order);
-            } else {
-                console.error("Order update is missing required properties", order);
-            }
-        });
-
-        window.signalRConnection.on("NewOrderPlaced", function (order) {
-            console.log("NewOrderPlaced method triggered with order:", order);
-            updateKitchenUIWithNewOrder(order);
-        });
-
-        window.signalRConnection.onreconnecting(error => {
-            console.warn(`Connection lost due to error "${error}". Reconnecting.`);
-        });
-
-        window.signalRConnection.onreconnected(connectionId => {
-            console.log(`Connection reestablished. Connected with connectionId "${connectionId}".`);
-        });
-
-        window.signalRConnection.start()
-            .then(function () {
-                console.log("SignalR connection established");
-            })
-            .catch(function (err) {
-                console.error("Error while starting SignalR connection:", err);
-            });
-
-        console.log("SignalR connection object after adding methods:", window.signalRConnection);
+    let currentOrder = JSON.parse(localStorage.getItem('currentOrder'));
+    if (currentOrder && typeof currentOrder.status === "number") {
+        currentOrder.status = mapEnumToStatusText(currentOrder.status);
+        localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
     }
 
-    const statusMappings = {
-        0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
-        1: { text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
-        2: { text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
-        3: { text: "Served", color: "#FFC1C1", section: 'servedOrders' },
-        4: { text: "Cancelled", color: "grey" },
-        default: { text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
-    };
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true`)
+        .configureLogging(signalR.LogLevel.Information)
+        .withAutomaticReconnect()
+        .build();
+
+    console.log("SignalR connection object before adding method:", connection);
+
+    connection.on("ReceiveWaiterCall", function (tableId) {
+        console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
+        addWaiterCallToTable(tableId);
+    });
+
+    connection.on("ReceiveOrderUpdate", function (order) {
+        console.log("ReceiveOrderUpdate method triggered with order:", order);
+        if (order && order.orderId && typeof order.status !== 'undefined') {
+            if (order.status === 4) { // Assuming 4 means 'Cancelled'
+                handleCancellationAlert(order);
+            }
+            updateOrderStatusUI(order);
+            updateKitchenOrderStatusUI(order);
+        } else {
+            console.error("Order update is missing required properties", order);
+        }
+    });
+
+    connection.on("NewOrderPlaced", function (order) {
+        console.log("NewOrderPlaced method triggered with order:", order);
+        updateKitchenUIWithNewOrder(order);
+    });
+
+    connection.onreconnecting(error => {
+        console.warn(`Connection lost due to error "${error}". Reconnecting.`);
+    });
+
+    connection.onreconnected(connectionId => {
+        console.log(`Connection reestablished. Connected with connectionId "${connectionId}".`);
+    });
+
+    connection.start()
+        .then(function () {
+            console.log("SignalR connection established");
+        })
+        .catch(function (err) {
+            console.error("Error while starting SignalR connection:", err);
+        });
+
+    console.log("SignalR connection object after adding methods:", connection);
+
+    function updateOrderStatusUI(order) {
+        console.log("Order status update received:", order);
+        let currentOrder = JSON.parse(localStorage.getItem('currentOrder')) || {};
+        currentOrder.status = order.status; // Store the numeric value
+        localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+
+        let statusText = getOrderStatusText(mapEnumToStatusText(order.status)); // Map the status to its string representation here
+        let color = getStatusColor(mapEnumToStatusText(order.status)); // Determine color based on status
+
+        let orderStatusElement = document.getElementById("orderStatus");
+        if (orderStatusElement) {
+            orderStatusElement.innerHTML = `<span style="color: ${color};">${statusText}</span>`; // Apply color
+            console.log(`Updated UI with new status: ${statusText}`);
+        }
+    }
+
+    function updateKitchenOrderStatusUI(order) {
+        console.log("Received kitchen update for order ID:", order.orderId, "with new status:", order.status);
+        let orderStatusText = mapEnumToStatusText(order.status);
+
+        let $orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
+        if (!$orderCard.length) {
+            console.log("No order card found for order ID:", order.orderId);
+            return;
+        }
+
+        const detailsHtml = order.orderDetails.map(detail => `
+            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
+
+        $orderCard.find('.card-body ul').html(detailsHtml);
+        $orderCard.find('.btn').removeClass('active');
+        $orderCard.find(`.btn[data-status="${orderStatusText.toLowerCase()}"]`).addClass('active');
+        $orderCard.find('.card-header span:last-child').text(`STATUS: ${orderStatusText.toUpperCase()}`);
+        console.log(`Order ${order.orderId} UI updated to ${orderStatusText}`);
+    }
+
+    function updateKitchenUIWithNewOrder(order) {
+        console.log("Updating kitchen UI with new order:", order);
+        const orderHtml = createOrderHtml(order);
+        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+        $('#' + sectionId).append(orderHtml);
+    }
+
+    function getOrderStatusText(status) {
+        switch (status) {
+            case 'Pending': return "Your order is being prepared.";
+            case 'Preparing': return "Your order is in progress.";
+            case 'Ready': return "Your order is ready for pickup!";
+            case 'Served': return "Your order has been served.";
+            case 'Delivered': return "Your order has been delivered.";
+            default: return "Order status: " + status;
+        }
+    }
+
+    function addWaiterCallToTable(tableId) {
+        const tableIdentifier = `Table: ${tableId}`;
+        const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
+
+        const newCallHtml = `
+            <tr>
+                <td>${callId}</td>
+                <td>${tableIdentifier}</td>
+            </tr>
+        `;
+
+        console.log("Adding new waiter call to table with HTML:", newCallHtml);
+
+        $('#waiterCalls tbody').append(newCallHtml);
+    }
 
     function handleCancellationAlert(order) {
+        const notifiedCancellations = {};
         if (!notifiedCancellations[order.orderId]) {
             const cancellationAlert = `
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -96,20 +165,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 $(`.alert:contains('Order #${order.orderId}')`).alert('close');
                 delete notifiedCancellations[order.orderId];
             }, 300000); // 5 minutes
-        }
-    }
-
-    function updateOrderStatusUI(order) {
-        const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
-        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-
-        if (order.status === 4) { // Cancelled
-            orderCard.remove(); // Remove from current section
-        } else {
-            updateOrderCard(order, orderCard);
-            if (!orderCard.closest(`#${sectionId}`).length) {
-                orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
-            }
         }
     }
 
@@ -167,6 +222,45 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    const statusMappings = {
+        0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
+        1: { text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
+        2: { text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
+        3: { text: "Served", color: "#FFC1C1", section: 'servedOrders' },
+        4: { text: "Cancelled", color: "grey" },
+        default: { text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
+    };
+
+    function createOrderHtml(order) {
+        const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
+        const color = statusMappings[order.status]?.color || statusMappings.default.color;
+        const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
+        const detailsHtml = order.orderDetails.map(detail => `
+            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
+        const tableIdentifier = `Table: ${order.tableId}`;
+
+        // Conditionally show the Cancel button if the status is not 'Completed' or 'Served'
+        const cancelButtonHtml = (order.status === 2 || order.status === 3) ? "" :
+            `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
+
+        return `
+                <div class="card mb-3 order-card bg-dark text-light" data-order-id="${order.id}" data-table-id="${order.tableId}" style="background-color: ${color};">
+                    <div class="card-header bg-dark text-light">
+                        Order #${order.id} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
+                    </div>
+                    <div class="card-body bg-dark text-light">
+                        <ul>${detailsHtml}</ul>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
+                            <button type="button" class="btn btn-primary" data-status="preparing">In Progress</button>
+                            <button type="button" class="btn btn-success" data-status="completed">Completed</button>
+                            ${cancelButtonHtml}
+                        </div>
+                    </div>
+                </div>`;
+    }
+
     function fetchTableName(tableId) {
         return fetch(`https://restosolutionssaas.com/api/TablesApi/GetTableName/${tableId}`)
             .then(response => {
@@ -220,22 +314,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Error updating order status to cancelled:', error);
             alert('Error cancelling order. Please try again.');
         }
-    }
-
-    function addWaiterCallToTable(tableId) {
-        const tableIdentifier = `Table: ${tableId}`;
-        const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
-
-        const newCallHtml = `
-            <tr>
-                <td>${callId}</td>
-                <td>${tableIdentifier}</td>
-            </tr>
-        `;
-
-        console.log("Adding new waiter call to table with HTML:", newCallHtml);
-
-        $('#waiterCalls tbody').append(newCallHtml);
     }
 
     // Clear existing dummy data from the table

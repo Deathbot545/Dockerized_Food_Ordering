@@ -126,20 +126,22 @@
 </footer>
 <script>
     $(document).ready(function () {
-        if (!window.signalRConnection) {
-            window.signalRConnection = new signalR.HubConnectionBuilder()
+        let connection;
+
+        if (!connection) {
+            connection = new signalR.HubConnectionBuilder()
                 .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
                 .configureLogging(signalR.LogLevel.Information)
                 .withAutomaticReconnect()
                 .build();
 
             // Define the ReceiveWaiterCall method before starting the connection
-            window.signalRConnection.on("ReceiveWaiterCall", function (tableId) {
+            connection.on("ReceiveWaiterCall", function (tableId) {
                 console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
                 addWaiterCallToTable(tableId);
             });
 
-            window.signalRConnection.on("ReceiveOrderUpdate", function (order) {
+            connection.on("ReceiveOrderUpdate", function (order) {
                 console.log("ReceiveOrderUpdate method triggered with order:", order);
                 console.log("Order details received:", order.orderDetails);
                 if (order && order.orderId && typeof order.status !== 'undefined') {
@@ -153,7 +155,7 @@
                 }
             });
 
-            window.signalRConnection.start().then(function () {
+            connection.start().then(function () {
                 console.log("SignalR connection established");
             }).catch(function (err) {
                 console.error("SignalR connection error:", err);
@@ -226,11 +228,11 @@
         updateAllTableNames();
 
         // Handle new orders and updates
-        window.signalRConnection.on("NewOrderPlaced", function (order) {
+        connection.on("NewOrderPlaced", function (order) {
             handleOrder(order, false);
         });
 
-        window.signalRConnection.on("ReceiveOrderUpdate", function (order) {
+        connection.on("ReceiveOrderUpdate", function (order) {
             console.log("Update received for order", order.orderId, "New status:", order.Status);
             updateOrderStatusUI(order);
             updateKitchenOrderStatusUI(order);
@@ -396,5 +398,4 @@
         // Clear existing dummy data from the table
         $('#waiterCalls tbody').empty();
     });
-
 </script>

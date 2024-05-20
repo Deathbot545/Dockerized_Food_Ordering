@@ -132,21 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function addWaiterCallToTable(tableId) {
-        const tableIdentifier = `Table: ${tableId}`;
-        const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
-
-        const newCallHtml = `
-            <tr>
-                <td>${callId}</td>
-                <td>${tableIdentifier}</td>
-            </tr>
-        `;
-
-        console.log("Adding new waiter call to table with HTML:", newCallHtml);
-
-        $('#waiterCalls tbody').append(newCallHtml);
-    }
+   
 
     function handleCancellationAlert(order) {
         const notifiedCancellations = {};
@@ -317,5 +303,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Clear existing dummy data from the table
-    $('#waiterCalls tbody').empty();
+    
 });

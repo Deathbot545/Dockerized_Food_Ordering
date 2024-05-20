@@ -36,11 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("SignalR connection object before adding method:", connection);
 
-    connection.on("ReceiveWaiterCall", function (tableId) {
-        console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
-        addWaiterCallToTable(tableId);
-    });
-
+   
     connection.on("ReceiveOrderUpdate", function (order) {
         console.log("ReceiveOrderUpdate method triggered with order:", order);
         if (order && order.orderId && typeof order.status !== 'undefined') {

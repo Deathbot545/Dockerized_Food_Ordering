@@ -47,7 +47,7 @@ jobs:
 
     - name: Deploy to AWS EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-16-171-250-163.eu-north-1.compute.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-15-0-22-126.eu-north-1.compute.amazonaws.com << 'EOF'
         # Pull the latest Docker image
         sudo docker pull deathbot545/foodorderingweb:latest
 

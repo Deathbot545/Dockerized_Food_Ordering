@@ -13,7 +13,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 });
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IMenuService, MenuService>();
-// Add services to the contain
+// Add services to the conta
 builder.Services.AddControllers();
 
 ConfigureSwagger(builder);

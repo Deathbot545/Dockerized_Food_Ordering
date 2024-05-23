@@ -40,7 +40,7 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 var connectionString = builder.Configuration.GetConnectionString("MenuDbConnection");
 logger.LogInformation($"Using connection string: {connectionString}");
 
-// Ensure Database is Created and Migrations
+// Ensure Database is Created and Migratio
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

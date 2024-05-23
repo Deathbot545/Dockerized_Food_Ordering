@@ -25,7 +25,7 @@ ConfigureIdentity(builder);
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// Add this line to add in-memo 
+// Add this line to add in-me
 builder.Services.AddDistributedMemoryCache();
 
 // Register AccountService

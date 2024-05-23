@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
     {
         builder.WithOrigins(
                  "https://restosolutionssaas.com:8443", // The first web application origin
-                 "https://restosolutionssaas.com" // The second web application origin
+                 "https://restosolutionssaas.com" // The seco web application origin
                )
                .AllowAnyMethod()
                .AllowAnyHeader()

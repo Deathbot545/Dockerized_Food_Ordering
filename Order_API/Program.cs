@@ -18,7 +18,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-// SignalR 
+// Signa
 builder.Services.AddSignalR();
 
 builder.Services.AddControllers();
@@ -26,7 +26,7 @@ builder.Services.AddControllers();
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// Modify your existing CORS policy setup in th
+// Modiy your existing CORS policy setup in th
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigins", builder =>

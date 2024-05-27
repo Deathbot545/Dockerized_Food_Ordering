@@ -13,7 +13,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 });
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IMenuService, MenuService>();
-// Add services to the contain
+// Add services to the conta
 builder.Services.AddControllers();
 
 ConfigureSwagger(builder);
@@ -40,7 +40,7 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 var connectionString = builder.Configuration.GetConnectionString("MenuDbConnection");
 logger.LogInformation($"Using connection string: {connectionString}");
 
-// Ensure Database is Created and Migrations
+// Ensure Database is Created and Migratio
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

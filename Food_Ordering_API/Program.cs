@@ -25,7 +25,7 @@ ConfigureIdentity(builder);
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// Add this line to add in-memory 
+// Add this line to add in-me
 builder.Services.AddDistributedMemoryCache();
 
 // Register AccountService
@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
     {
         builder.WithOrigins(
                  "https://restosolutionssaas.com:8443", // The first web application origin
-                 "https://restosolutionssaas.com" // The second web application origin
+                 "https://restosolutionssaas.com" // The seco web application origin
                )
                .AllowAnyMethod()
                .AllowAnyHeader()

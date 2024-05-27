@@ -158,23 +158,23 @@
         }
 
         const statusMappings = {
-            pending: { value: 0, text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
-            preparing: { value: 1, text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
-            completed: { value: 2, text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
-            served: { value: 3, text: "Served", color: "#FFC1C1", section: 'servedOrders' },
-            cancelled: { value: 4, text: "Cancelled", color: "grey" },
-            default: { value: -1, text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
+            0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
+            1: { text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
+            2: { text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
+            3: { text: "Served", color: "#FFC1C1", section: 'servedOrders' },
+            4: { text: "Cancelled", color: "grey" },
+            default: { text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
         };
 
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        Order #${order.orderId} has been cancelled by the customer.
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>`;
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            Order #${order.orderId} has been cancelled by the customer.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>`;
                 $('#cancelledOrders').prepend(cancellationAlert);
                 notifiedCancellations[order.orderId] = true;
 
@@ -192,43 +192,15 @@
             if (order.status === 4) { // Cancelled
                 orderCard.remove(); // Remove from current section
             } else {
-                updateOrderCard(order, orderCard);
+                if (orderCard.length) {
+                    updateOrderCard(order, orderCard);
+                } else {
+                    addNewOrderToDOM(order);
+                }
                 if (!orderCard.closest(`#${sectionId}`).length) {
                     orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
                 }
             }
-        }
-
-        function updateKitchenOrderStatusUI(order) {
-            const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
-            if (!orderCard.length) {
-                console.log("No order card found for order ID:", order.orderId);
-                return;
-            }
-
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-            if (!orderCard.closest(`#${sectionId}`).length) {
-                orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
-            }
-
-            const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
-            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-
-            orderCard.find('.card-header').html(
-                `Order #${order.orderId} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
-            );
-
-            fetchTableName(order.tableId).then(tableName => {
-                orderCard.find('.card-header').html(
-                    `Order #${order.orderId} | Table: ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
-                );
-            });
-
-            const detailsHtml = (order.orderDetails || []).map(detail => `
-                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-            `).join("");
-
-            orderCard.find('.card-body ul').html(detailsHtml);
         }
 
         $(document).on('click', '.btn-group .btn', function () {
@@ -262,7 +234,6 @@
         connection.on("ReceiveOrderUpdate", function (order) {
             console.log("Update received for order", order.orderId, "New status:", order.status);
             updateOrderStatusUI(order);
-            updateKitchenOrderStatusUI(order);
         });
 
         // Function to handle new orders and updates
@@ -288,8 +259,8 @@
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
             const detailsHtml = (order.orderDetails || []).map(detail => `
-                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-            `).join("");
+                    <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+                `).join("");
 
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
@@ -333,17 +304,9 @@
                 data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
                 success: function () {
                     console.log("Successfully updated status for Order ID:", orderId);
-                    const orderCard = $(`.order-card[data-order-id="${orderId}"]`);
-                    if (orderCard.length) {
-                        const formattedDate = new Date(orderCard.find('.card-header').text().split('|')[2].trim()).toLocaleString('en-US', { hour12: false });
-                        const tableName = orderCard.find('.card-header').text().split('|')[1].trim();
-                        orderCard.find('.card-header').html(
-                            `Order #${orderId} | ${tableName} | Date: ${formattedDate} | STATUS: ${statusMappings[statusEnumValue].text}`
-                        );
-                        // Optionally, move the card to the correct section if status changes
-                        const sectionId = statusMappings[statusEnumValue]?.section || statusMappings.default.section;
-                        orderCard.detach().appendTo(`#${sectionId}`);
-                    }
+                    connection.invoke("ReceiveOrderUpdate", { orderId: orderId, status: statusEnumValue }).catch(function (err) {
+                        console.error("SignalR Error:", err);
+                    });
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error("AJAX Error:", textStatus, "Response Text:", jqXHR.responseText, "Error Thrown:", errorThrown);
@@ -411,11 +374,11 @@
             const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes
 
             const newCallHtml = `
-                <tr>
-                    <td>${callId}</td>
-                    <td>${tableIdentifier}</td>
-                </tr>
-            `;
+                    <tr>
+                        <td>${callId}</td>
+                        <td>${tableIdentifier}</td>
+                    </tr>
+                `;
 
             console.log("Adding new waiter call to table with HTML:", newCallHtml);
 
@@ -425,5 +388,4 @@
         // Clear existing dummy data from the table
         $('#waiterCalls tbody').empty();
     });
-
 </script>

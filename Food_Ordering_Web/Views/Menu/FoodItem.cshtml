@@ -43,26 +43,23 @@
     }
 </style>
 <div class="container my-5" style="padding-top: 50px;">
-    <!-- Added padding to the container -->
     <div class="row">
         <div class="col-md-6" style="position: relative;">
-            <!-- Back Button -->
             <a href="javascript:void(0)" onclick="goBack()" class="btn btn-link back-button">← Back to @ViewBag.CustomerFacingName</a>
-
-            <!-- Image -->
             <img class="img-fluid rounded food-image" alt="Food Image">
         </div>
         <div class="col-md-6">
-            <!-- Title and Price -->
             <h2 class="mb-3">Loading... <span class="text-primary">LKR 0.00</span></h2>
-
-            <!-- Description -->
             <p id="food-description">Loading...</p>
-
-            <!-- Rating -->
             <p><span class="text-success">👍 Loading...</span> (0)</p>
 
-            <!-- Packaging Charges Section -->
+            <div class="mb-3">
+                <label><strong>Select Size</strong></label>
+                <div id="size-options" class="border rounded p-3">
+                    <!-- Size options will be populated here by JavaScript -->
+                </div>
+            </div>
+
             <div class="mb-3">
                 <label><strong>Packaging Charges</strong></label>
                 <div class="border rounded p-3">
@@ -70,28 +67,25 @@
                 </div>
             </div>
 
-            <!-- Quantity Selector -->
             <div class="mb-3">
                 <label for="inputQuantitySelector" class="form-label"><strong>Quantity:</strong></label>
                 <div class="input-group">
                     <button type="button" class="btn btn-icon btn-secondary" onclick="decrementQuantity()">
-                        &#8722; <!-- Minus symbol -->
+                        &#8722;
                     </button>
                     <input type="number" id="inputQuantitySelector" class="form-control text-center" name="quantity" aria-label="Quantity" value="1" min="1" max="100">
                     <button type="button" class="btn btn-icon btn-secondary" onclick="incrementQuantity()">
-                        &#43; <!-- Plus symbol -->
+                        &#43;
                     </button>
                 </div>
             </div>
 
-            <!-- Note Input Field -->
             <div class="mb-3">
                 <label for="inputNote" class="form-label"><strong>Note:</strong></label>
                 <textarea id="inputNote" class="form-control" rows="3" placeholder="Add your notes here (e.g., extra cheese, no tomato)"></textarea>
             </div>
 
-            <!-- Order Button -->
-            <button class="btn btn-dark btn-lg btn-block" id="order-button">Add 1  LKR 0.00</button>
+            <button class="btn btn-dark btn-lg btn-block" id="order-button">Add 1 • LKR 0.00</button>
         </div>
     </div>
 </div>
@@ -123,7 +117,8 @@
 
     function updateOrderButton() {
         let quantity = parseInt($('#inputQuantitySelector').val());
-        let total = parseFloat($('h2 span').text().replace('LKR ', '').trim()) * quantity;
+        let sizePrice = parseFloat($('input[name="size"]:checked').data('price')) || 0;
+        let total = sizePrice * quantity;
         $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
     }
 
@@ -135,14 +130,13 @@
         const menuItemId = '@ViewBag.ItemId';
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}`;
         $('#inputQuantitySelector').on('input change', updateOrderButton);
-        // Fetch the data from the API
+
         $.ajax({
             url: apiEndpoint,
             method: 'GET',
             success: function (data) {
-                // Populate the HTML elements with the fetched data
                 if (data && data.image) {
-                    $('img').attr('src', 'data:image/png;base64,' + data.image);
+                    $('img.food-image').attr('src', 'data:image/png;base64,' + data.image);
                 } else {
                     console.error("Image data is missing or invalid:", data);
                 }
@@ -153,8 +147,20 @@
                     console.error("Price data is missing or invalid:", data);
                 }
                 $('#food-description').text(data.description);
-                // For the rating, I am assuming you'll provide the rating and total votes in your data, for now I'm hardcoding
-                $('p').eq(2).html('<span class="text-success">👍 ' + data.Rating + '%</span> (' + data.Votes + ')');  // Adjust as per your API data
+                $('p').eq(2).html('<span class="text-success">👍 ' + data.Rating + '%</span> (' + data.Votes + ')');
+
+                // Populate size options
+                let sizeOptionsHtml = '';
+                data.sizes.forEach(size => {
+                    sizeOptionsHtml += `<div class="form-check">
+                                              <input class="form-check-input" type="radio" name="size" value="${size.size}" data-price="${size.price}" id="size-${size.size}">
+                                              <label class="form-check-label" for="size-${size.size}">
+                                                  ${size.size} - LKR ${size.price.toFixed(2)}
+                                              </label>
+                                           </div>`;
+                });
+                $('#size-options').html(sizeOptionsHtml);
+                $('input[name="size"]').on('change', updateOrderButton);
             },
             error: function (error) {
                 console.error("Error fetching data:", error);
@@ -165,12 +171,9 @@
         function updateCartButton() {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             let currentTime = new Date().getTime();
-            let durationLimit = 24 * 60 * 60 * 1000; // Duration limit in milliseconds (e.g., 24 hours)
+            let durationLimit = 24 * 60 * 60 * 1000;
 
-            // Filter out items that are older than the duration limit
             cart = cart.filter(item => currentTime - item.timestamp < durationLimit);
-
-            // Update the cart in local storage after filtering out old items
             localStorage.setItem('cart', JSON.stringify(cart));
 
             let itemCount = cart.reduce((count, item) => count + item.qty, 0);
@@ -186,47 +189,46 @@
             }
         }
 
-        // This will be called when an item is added to the cart
         $('#order-button').click(function () {
             const qty = parseInt($('#inputQuantitySelector').val());
-            const price = parseFloat($('h2 span').text().replace('LKR', '').trim());
+            const sizePrice = parseFloat($('input[name="size"]:checked').data('price')) || 0;
             const h2Text = $('h2').text();
             const priceText = $('h2 span').text();
             const name = h2Text.replace(priceText, '').trim();
-            const note = $('#inputNote').val(); // Get the note from the input field
+            const note = $('#inputNote').val();
             const tableId = '@ViewBag.TableId';
-            const outletId = '@ViewBag.OutletId'; // Get outletId from ViewBag
+            const outletId = '@ViewBag.OutletId';
+            const size = $('input[name="size"]:checked').val();
 
             addToCart({
                 id: '@ViewBag.ItemId'.toString(),
                 name: name,
                 qty: qty,
-                price: price,
-                tableId: tableId, // Including tableId in the item data
-                outletId: outletId, // Including outletId in the item data
-                note: note // Add the note to the item data
+                price: sizePrice,
+                tableId: tableId,
+                outletId: outletId,
+                note: note,
+                size: size
             });
         });
 
         function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let existingItem = cart.find(x => x.id === item.id);
-            let timestamp = new Date().getTime(); // Current timestamp in milliseconds
+            let existingItem = cart.find(x => x.id === item.id && x.size === item.size);
+            let timestamp = new Date().getTime();
 
-            // Check if the item already exists in the cart
             if (existingItem) {
                 existingItem.qty += item.qty;
-                existingItem.timestamp = timestamp; // Update timestamp
-                existingItem.tableId = item.tableId; // Ensure tableId is updated if necessary
-                existingItem.outletId = item.outletId; // Ensure outletId is included and updated if necessary
-                existingItem.note = item.note; // Ensure note is included and updated if necessary
+                existingItem.timestamp = timestamp;
+                existingItem.tableId = item.tableId;
+                existingItem.outletId = item.outletId;
+                existingItem.note = item.note;
             } else {
-                // If the item is new, include tableId, outletId, and note
-                item.timestamp = timestamp; // Add timestamp
+                item.timestamp = timestamp;
                 cart.push({
                     ...item,
-                    outletId: '@ViewBag.OutletId', // Include outletId when adding a new item
-                    note: item.note // Include note when adding a new item
+                    outletId: '@ViewBag.OutletId',
+                    note: item.note
                 });
             }
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -237,26 +239,24 @@
             window.location.href = '/Order/Checkout';
         });
 
-        // Add functionality for the Call Waiter button
         $('#cart-button').on('click', '.call-waiter-button', function () {
-            const tableId = '@ViewBag.TableId'; // Assuming tableId is available in ViewBag
-            console.log("Call Waiter button clicked. Table ID:", tableId); // Log the button click and table ID
+            const tableId = '@ViewBag.TableId';
+            console.log("Call Waiter button clicked. Table ID:", tableId);
             $.ajax({
                 url: 'https://restosolutionssaas.com/api/OrderApi/CallWaiter',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ tableId: tableId }),
                 success: function () {
-                    console.log("Waiter call sent successfully."); // Log successful response
+                    console.log("Waiter call sent successfully.");
                     alert("Waiter has been called!");
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    console.error("Error calling waiter:", textStatus, errorThrown); // Log error details
+                    console.error("Error calling waiter:", textStatus, errorThrown);
                 }
             });
         });
 
-        // Initialization
         updateCartButton();
     });
 </script>

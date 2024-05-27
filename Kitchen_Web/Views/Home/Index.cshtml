@@ -143,13 +143,8 @@
 
             connection.on("ReceiveOrderUpdate", function (order) {
                 console.log("ReceiveOrderUpdate method triggered with order:", order);
-                console.log("Order details received:", order.orderDetails);
                 if (order && order.orderId && typeof order.status !== 'undefined') {
-                    if (order.status === 4) { // Assuming 4 means 'Cancelled'
-                        handleCancellationAlert(order);
-                    }
                     updateOrderStatusUI(order);
-                    updateKitchenOrderStatusUI(order);
                 } else {
                     console.error("Order update is missing required properties", order);
                 }
@@ -202,6 +197,38 @@
                     orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
                 }
             }
+        }
+
+        function updateKitchenOrderStatusUI(order) {
+            const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
+            if (!orderCard.length) {
+                console.log("No order card found for order ID:", order.orderId);
+                return;
+            }
+
+            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+            if (!orderCard.closest(`#${sectionId}`).length) {
+                orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
+            }
+
+            const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
+            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
+
+            orderCard.find('.card-header').html(
+                `Order #${order.orderId} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
+            );
+
+            fetchTableName(order.tableId).then(tableName => {
+                orderCard.find('.card-header').html(
+                    `Order #${order.orderId} | Table: ${tableName} | Date: ${formattedDate} | STATUS: ${statusText}`
+                );
+            });
+
+            const detailsHtml = (order.orderDetails || []).map(detail => `
+                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+            `).join("");
+
+            orderCard.find('.card-body ul').html(detailsHtml);
         }
 
         $(document).on('click', '.btn-group .btn', function () {
@@ -313,7 +340,7 @@
                         orderCard.find('.card-header').html(
                             `Order #${orderId} | ${tableName} | Date: ${formattedDate} | STATUS: ${statusMappings[statusEnumValue].text}`
                         );
-                        // Move the card to the correct section if status changes
+                        // Optionally, move the card to the correct section if status changes
                         const sectionId = statusMappings[statusEnumValue]?.section || statusMappings.default.section;
                         orderCard.detach().appendTo(`#${sectionId}`);
                     }

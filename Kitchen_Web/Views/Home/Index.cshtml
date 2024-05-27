@@ -163,12 +163,12 @@
         }
 
         const statusMappings = {
-            0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
-            1: { text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
-            2: { text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
-            3: { text: "Served", color: "#FFC1C1", section: 'servedOrders' },
-            4: { text: "Cancelled", color: "grey" },
-            default: { text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
+            pending: { value: 0, text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
+            preparing: { value: 1, text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
+            completed: { value: 2, text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
+            served: { value: 3, text: "Served", color: "#FFC1C1", section: 'servedOrders' },
+            cancelled: { value: 4, text: "Cancelled", color: "grey" },
+            default: { value: -1, text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
         };
 
         function handleCancellationAlert(order) {
@@ -292,7 +292,7 @@
         }
 
         function updateOrderStatus(orderId, newStatus) {
-            let statusEnumValue = Object.keys(statusMappings).find(key => statusMappings[key].text.toLowerCase() === newStatus);
+            let statusEnumValue = statusMappings[newStatus]?.value;
             console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
             if (statusEnumValue === undefined) {
                 console.error("Invalid status value for update:", newStatus);
@@ -398,4 +398,5 @@
         // Clear existing dummy data from the table
         $('#waiterCalls tbody').empty();
     });
+
 </script>

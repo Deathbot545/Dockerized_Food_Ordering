@@ -78,9 +78,15 @@ namespace Menu_API.Services.MenuS
             {
                 Name = menuItemDto.Name,
                 Description = menuItemDto.Description,
-                Price = menuItemDto.Price,
+                Price = menuItemDto.Price, // This is a base price, it can be optional
+                IsVegetarian = menuItemDto.IsVegetarian, // new property
                 MenuCategoryId = menuItemDto.MenuCategoryId,
-                Image = Convert.FromBase64String(menuItemDto.Image),
+                Image = imageBytes,
+                MenuItemSizes = menuItemDto.Sizes.Select(sizeDto => new MenuItemSize
+                {
+                    Size = sizeDto.Size,
+                    Price = sizeDto.Price
+                }).ToList()
             };
 
             _context.MenuItems.Add(newMenuItem);
@@ -88,6 +94,7 @@ namespace Menu_API.Services.MenuS
 
             return newMenuItem;
         }
+
 
 
         public async Task<List<MenuItemDto>> GetMenuItemsByOutletIdAsync(int outletId)
@@ -100,36 +107,51 @@ namespace Menu_API.Services.MenuS
 
             var menuItems = await _context.MenuItems
                 .Include(mi => mi.MenuCategory)  // Include the MenuCategory to access the name
+                .Include(mi => mi.MenuItemSizes) // Include the MenuItemSizes
                 .Where(mi => mi.MenuCategory.MenuId == menu.Id)
                 .Select(mi => new MenuItemDto
                 {
-                    id= mi.Id,
+                    Id = mi.Id,
                     Name = mi.Name,
                     Description = mi.Description,
                     Price = mi.Price,
+                    IsVegetarian = mi.IsVegetarian, // Include vegetarian option
                     MenuCategoryId = mi.MenuCategoryId,
                     CategoryName = mi.MenuCategory.Name,  // Assign the category name here
-                    Image = Convert.ToBase64String(mi.Image)  // Convert byte[] to base64 string
+                    Image = Convert.ToBase64String(mi.Image),  // Convert byte[] to base64 string
+                    Sizes = mi.MenuItemSizes.Select(size => new MenuItemSizeDto
+                    {
+                        Size = size.Size,
+                        Price = size.Price
+                    }).ToList()
                 })
                 .ToListAsync();
 
             return menuItems;
         }
 
+
         public async Task<MenuItemDto> GetMenuItemByIdAsync(int menuItemId)
         {
             var menuItem = await _context.MenuItems
                 .Include(mi => mi.MenuCategory)
+                .Include(mi => mi.MenuItemSizes)
                 .Where(mi => mi.Id == menuItemId)
                 .Select(mi => new MenuItemDto
                 {
-                    id = mi.Id,
+                    Id = mi.Id,
                     Name = mi.Name,
                     Description = mi.Description,
                     Price = mi.Price,
+                    IsVegetarian = mi.IsVegetarian, // Include vegetarian option
                     MenuCategoryId = mi.MenuCategoryId,
                     CategoryName = mi.MenuCategory.Name,
-                    Image = Convert.ToBase64String(mi.Image)
+                    Image = Convert.ToBase64String(mi.Image),
+                    Sizes = mi.MenuItemSizes.Select(size => new MenuItemSizeDto
+                    {
+                        Size = size.Size,
+                        Price = size.Price
+                    }).ToList()
                 })
                 .FirstOrDefaultAsync();
 

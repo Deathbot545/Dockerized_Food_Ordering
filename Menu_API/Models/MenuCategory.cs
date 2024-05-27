@@ -12,10 +12,9 @@ namespace Menu_API.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }  // e.g., "Rice", "Sea Food", "Beverages"
-
         public int MenuId { get; set; }  // Foreign key for Menu
         public Menu Menu { get; set; }  // Navigation property for Menu
-
         public ICollection<MenuItem> MenuItems { get; set; } // one-to-many with MenuItem
     }
+
 }

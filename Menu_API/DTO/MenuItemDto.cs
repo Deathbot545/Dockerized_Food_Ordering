@@ -8,12 +8,21 @@ namespace Menu_API.DTO
 {
     public class MenuItemDto
     {
-        public int id {  get; set; }    
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public bool IsVegetarian { get; set; }
         public int MenuCategoryId { get; set; }
-        public string CategoryName { get; set; }  // new field
-        public string Image { get; set; }  // This should be a base64 encoded string
+        public string CategoryName { get; set; }
+        public string Image { get; set; }
+        public List<MenuItemSizeDto> Sizes { get; set; } // List of sizes
     }
+
+    public class MenuItemSizeDto
+    {
+        public string Size { get; set; }
+        public decimal Price { get; set; }
+    }
+
 }

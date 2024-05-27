@@ -68,7 +68,8 @@ namespace Order_API.Service.Orderser
                     {
                         MenuItemId = menuItemDto.id,
                         Quantity = item.Qty,
-                        Note = item.Note
+                        Note = item.Note,
+                        Size = item.Size // Include the size from the request
                     };
 
                     _logger.LogInformation($"Adding order detail: {@orderDetail}");
@@ -86,7 +87,7 @@ namespace Order_API.Service.Orderser
 
             foreach (var detail in order.OrderDetails)
             {
-                _logger.LogInformation($"Order detail before saving: {detail.MenuItemId}, {detail.Quantity}, {detail.Note}");
+                _logger.LogInformation($"Order detail before saving: {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}");
             }
 
             _context.Orders.Add(order);
@@ -95,17 +96,6 @@ namespace Order_API.Service.Orderser
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
-
-
-
-
-
-
-
-
-
-
-
 
 
         public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
@@ -128,7 +118,6 @@ namespace Order_API.Service.Orderser
         {
             var currentTime = DateTime.UtcNow;
 
-            // Fetch orders from the local database
             var orders = _context.Orders
                 .Include(o => o.OrderDetails)
                 .Where(o => o.OutletId == outletId &&
@@ -137,10 +126,8 @@ namespace Order_API.Service.Orderser
                             (o.Status != OrderStatus.Served || o.OrderTime > currentTime.AddHours(-1)))
                 .ToList();
 
-            // Fetch menu items from the Menu API
             var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
 
-            // Map to DTOs, converting MenuItemDto to MenuItemData
             var orderDtos = orders.Select(o => new OrderDTO
             {
                 Id = o.Id,
@@ -165,7 +152,8 @@ namespace Order_API.Service.Orderser
                             Image = mi.Image
                         }).FirstOrDefault(),
                     Quantity = od.Quantity,
-                    Note = od.Note
+                    Note = od.Note,
+                    Size = od.Size // Include the size in the DTO
                 }).ToList()
             }).ToList();
 
@@ -174,12 +162,13 @@ namespace Order_API.Service.Orderser
                 _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
                 foreach (var detail in orderDto.OrderDetails)
                 {
-                    _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}");
+                    _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}");
                 }
             }
 
             return orderDtos;
         }
+
 
 
 
@@ -283,18 +272,20 @@ namespace Order_API.Service.Orderser
                             Image = mi.Image
                         }).FirstOrDefault(),
                     Quantity = od.Quantity,
-                    Note = od.Note
+                    Note = od.Note,
+                    Size = od.Size // Include the size in the DTO
                 }).ToList()
             };
 
             _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
             foreach (var detail in orderDto.OrderDetails)
             {
-                _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}");
+                _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}");
             }
 
             return orderDto;
         }
+
 
 
         public async Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(string userId)
@@ -355,12 +346,6 @@ namespace Order_API.Service.Orderser
 
             return orderDtos;
         }
-
-
-
-        // Assume FetchMenuItemsByOutletIdAsync and MenuItemData are defined similarly to your previous context.
-
-
     }
-
+       
 }

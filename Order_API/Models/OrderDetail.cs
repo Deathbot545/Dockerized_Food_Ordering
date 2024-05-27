@@ -13,6 +13,8 @@ namespace Order_API.Models
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
         public int Quantity { get; set; }
-        public string Note { get; set; } // Add this line
+        public string Note { get; set; } // Note for special instructions
+        public string Size { get; set; } // Add this line for size
     }
+
 }

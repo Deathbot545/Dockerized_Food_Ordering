@@ -14,7 +14,7 @@ namespace Menu_API.Models
         public int Id { get; set; }
         public string Name { get; set; }  // e.g., "Summer 2023 Menu"
         public int? OutletId { get; set; }
-
         public ICollection<MenuCategory> MenuCategories { get; set; } // one-to-many with MenuCategory
     }
+
 }

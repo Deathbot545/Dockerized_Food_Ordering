@@ -1,6 +1,5 @@
 ﻿<div class="container">
     <div class="row">
-      
         <!-- Category Form -->
         <div class="container">
             <div id="alert-placeholder"></div>
@@ -18,7 +17,6 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Add Category</button>
                     </form>
-
                 </div>
                 <!-- Category Table -->
                 <div class="col-md-6">
@@ -27,11 +25,11 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>Category Name</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="category-table-body">
                             <!-- Sample category rows, replace with actual data from your database -->
-                           
                         </tbody>
                     </table>
                 </div>
@@ -54,13 +52,27 @@
                             <label for="food_category">Food Category</label>
                             <select class="form-control" id="food_category" required>
                                 <option value="">Choose...</option>
-                                
                                 <!-- Add more categories as needed -->
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="food_price">Food Price ($)</label>
+                            <label for="food_price">Base Price ($)</label>
                             <input type="number" step="0.01" class="form-control" id="food_price" placeholder="Enter Food Price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="is_vegetarian">Vegetarian</label>
+                            <input type="checkbox" id="is_vegetarian">
+                        </div>
+                        <div class="form-group">
+                            <label for="food_sizes">Sizes</label>
+                            <div id="sizes-container">
+                                <div class="size-group">
+                                    <input type="text" class="form-control d-inline size-name" placeholder="Size Name" required>
+                                    <input type="number" step="0.01" class="form-control d-inline size-price" placeholder="Price" required>
+                                    <button type="button" class="btn btn-danger remove-size">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-size" class="btn btn-secondary mt-2">Add Size</button>
                         </div>
                         <div class="form-group">
                             <label for="food_image">Food Image</label>
@@ -92,8 +104,9 @@
                 </div>
             </div>
         </div>
-      </div>
+    </div>
 </div>
+
 <script>
     $(document).ready(function () {
         function fetchAndPopulateCategories() {
@@ -112,13 +125,12 @@
 
                 $('#category-table-body').html(tableBody);
                 $('#food_category').html(dropdownOptions);
-
             })
                 .fail(function (jqXHR, textStatus, errorThrown) {
                     console.log("Request failed:", textStatus, errorThrown);
                 });
         }
-        // New function to fetch and populate menu items
+
         function fetchAndPopulateMenuItems() {
             let outletId = parseInt($('#outlet_id').val(), 10);
             let apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItems/${outletId}`;
@@ -130,17 +142,15 @@
                 menuItems.forEach(menuItemDto => {
                     const imageBase64 = menuItemDto.image;
                     tableBody += `<tr data-item-id="${menuItemDto.id}">
-                        <td>${menuItemDto.name}</td>
-                        <td>${menuItemDto.description}</td>
-                        <td>${menuItemDto.categoryName}</td>
-                        <td>${menuItemDto.price.toFixed(2)}</td>
-                        <td><img src="data:image/png;base64,${imageBase64}" width="100"/></td>
-                        <td><button class="btn btn-danger delete-button">Delete</button></td>
-                      </tr>`;
+                            <td>${menuItemDto.name}</td>
+                            <td>${menuItemDto.description}</td>
+                            <td>${menuItemDto.categoryName}</td>
+                            <td>${menuItemDto.price.toFixed(2)}</td>
+                            <td><img src="data:image/png;base64,${imageBase64}" width="100"/></td>
+                            <td><button class="btn btn-danger delete-button">Delete</button></td>
+                        </tr>`;
                 });
 
-
-                // Assuming your menu items table body has an id "menu-item-table-body"
                 $('#menu-item-table-body').html(tableBody);
             })
                 .fail(function (jqXHR, textStatus, errorThrown) {
@@ -148,10 +158,8 @@
                 });
         }
 
-
-        // Call the function initially to populate categories and menu items when the page loads.
         fetchAndPopulateCategories();
-        fetchAndPopulateMenuItems(); // new call
+        fetchAndPopulateMenuItems();
 
         $('#category-form').submit(function (e) {
             e.preventDefault();
@@ -185,7 +193,6 @@
 
             let categoryHasMenuItems = false;
 
-            // Check each menu item
             $('#menu-item-table-body tr').each(function () {
                 const menuItemCategoryName = $(this).find('td:nth-child(3)').text(); // Assuming category name is in the third column
                 if (menuItemCategoryName === categoryName) {
@@ -195,12 +202,10 @@
             });
 
             if (categoryHasMenuItems) {
-                // Show Bootstrap alert instead of JavaScript alert
                 showBootstrapAlert('This category has menu items. Please delete them first before deleting the category.');
                 return;
             }
 
-            // Proceed with deletion if no menu items are found
             $.ajax({
                 url: `https://restosolutionssaas.com/api/MenuApi/DeleteCategory/${categoryId}`,
                 method: 'DELETE',
@@ -219,11 +224,18 @@
 
             let foodName = $('#food_name').val();
             let foodDescription = $('#food_description').val();
-            let foodCategoryId = $('#food_category').val(); // Assuming this is the ID
-            let foodCategoryName = $('#food_category option:selected').text(); // Assuming this is the name
+            let foodCategoryId = $('#food_category').val();
+            let foodCategoryName = $('#food_category option:selected').text();
             let foodPrice = parseFloat($('#food_price').val());
+            let isVegetarian = $('#is_vegetarian').is(':checked');
             let foodImage = $('#food_image')[0].files[0];
+            let sizes = [];
 
+            $('#sizes-container .size-group').each(function () {
+                const sizeName = $(this).find('.size-name').val();
+                const sizePrice = parseFloat($(this).find('.size-price').val());
+                sizes.push({ size: sizeName, price: sizePrice });
+            });
 
             getBase64(foodImage, (base64Image) => {
                 $.ajax({
@@ -234,17 +246,16 @@
                         name: foodName,
                         description: foodDescription,
                         menuCategoryId: foodCategoryId,
-                        categoryName: foodCategoryName, // Added this field
+                        categoryName: foodCategoryName,
                         price: foodPrice,
-                        image: base64Image.split(',')[1]
+                        isVegetarian: isVegetarian,
+                        image: base64Image.split(',')[1],
+                        sizes: sizes
                     }),
-
                     success: function (response) {
                         console.log("Menu item added:", response);
-                        // Refresh the menu items and categories tables
                         fetchAndPopulateCategories();
                         fetchAndPopulateMenuItems();
-
                     },
                     error: function (error) {
                         console.log("Error adding menu item:", error);
@@ -271,7 +282,18 @@
             });
         });
 
+        $(document).on('click', '.remove-size', function () {
+            $(this).closest('.size-group').remove();
+        });
 
+        $('#add-size').click(function () {
+            const sizeGroup = `<div class="size-group mt-2">
+                    <input type="text" class="form-control d-inline size-name" placeholder="Size Name" required>
+                    <input type="number" step="0.01" class="form-control d-inline size-price" placeholder="Price" required>
+                    <button type="button" class="btn btn-danger remove-size">Remove</button>
+                </div>`;
+            $('#sizes-container').append(sizeGroup);
+        });
     });
 
     function getBase64(file, callback) {
@@ -285,16 +307,12 @@
         };
     }
 
-    // Function to display a Bootstrap alert
     function showBootstrapAlert(message) {
         const alertHtml = `
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong>Attention!</strong> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>`;
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Attention!</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
         $('#alert-placeholder').html(alertHtml);
     }
-
 </script>
-
-

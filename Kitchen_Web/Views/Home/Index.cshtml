@@ -143,6 +143,7 @@
 
             connection.on("ReceiveOrderUpdate", function (order) {
                 console.log("ReceiveOrderUpdate method triggered with order:", order);
+                console.log("Order details received:", order.orderDetails);
                 if (order && order.orderId && typeof order.status !== 'undefined') {
                     updateOrderStatusUI(order);
                 } else {
@@ -158,12 +159,12 @@
         }
 
         const statusMappings = {
-            0: { text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
-            1: { text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
-            2: { text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
-            3: { text: "Served", color: "#FFC1C1", section: 'servedOrders' },
-            4: { text: "Cancelled", color: "grey" },
-            default: { text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
+            pending: { value: 0, text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
+            preparing: { value: 1, text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
+            completed: { value: 2, text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
+            served: { value: 3, text: "Served", color: "#FFC1C1", section: 'servedOrders' },
+            cancelled: { value: 4, text: "Cancelled", color: "grey" },
+            default: { value: -1, text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
         };
 
         function handleCancellationAlert(order) {
@@ -187,7 +188,7 @@
 
         function updateOrderStatusUI(order) {
             const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+            const sectionId = statusMappings[getKeyByValue(statusMappings, order.status)]?.section || statusMappings.default.section;
 
             if (order.status === 4) { // Cancelled
                 orderCard.remove(); // Remove from current section
@@ -204,7 +205,7 @@
         }
 
         function updateOrderCard(order, orderCard) {
-            const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
+            const statusText = statusMappings[getKeyByValue(statusMappings, order.status)]?.text || statusMappings.default.text;
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
             const detailsHtml = (order.orderDetails || []).map(detail => `
@@ -223,7 +224,7 @@
 
             orderCard.find('.card-body ul').html(detailsHtml);
 
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+            const sectionId = statusMappings[getKeyByValue(statusMappings, order.status)]?.section || statusMappings.default.section;
             if (!orderCard.closest(`#${sectionId}`).length) {
                 orderCard.detach().appendTo(`#${sectionId}`);
             }
@@ -231,7 +232,7 @@
 
         function addNewOrderToDOM(order) {
             const orderHtml = createOrderHtml(order);
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+            const sectionId = statusMappings[getKeyByValue(statusMappings, order.status)]?.section || statusMappings.default.section;
             $('#' + sectionId).append(orderHtml);
         }
 
@@ -380,4 +381,8 @@
         $('#waiterCalls tbody').empty();
     });
 
+    // Utility function to get key by value
+    function getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key].value === value);
+    }
 </script>

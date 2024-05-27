@@ -163,11 +163,11 @@
         }
 
         const statusMappings = {
-            pending: { value: 0, text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
-            preparing: { value: 1, text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
-            completed: { value: 2, text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
-            served: { value: 3, text: "Served", color: "#FFC1C1", section: 'servedOrders' },
-            cancelled: { value: 4, text: "Cancelled", color: "grey" },
+            0: { value: 0, text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
+            1: { value: 1, text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
+            2: { value: 2, text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
+            3: { value: 3, text: "Served", color: "#FFC1C1", section: 'servedOrders' },
+            4: { value: 4, text: "Cancelled", color: "grey" },
             default: { value: -1, text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
         };
 
@@ -233,7 +233,7 @@
         });
 
         connection.on("ReceiveOrderUpdate", function (order) {
-            console.log("Update received for order", order.orderId, "New status:", order.Status);
+            console.log("Update received for order", order.orderId, "New status:", order.status);
             updateOrderStatusUI(order);
             updateKitchenOrderStatusUI(order);
         });
@@ -260,7 +260,7 @@
             const statusText = statusMappings[order.status]?.text || statusMappings.default.text;
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
-            const detailsHtml = order.orderDetails.map(detail => `
+            const detailsHtml = (order.orderDetails || []).map(detail => `
                 <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
             `).join("");
 

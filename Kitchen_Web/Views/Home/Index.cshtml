@@ -313,7 +313,7 @@
                         orderCard.find('.card-header').html(
                             `Order #${orderId} | ${tableName} | Date: ${formattedDate} | STATUS: ${statusMappings[statusEnumValue].text}`
                         );
-                        // Optionally, move the card to the correct section if status changes
+                        // Move the card to the correct section if status changes
                         const sectionId = statusMappings[statusEnumValue]?.section || statusMappings.default.section;
                         orderCard.detach().appendTo(`#${sectionId}`);
                     }

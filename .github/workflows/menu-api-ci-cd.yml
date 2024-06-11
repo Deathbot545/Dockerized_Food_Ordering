@@ -35,12 +35,12 @@ jobs:
     # Copy the SSH private key file from your repository to the runner's home directory and set permissions
     - name: Prepare SSH Key
       run: |
-        cp ./.github/workflows/restro.pem $HOME/restro.pem
+        cp ./.github/workflows/restro.pem $HOME/Resto two.pem
         chmod 600 $HOME/restro.pem
 
     - name: Deploy to AWS EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-16-171-35-246.eu-north-1.compute.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-16-171-200-250.eu-north-1.compute.amazonaws.com << 'EOF'
         # Pull the latest Docker image for the API
         sudo docker pull deathbot545/menuapi:latest
 

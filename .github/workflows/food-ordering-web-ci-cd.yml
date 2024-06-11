@@ -43,11 +43,11 @@ jobs:
     - name: Prepare SSH Key
       run: |
         cp ./.github/workflows/restro.pem $HOME/restro.pem
-        chmod 600 $HOME/Resto two.pem
+        chmod 600 $HOME/Rast.pem
 
     - name: Deploy to AWS EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-16-170-215-177.eu-north-1.compute.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i $HOME/restro.pem ec2-user@ec2-16-170-232-54.eu-north-1.compute.amazonaws.com << 'EOF'
         # Pull the latest Docker image
         sudo docker pull deathbot545/foodorderingweb:latest
 

@@ -18,7 +18,7 @@ builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); // List
+    serverOptions.ListenAnyIP(80); // Li
 
 });
 ConfigureIdentity(builder);

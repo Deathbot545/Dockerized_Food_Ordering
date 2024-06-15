@@ -11,7 +11,6 @@ namespace Food_Ordering_Web.DTO
 
         public int Id { get; set; }
         public DateTime OrderTime { get; set; }
-        // Changed to string to match the Order model and represent the customer as a user ID
         public string Customer { get; set; }
         public int TableId { get; set; }
         public int OutletId { get; set; }
@@ -24,9 +23,9 @@ namespace Food_Ordering_Web.DTO
         public int Id { get; set; }
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
-        // Assuming MenuItemData is a simplified DTO for MenuItem; adjusted to not include a direct entity reference
         public MenuItemData MenuItem { get; set; }
         public int Quantity { get; set; }
+        public string Size { get; set; } // Include the size in the DTO
     }
 
     public class MenuItemData
@@ -36,7 +35,6 @@ namespace Food_Ordering_Web.DTO
         public string Description { get; set; }
         public double Price { get; set; }
         public int MenuCategoryId { get; set; }
-        // This should be a simplified category information if needed, otherwise consider removing or adjusting based on actual usage
 
         public string Image { get; set; } // Assuming this is a base64 encoded string for the image
     }

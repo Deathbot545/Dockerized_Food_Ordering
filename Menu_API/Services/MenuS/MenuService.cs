@@ -164,16 +164,26 @@ namespace Menu_API.Services.MenuS
 
         public async Task<bool> DeleteMenuItemAsync(int itemId)
         {
-            var item = await _context.MenuItems.FindAsync(itemId);
+            var item = await _context.MenuItems
+                                     .Include(mi => mi.MenuItemSizes)
+                                     .FirstOrDefaultAsync(mi => mi.Id == itemId);
+
             if (item == null)
             {
                 return false;
             }
 
+            // Manually delete associated MenuItemSizes
+            _context.MenuItemSizes.RemoveRange(item.MenuItemSizes);
+
+            // Remove the MenuItem
             _context.MenuItems.Remove(item);
+
             await _context.SaveChangesAsync();
             return true;
         }
+
+
 
         public async Task<bool> DeleteMenusByOutletIdAsync(int outletId)
         {

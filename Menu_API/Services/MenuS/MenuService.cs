@@ -174,7 +174,7 @@ namespace Menu_API.Services.MenuS
             }
 
             // Manually delete associated MenuItemSizes
-            _context.MenuItemSizes.RemoveRange(item.MenuItemSizes);
+            _context.MenuItemsSize.RemoveRange(item.MenuItemSizes);
 
             // Remove the MenuItem
             _context.MenuItems.Remove(item);

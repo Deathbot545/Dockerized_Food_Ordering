@@ -107,7 +107,8 @@ namespace Food_Ordering_Web.Controllers
                     int.TryParse(form[$"items[{i}].qty"], out int qty) &&
                     decimal.TryParse(form[$"items[{i}].price"], out decimal price) &&
                     form.TryGetValue($"items[{i}].name", out var name) && !string.IsNullOrWhiteSpace(name) &&
-                    form.TryGetValue($"items[{i}].note", out var note))
+                    form.TryGetValue($"items[{i}].note", out var note) &&
+                    form.TryGetValue($"items[{i}].size", out var size)) // Add this line
                 {
                     items.Add(new CartItem
                     {
@@ -115,16 +116,18 @@ namespace Food_Ordering_Web.Controllers
                         Qty = qty,
                         Name = name,
                         Price = price,
-                        Note = note
+                        Note = note,
+                        Size = size // Set the Size value
                     });
 
-                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}");
+                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}, Size={size}"); // Update log message
                 }
                 else
                 {
                     _logger.LogError($"Invalid data for item at index {i}.");
                 }
             }
+
 
             CartRequest orderData = new CartRequest
             {

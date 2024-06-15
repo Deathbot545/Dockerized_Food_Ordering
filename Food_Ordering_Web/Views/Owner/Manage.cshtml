@@ -188,7 +188,7 @@
             });
 
             $.ajax({
-                url: 'https://restosolutionssaas.com/api/MenuApi/AddCategory',
+                url: '/api/MenuApi/AddCategory',
                 method: 'POST',
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify({
@@ -206,6 +206,7 @@
                 }
             });
         });
+
 
         $(document).on('click', '.delete-category', function () {
             const categoryId = $(this).attr('data-id');

@@ -47,7 +47,7 @@ namespace Menu_API.Services.MenuS
             return true;
         }
 
-        public async Task<MenuCategory> AddCategoryAsync(int menuId, string categoryName, List<ExtraItemDto> extraItems)
+        public async Task<MenuCategoryDto> AddCategoryAsync(int menuId, string categoryName, List<ExtraItemDto> extraItems)
         {
             var menuCategory = new MenuCategory
             {
@@ -63,8 +63,23 @@ namespace Menu_API.Services.MenuS
             _context.MenuCategories.Add(menuCategory);
             await _context.SaveChangesAsync();
 
-            return menuCategory;
+            var menuCategoryDto = new MenuCategoryDto
+            {
+                Id = menuCategory.Id,
+                OutletId = (int)menuCategory.Menu.OutletId, // Adjust if necessary
+                CategoryName = menuCategory.Name,
+                InternalOutletName = menuCategory.Menu.Name, // Adjust if necessary
+                ExtraItems = menuCategory.ExtraItems.Select(ei => new ExtraItemDto
+                {
+                    Id = ei.Id,
+                    Name = ei.Name,
+                    Price = ei.Price
+                }).ToList()
+            };
+
+            return menuCategoryDto;
         }
+
 
         // Method to get all categories
         public async Task<List<MenuCategory>> GetAllCategoriesAsync(int outletId)

@@ -40,9 +40,10 @@ namespace Menu_API.Controllers
             {
                 // Log the exception details
                 // You can also return the exception message to help with debugging
-                return StatusCode(500, $"Internal server error: {ex}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
 
         // API to get all categories
         [HttpGet("GetAllCategories/{outletId}")]

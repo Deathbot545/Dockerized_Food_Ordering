@@ -22,6 +22,7 @@ namespace Food_Ordering_Web.DTO
         public string Name { get; set; }  // Add this
         public decimal Price { get; set; }  // Assuming price is a decimal, add this
        public string Note { get; set; }
+        public string Size { get; internal set; }
     }
 
 

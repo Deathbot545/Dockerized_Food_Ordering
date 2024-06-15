@@ -237,7 +237,23 @@
                 sizes.push({ size: sizeName, price: sizePrice });
             });
 
+            if (!foodImage) {
+                console.log("No image file selected.");
+                return;
+            }
+
             getBase64(foodImage, (base64Image) => {
+                console.log("Sending data:", {
+                    name: foodName,
+                    description: foodDescription,
+                    menuCategoryId: foodCategoryId,
+                    categoryName: foodCategoryName,
+                    price: foodPrice,
+                    isVegetarian: isVegetarian,
+                    image: base64Image.split(',')[1],
+                    sizes: sizes
+                });
+
                 $.ajax({
                     url: 'https://restosolutionssaas.com/api/MenuApi/AddMenuItem',
                     method: 'POST',
@@ -263,6 +279,18 @@
                 });
             });
         });
+
+        function getBase64(file, callback) {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                callback(reader.result);
+            };
+            reader.onerror = function (error) {
+                console.log('Error: ', error);
+            };
+        }
+
 
         $(document).on('click', '.delete-button', function () {
             const row = $(this).closest('tr');

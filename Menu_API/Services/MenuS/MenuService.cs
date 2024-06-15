@@ -66,9 +66,9 @@ namespace Menu_API.Services.MenuS
             var menuCategoryDto = new MenuCategoryDto
             {
                 Id = menuCategory.Id,
-                OutletId = (int)menuCategory.Menu.OutletId, // Adjust if necessary
+                OutletId = menuCategory.Menu.OutletId.HasValue ? menuCategory.Menu.OutletId.Value : 0, // or handle it appropriately
                 CategoryName = menuCategory.Name,
-                InternalOutletName = menuCategory.Menu.Name, // Adjust if necessary
+                InternalOutletName = menuCategory.Menu.Name,
                 ExtraItems = menuCategory.ExtraItems.Select(ei => new ExtraItemDto
                 {
                     Id = ei.Id,
@@ -76,6 +76,7 @@ namespace Menu_API.Services.MenuS
                     Price = ei.Price
                 }).ToList()
             };
+
 
             return menuCategoryDto;
         }

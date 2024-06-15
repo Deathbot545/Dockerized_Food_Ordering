@@ -12,7 +12,7 @@ namespace Menu_API.Services.MenuS
     public interface IMenuService
     {
         Task<Menu> EnsureMenuExistsAsync(int outletId, string internalOutletName);
-        Task<MenuCategory> AddCategoryAsync(int menuId, string categoryName, List<ExtraItemDto> extraItems);
+        Task<MenuCategoryDto> AddCategoryAsync(int menuId, string categoryName, List<ExtraItemDto> extraItems);
         Task<List<MenuCategory>> GetAllCategoriesAsync(int outletId);
         Task<bool> DeleteCategoryAsync(int categoryId);
         Task<MenuItem> AddMenuItemAsync(MenuItemDto menuItemDto);

@@ -43,16 +43,9 @@ namespace Food_Ordering_Web.Controllers
         [HttpPost]
         public IActionResult RedirectToDetail(int itemId, int outletId, int tableId, string customerFacingName)
         {
-            TempData["itemId"] = itemId;
-            TempData["outletId"] = outletId;
-            TempData["tableId"] = tableId;
-            TempData["customerFacingName"] = customerFacingName;
-
-            TempData.Keep("tableId");
-            TempData.Keep("outletId");
-
-            return Json(new { success = true, redirectUrl = Url.Action("FoodDetail") });
+            return Json(new { success = true, redirectUrl = Url.Action("FoodDetail"), itemId, outletId, tableId, customerFacingName });
         }
+
 
         public IActionResult FoodDetail()
         {

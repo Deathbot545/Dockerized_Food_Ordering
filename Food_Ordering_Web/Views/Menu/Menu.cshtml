@@ -382,21 +382,29 @@
             const itemId = $(this).data('item-id');
             const outletId = $(this).data('outlet-id');
             const tableId = $(this).data('table-id');
-            const customerFacingName = $("#outlet-name").text(); // Get the customerFacingName
+            const customerFacingName = $("#outlet-name").text();
 
             $.post('/Order/RedirectToDetail', {
                 itemId: itemId,
                 outletId: outletId,
                 tableId: tableId,
-                name: customerFacingName // Send the customerFacingName
+                customerFacingName: customerFacingName
             }).done(function (response) {
                 if (response.success) {
-                    window.location.href = response.redirectUrl; // assuming your controller action returns the URL to redirect to
+                    // Store data in local storage
+                    localStorage.setItem('foodItemData', JSON.stringify({
+                        itemId: response.itemId,
+                        outletId: response.outletId,
+                        tableId: response.tableId,
+                        customerFacingName: response.customerFacingName
+                    }));
+                    window.location.href = response.redirectUrl;
                 } else {
                     console.error("Failed to redirect");
                 }
             });
         });
+
 
         $('#cart-button').click(function () {
             window.location.href = '/Order/Checkout';

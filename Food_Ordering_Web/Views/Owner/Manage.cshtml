@@ -15,6 +15,18 @@
                             <label for="category_name">Category Name</label>
                             <input type="text" class="form-control" id="category_name" placeholder="Enter Category Name" required>
                         </div>
+                        <div class="form-group">
+                            <label for="category_extras">Extras</label>
+                            <div id="extras-container">
+                                <div class="extra-group">
+                                    <input type="text" class="form-control d-inline extra-name" placeholder="Extra Name" required>
+                                    <input type="number" step="0.01" class="form-control d-inline extra-price" placeholder="Price" required>
+                                    <button type="button" class="btn btn-danger remove-extra">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" id="add-extra" class="btn btn-secondary mt-2">Add Extra</button>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Add Category</button>
                     </form>
                 </div>
@@ -324,6 +336,19 @@
             $('#sizes-container').append(sizeGroup);
         });
     });
+    $(document).on('click', '.remove-extra', function () {
+        $(this).closest('.extra-group').remove();
+    });
+
+    $('#add-extra').click(function () {
+        const extraGroup = `<div class="extra-group mt-2">
+            <input type="text" class="form-control d-inline extra-name" placeholder="Extra Name" required>
+            <input type="number" step="0.01" class="form-control d-inline extra-price" placeholder="Price" required>
+            <button type="button" class="btn btn-danger remove-extra">Remove</button>
+        </div>`;
+        $('#extras-container').append(extraGroup);
+    });
+
 
     function getBase64(file, callback) {
         const reader = new FileReader();

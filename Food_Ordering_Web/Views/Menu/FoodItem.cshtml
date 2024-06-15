@@ -138,11 +138,12 @@
 
         const menuItemId = foodItemData.itemId;
         const customerFacingName = foodItemData.customerFacingName;
+        const menuId = foodItemData.menuId; // Retrieve menu ID
 
         // Set the customer facing name
         $('#customerFacingName').text(customerFacingName);
 
-        const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}`;
+        const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}?menuId=${menuId}`; // Use menu ID in API call
         $('#inputQuantitySelector').on('input change', updateOrderButton);
 
         $.ajax({

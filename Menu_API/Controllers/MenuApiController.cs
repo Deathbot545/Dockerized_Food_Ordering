@@ -59,6 +59,16 @@ namespace Menu_API.Controllers
 
             return Ok(categoryDtos);
         }
+        [HttpGet("GetCategoryWithExtraItems/{categoryId}")]
+        public async Task<IActionResult> GetCategoryWithExtraItems(int categoryId)
+        {
+            var categoryDto = await _menuService.GetCategoryWithExtraItemsAsync(categoryId);
+            if (categoryDto == null)
+            {
+                return NotFound(new { message = "Category not found." });
+            }
+            return Ok(categoryDto);
+        }
         [HttpDelete("DeleteCategory/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

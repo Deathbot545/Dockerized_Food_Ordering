@@ -383,12 +383,14 @@
             const outletId = $(this).data('outlet-id');
             const tableId = $(this).data('table-id');
             const customerFacingName = $("#outlet-name").text();
+            const menuId = '@ViewBag.MenuId'; // Assuming the menu ID is available in ViewBag
 
             $.post('/Order/RedirectToDetail', {
                 itemId: itemId,
                 outletId: outletId,
                 tableId: tableId,
-                customerFacingName: customerFacingName
+                customerFacingName: customerFacingName,
+                menuId: menuId // Pass menu ID
             }).done(function (response) {
                 if (response.success) {
                     // Store data in local storage
@@ -396,7 +398,8 @@
                         itemId: response.itemId,
                         outletId: response.outletId,
                         tableId: response.tableId,
-                        customerFacingName: response.customerFacingName
+                        customerFacingName: response.customerFacingName,
+                        menuId: response.menuId // Save menu ID
                     }));
                     window.location.href = response.redirectUrl;
                 } else {

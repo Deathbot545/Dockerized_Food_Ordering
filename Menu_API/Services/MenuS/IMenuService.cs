@@ -13,10 +13,12 @@ namespace Menu_API.Services.MenuS
     {
         Task<Menu> EnsureMenuExistsAsync(int outletId, string internalOutletName);
         Task<MenuCategoryDto> AddCategoryAsync(int menuId, string categoryName, List<ExtraItemDto> extraItems);
+        Task<MenuCategoryDto> GetCategoryWithExtraItemsAsync(int categoryId);
         Task<List<MenuCategory>> GetAllCategoriesAsync(int outletId);
         Task<bool> DeleteCategoryAsync(int categoryId);
         Task<MenuItem> AddMenuItemAsync(MenuItemDto menuItemDto);
         Task<List<MenuItemDto>> GetMenuItemsByOutletIdAsync(int outletId);
+
         Task<MenuItemDto> GetMenuItemByIdAsync(int menuItemId);
         Task<bool> DeleteMenuItemAsync(int itemId);
         Task<bool> DeleteMenusByOutletIdAsync(int outletId);

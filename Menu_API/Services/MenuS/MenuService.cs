@@ -36,16 +36,20 @@ namespace Menu_API.Services.MenuS
         }
         public async Task<bool> DeleteCategoryAsync(int categoryId)
         {
-            var category = await _context.MenuCategories.FindAsync(categoryId);
+            var category = await _context.MenuCategories
+                                         .Include(c => c.ExtraItems)
+                                         .FirstOrDefaultAsync(c => c.Id == categoryId);
             if (category == null)
             {
                 return false;
             }
 
+            _context.ExtraItems.RemoveRange(category.ExtraItems); // Delete related extra items
             _context.MenuCategories.Remove(category);
             await _context.SaveChangesAsync();
             return true;
         }
+
 
         public async Task<MenuCategoryDto> AddCategoryAsync(int menuId, string categoryName, List<ExtraItemDto> extraItems)
         {
@@ -91,6 +95,35 @@ namespace Menu_API.Services.MenuS
                                  .Where(c => c.Menu.OutletId == outletId)
                                  .ToListAsync();
         }
+        public async Task<MenuCategoryDto> GetCategoryWithExtraItemsAsync(int categoryId)
+        {
+            var category = await _context.MenuCategories
+                                         .Include(c => c.Menu)
+                                         .Include(c => c.ExtraItems)
+                                         .FirstOrDefaultAsync(c => c.Id == categoryId);
+
+            if (category == null)
+            {
+                return null;
+            }
+
+            var categoryDto = new MenuCategoryDto
+            {
+                Id = category.Id,
+                OutletId = category.Menu.OutletId.HasValue ? category.Menu.OutletId.Value : 0,
+                CategoryName = category.Name,
+                InternalOutletName = category.Menu.Name,
+                ExtraItems = category.ExtraItems.Select(ei => new ExtraItemDto
+                {
+                    Id = ei.Id,
+                    Name = ei.Name,
+                    Price = ei.Price
+                }).ToList()
+            };
+
+            return categoryDto;
+        }
+
 
         public async Task<MenuItem> AddMenuItemAsync(MenuItemDto menuItemDto)
         {

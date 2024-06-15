@@ -18,7 +18,7 @@ namespace Menu_API.Models
         public int MenuCategoryId { get; set; } // Foreign key for MenuCategory
         public MenuCategory MenuCategory { get; set; }  // Navigation property for MenuCategory
         public byte[] Image { get; set; } // field to hold image data
-        public ICollection<MenuItemSize> MenuItemSizes { get; set; } // one-to-many relationship with MenuItemSize
+        public ICollection<MenuItemSize> MenuItemSizes { get; set; } // one-to-many relationship with MenuItemSi
     }
 
 }

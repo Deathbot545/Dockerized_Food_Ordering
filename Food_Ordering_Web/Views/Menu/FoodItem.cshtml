@@ -127,7 +127,21 @@
     }
 
     $(document).ready(function () {
-        const menuItemId = '@ViewBag.ItemId';
+        // Check if data is available in local storage
+        const foodItemData = JSON.parse(localStorage.getItem('foodItemData'));
+
+        if (!foodItemData) {
+            // If no data is found, redirect back to the menu page
+            window.location.href = '/Menu';
+            return;
+        }
+
+        const menuItemId = foodItemData.itemId;
+        const customerFacingName = foodItemData.customerFacingName;
+
+        // Set the customer facing name
+        $('#customerFacingName').text(customerFacingName);
+
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}`;
         $('#inputQuantitySelector').on('input change', updateOrderButton);
 
@@ -149,7 +163,6 @@
                 $('#food-description').text(data.description);
                 $('p').eq(2).html('<span class="text-success">👍 ' + data.Rating + '%</span> (' + data.Votes + ')');
 
-                // Populate size options
                 let sizeOptionsHtml = '';
                 data.sizes.forEach(size => {
                     sizeOptionsHtml += `<div class="form-check">

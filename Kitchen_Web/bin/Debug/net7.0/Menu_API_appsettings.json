@@ -6,7 +6,7 @@
     }
   },
   "ConnectionStrings": {
-    "MenuDbConnection": "Host=menuapi.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=MenuDb;User Id=postgres;Password=NxPostgrsql;"
+    "MenuDbConnection": "Host=menuapi.c1scs0akut74.eu-north-1.rds.amazonaws.com;Port=5432;Database=MenuDb;User Id=postgres;Password=NxPostgrsql;"
   },
   "AllowedHosts": "*"
 }

@@ -6,7 +6,7 @@
     }
   },
   "ConnectionStrings": {
-    "OrderDbConnection": "Host=orderapi.cmnkfdahsas3.eu-north-1.rds.amazonaws.com;Port=5432;Database=OrderDb;User Id=postgres;Password=NxPostgrsql;"
+    "OrderDbConnection": "Host=orderapi.c1scs0akut74.eu-north-1.rds.amazonaws.com;Port=5432;Database=OrderDb;User Id=postgres;Password=NxPostgrsql;"
   },
   "AllowedHosts": "*"
 }

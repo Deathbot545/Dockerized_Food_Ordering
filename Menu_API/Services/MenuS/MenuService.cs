@@ -78,8 +78,8 @@ namespace Menu_API.Services.MenuS
             {
                 Name = menuItemDto.Name,
                 Description = menuItemDto.Description,
-                Price = menuItemDto.Price, // This is a base price, it can be optional
-                IsVegetarian = menuItemDto.IsVegetarian, // new property
+                Price = menuItemDto.Price,
+                IsVegetarian = menuItemDto.IsVegetarian,
                 MenuCategoryId = menuItemDto.MenuCategoryId,
                 Image = imageBytes,
                 MenuItemSizes = menuItemDto.Sizes.Select(sizeDto => new MenuItemSize
@@ -92,8 +92,11 @@ namespace Menu_API.Services.MenuS
             _context.MenuItems.Add(newMenuItem);
             await _context.SaveChangesAsync();
 
-            return newMenuItem;
+            return await _context.MenuItems
+                .Include(mi => mi.MenuItemSizes)
+                .FirstOrDefaultAsync(mi => mi.Id == newMenuItem.Id);
         }
+
 
 
 

@@ -75,17 +75,30 @@ namespace Menu_API.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                byte[] imageBytes = Convert.FromBase64String(menuItemDto.Image);
-                var newMenuItem = await _menuService.AddMenuItemAsync(menuItemDto);
 
-                return Json(newMenuItem);
+                var newMenuItem = await _menuService.AddMenuItemAsync(menuItemDto);
+                return Json(new
+                {
+                    newMenuItem.Id,
+                    newMenuItem.Name,
+                    newMenuItem.Description,
+                    newMenuItem.Price,
+                    newMenuItem.IsVegetarian,
+                    newMenuItem.MenuCategoryId,
+                    newMenuItem.Image,
+                    Sizes = newMenuItem.MenuItemSizes.Select(size => new
+                    {
+                        size.Size,
+                        size.Price
+                    }).ToList()
+                });
             }
             catch (Exception ex)
             {
-                // Log the exception details
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
         [HttpGet("GetMenuItems/{outletId}")]               //MenuItem By Outlet ID
         public async Task<IActionResult> GetMenuItems(int outletId)
         {

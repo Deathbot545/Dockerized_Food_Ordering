@@ -29,11 +29,12 @@ namespace Menu_API.Controllers
                 {
                     return BadRequest(ModelState);
                 }
+
                 var menu = await _menuService.EnsureMenuExistsAsync(menuCategoryDto.OutletId, menuCategoryDto.InternalOutletName);
 
-                var newMenuCategory = await _menuService.AddCategoryAsync(menu.Id, menuCategoryDto.CategoryName);
+                var newMenuCategory = await _menuService.AddCategoryAsync(menu.Id, menuCategoryDto.CategoryName, menuCategoryDto.ExtraItems);
 
-                return Ok("Test");
+                return Ok(newMenuCategory); // Return the newly created category along with extras
             }
             catch (Exception ex)
             {
@@ -42,6 +43,7 @@ namespace Menu_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+
         // API to get all categories
         [HttpGet("GetAllCategories/{outletId}")]
         public async Task<IActionResult> GetAllCategories(int outletId)

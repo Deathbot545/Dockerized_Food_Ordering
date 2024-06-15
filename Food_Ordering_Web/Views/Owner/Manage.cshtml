@@ -179,6 +179,13 @@
             let outletId = parseInt($('#outlet_id').val(), 10);
             let categoryName = $('#category_name').val();
             let internalOutletName = '@ViewBag.InternalOutletName';
+            let extraItems = [];
+
+            $('#extras-container .extra-group').each(function () {
+                const extraName = $(this).find('.extra-name').val();
+                const extraPrice = parseFloat($(this).find('.extra-price').val());
+                extraItems.push({ name: extraName, price: extraPrice });
+            });
 
             $.ajax({
                 url: 'https://restosolutionssaas.com/api/MenuApi/AddCategory',
@@ -187,7 +194,8 @@
                 data: JSON.stringify({
                     outletId: outletId,
                     categoryName: categoryName,
-                    internalOutletName: internalOutletName
+                    internalOutletName: internalOutletName,
+                    extraItems: extraItems
                 }),
                 success: function (response) {
                     console.log("Category added:", response);

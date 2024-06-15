@@ -47,12 +47,17 @@ namespace Menu_API.Services.MenuS
             return true;
         }
 
-        public async Task<MenuCategory> AddCategoryAsync(int menuId, string categoryName)
+        public async Task<MenuCategory> AddCategoryAsync(int menuId, string categoryName, List<ExtraItemDto> extraItems)
         {
             var menuCategory = new MenuCategory
             {
                 MenuId = menuId,
-                Name = categoryName
+                Name = categoryName,
+                ExtraItems = extraItems.Select(e => new ExtraItem
+                {
+                    Name = e.Name,
+                    Price = e.Price
+                }).ToList()
             };
 
             _context.MenuCategories.Add(menuCategory);
@@ -60,6 +65,7 @@ namespace Menu_API.Services.MenuS
 
             return menuCategory;
         }
+
         // Method to get all categories
         public async Task<List<MenuCategory>> GetAllCategoriesAsync(int outletId)
         {

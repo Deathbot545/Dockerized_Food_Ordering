@@ -134,6 +134,7 @@
                             <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
                             <button class="btn btn-sm remove-extra-item" data-item-id="${item.id}" data-extra-item-id="${extraItem.id}">&times;</button>
                         </div>`;
+                    itemTotal += extraItem.price; // Add the price of extra items to itemTotal
                 });
             }
 
@@ -163,7 +164,6 @@
             removeExtraItemFromCart(itemId, extraItemId);
         });
     }
-
 
 
     $(document).ready(function () {
@@ -243,12 +243,22 @@
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         console.log(`Before removal, cart contains:`, cart);
 
-        cart = cart.filter(item => item.id !== itemId.toString());
+        // Remove the item and its extra items
+        cart = cart.filter(item => {
+            if (item.id === itemId.toString()) {
+                // Remove the extra items if any
+                item.extraItems = [];
+                return false;
+            }
+            return true;
+        });
+
         console.log(`After removal, cart now contains:`, cart);
 
         localStorage.setItem('cart', JSON.stringify(cart));
         loadCheckoutPage();
     }
+
     function removeExtraItemFromCart(itemId, extraItemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         console.log(`Before removal, cart contains:`, cart);

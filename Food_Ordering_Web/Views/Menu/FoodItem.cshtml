@@ -285,7 +285,9 @@
 
         function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let existingItem = cart.find(x => x.id === item.id && x.size === item.size && JSON.stringify(x.extraItems) === JSON.stringify(item.extraItems));
+            let itemKey = item.id + "-" + item.size + "-" + JSON.stringify(item.extraItems); // Create a unique key for the item
+
+            let existingItem = cart.find(x => x.itemKey === itemKey);
 
             let timestamp = new Date().getTime();
 
@@ -297,18 +299,13 @@
                 existingItem.note = item.note;
             } else {
                 item.timestamp = timestamp;
-                cart.push({
-                    ...item,
-                    outletId: '@ViewBag.OutletId',
-                    note: item.note
-                });
+                item.itemKey = itemKey;
+                cart.push(item);
             }
 
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartButton();
         }
-
-
 
 
         $('#cart-button').click(function () {

@@ -267,17 +267,20 @@
                 existingItem.tableId = item.tableId;
                 existingItem.outletId = item.outletId;
                 existingItem.note = item.note;
+                existingItem.extraItems = item.extraItems;
             } else {
                 item.timestamp = timestamp;
                 cart.push({
                     ...item,
                     outletId: '@ViewBag.OutletId',
-                    note: item.note
+                    note: item.note,
+                    extraItems: item.extraItems
                 });
             }
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartButton();
         }
+
 
         $('#cart-button').click(function () {
             window.location.href = '/Order/Checkout';

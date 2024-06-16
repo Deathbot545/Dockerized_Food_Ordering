@@ -253,57 +253,38 @@
             console.error("SignalR connection error:", err);
         });
 
-        function fetchAndDisplayMenuItems() {
-            let apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItems/${outletId}`;
-            $.get(apiEndpoint, function (menuItems) {
-                let categoryMap = {};
-                let navbarItems = '';
+        function fetchAndDisplayOutletInfo() {
+            let outletInfoEndpoint = `https://restosolutionssaas.com/api/OutletApi/outletInfo/${outletId}`;
 
-                console.log("Fetched Menu Items:", menuItems); // Log menu items
+            console.log(`Fetching data from endpoint: ${outletInfoEndpoint}`); // Logs the endpoint being hit.
 
-                menuItems.forEach(menuItem => {
-                    console.log("Menu Item:", menuItem); // Log each menu item
+            $.get(outletInfoEndpoint, function (outletInfo) {
+                console.log('Received data:', outletInfo); // Logs the received data.
 
-                    if (!categoryMap[menuItem.categoryId]) {
-                        categoryMap[menuItem.categoryId] = { name: menuItem.categoryName, items: [] };
-                    }
-                    categoryMap[menuItem.categoryId].items.push(menuItem);
-                });
+                // Set the outlet name in the title
+                if (outletInfo && outletInfo.customerFacingName) {
+                    console.log('Setting customerFacingName:', outletInfo.customerFacingName); // Logs the name being set.
+                    $("#outlet-name").text(outletInfo.customerFacingName);
+                } else {
+                    console.error('customerFacingName not found or is undefined in the received data');
+                }
 
-                let menuHtml = '';
+                if (outletInfo && outletInfo.logo) {
+                    const logoBase64 = outletInfo.logo;
+                    console.log('Setting Logo:', logoBase64.substring(0, 100) + '...'); // Logs the first 100 characters of the logo data for brevity.
 
-                Object.keys(categoryMap).forEach(categoryId => {
-                    const category = categoryMap[categoryId];
-                    navbarItems += `<li class="nav-item"><a class="nav-link" href="#${categoryId}">${category.name}</a></li>`;
-
-                    menuHtml += `<div id="${categoryId}">
-                                     <h2>${category.name}</h2>
-                                     <div class="row">`;
-
-                    category.items.forEach(menuItem => {
-                        const imageBase64 = menuItem.image;
-                        menuHtml += `<div class="col-md-4">
-                                         <div class="card" data-item-id="${menuItem.id}" data-category-id="${menuItem.categoryId}" data-outlet-id="${outletId}" data-table-id="${tableId}">
-                                             <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
-                                             <div class="card-body">
-                                                 <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
-                                                 <p class="card-text">${menuItem.description}</p>
-                                             </div>
-                                         </div>
-                                     </div>`;
-                    });
-
-                    menuHtml += `</div>
-                                 </div>`;
-                });
-
-                $('#category-navbar').html(navbarItems);
-                $('#menu-container').html(menuHtml);
+                    $("#outlet-logo").attr('src', `data:image/png;base64,${logoBase64}`)
+                        .attr('alt', `${outletInfo.customerFacingName} Logo`)
+                        .show();
+                } else {
+                    console.error("Logo data is undefined or empty");
+                }
             })
                 .fail(function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed:", textStatus, errorThrown);
+                    console.log("Request failed for outlet info:", textStatus, errorThrown);
                 });
         }
+
 
         function fetchAndDisplayOutletInfo() {
             let outletInfoEndpoint = `https://restosolutionssaas.com/api/OutletApi/outletInfo/${outletId}`;

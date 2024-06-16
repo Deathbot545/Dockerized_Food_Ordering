@@ -225,6 +225,7 @@
         <button class="btn call-waiter-nav-button">Call Waiter</button>
     </div>
 </nav>
+
 <!-- Container for menu items -->
 <div id="menu-container" class="container">
     <!-- This will be populated by JavaScript -->
@@ -259,36 +260,37 @@
                 let navbarItems = '';
 
                 menuItems.forEach(menuItem => {
-                    if (!categoryMap[menuItem.categoryName]) {
-                        categoryMap[menuItem.categoryName] = [];
+                    if (!categoryMap[menuItem.categoryId]) {
+                        categoryMap[menuItem.categoryId] = { name: menuItem.categoryName, items: [] };
                     }
-                    categoryMap[menuItem.categoryName].push(menuItem);
+                    categoryMap[menuItem.categoryId].items.push(menuItem);
                 });
 
                 let menuHtml = '';
 
-                Object.keys(categoryMap).forEach((category, index) => {
-                    navbarItems += `<li class="nav-item"><a class="nav-link" href="#${category}">${category}</a></li>`;
+                Object.keys(categoryMap).forEach(categoryId => {
+                    const category = categoryMap[categoryId];
+                    navbarItems += `<li class="nav-item"><a class="nav-link" href="#${categoryId}">${category.name}</a></li>`;
 
-                    menuHtml += `<div id="${category}">
-                                                   <h2>${category}</h2>
-                                                   <div class="row">`;
+                    menuHtml += `<div id="${categoryId}">
+                                         <h2>${category.name}</h2>
+                                         <div class="row">`;
 
-                    categoryMap[category].forEach(menuItem => {
+                    category.items.forEach(menuItem => {
                         const imageBase64 = menuItem.image;
                         menuHtml += `<div class="col-md-4">
-                                                      <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
-                                                   <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
-                                                   <div class="card-body">
+                                             <div class="card" data-item-id="${menuItem.id}" data-outlet-id="${outletId}" data-table-id="${tableId}">
+                                                 <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
+                                                 <div class="card-body">
                                                      <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
                                                      <p class="card-text">${menuItem.description}</p>
-                                                   </div>
                                                  </div>
-                                               </div>`;
+                                             </div>
+                                         </div>`;
                     });
 
-                    menuHtml += ` </div>
-                                            </div>`;
+                    menuHtml += `</div>
+                                     </div>`;
                 });
 
                 $('#category-navbar').html(navbarItems);
@@ -408,9 +410,9 @@
             });
         });
 
-
         $('#cart-button').click(function () {
             window.location.href = '/Order/Checkout';
         });
     });
 </script>
+

@@ -273,24 +273,24 @@
                     navbarItems += `<li class="nav-item"><a class="nav-link" href="#${categoryId}">${category.name}</a></li>`;
 
                     menuHtml += `<div id="${categoryId}">
-                                             <h2>${category.name}</h2>
-                                             <div class="row">`;
+                                     <h2>${category.name}</h2>
+                                     <div class="row">`;
 
                     category.items.forEach(menuItem => {
                         const imageBase64 = menuItem.image;
                         menuHtml += `<div class="col-md-4">
-                                                 <div class="card" data-item-id="${menuItem.id}" data-category-id="${categoryId}" data-outlet-id="${outletId}" data-table-id="${tableId}">
-                                                     <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
-                                                     <div class="card-body">
-                                                         <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
-                                                         <p class="card-text">${menuItem.description}</p>
-                                                     </div>
-                                                 </div>
-                                             </div>`;
+                                         <div class="card" data-item-id="${menuItem.id}" data-category-id="${menuItem.categoryId}" data-outlet-id="${outletId}" data-table-id="${tableId}">
+                                             <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
+                                             <div class="card-body">
+                                                 <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
+                                                 <p class="card-text">${menuItem.description}</p>
+                                             </div>
+                                         </div>
+                                     </div>`;
                     });
 
                     menuHtml += `</div>
-                                         </div>`;
+                                 </div>`;
                 });
 
                 $('#category-navbar').html(navbarItems);
@@ -300,6 +300,7 @@
                     console.log("Request failed:", textStatus, errorThrown);
                 });
         }
+
 
         function fetchAndDisplayOutletInfo() {
             let outletInfoEndpoint = `https://restosolutionssaas.com/api/OutletApi/outletInfo/${outletId}`;
@@ -388,6 +389,11 @@
             const customerFacingName = $("#outlet-name").text();
             const menuId = '@ViewBag.MenuId'; // Assuming the menu ID is available in ViewBag
 
+            console.log("Item ID:", itemId);
+            console.log("Category ID:", categoryId);
+            console.log("Outlet ID:", outletId);
+            console.log("Table ID:", tableId);
+
             $.post('/Order/RedirectToDetail', {
                 itemId: itemId,
                 categoryId: categoryId, // Pass category ID
@@ -400,7 +406,7 @@
                     // Store data in local storage
                     localStorage.setItem('foodItemData', JSON.stringify({
                         itemId: response.itemId,
-                        categoryId: categoryId, // Save category ID
+                        categoryId: response.categoryId, // Save category ID
                         outletId: response.outletId,
                         tableId: response.tableId,
                         customerFacingName: response.customerFacingName,
@@ -412,6 +418,8 @@
                 }
             });
         });
+
+
 
         $('#cart-button').click(function () {
             window.location.href = '/Order/Checkout';

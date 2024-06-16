@@ -41,10 +41,12 @@ namespace Food_Ordering_Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult RedirectToDetail(int itemId, int outletId, int tableId, string customerFacingName)
+        public IActionResult RedirectToDetail(int itemId, int outletId, int tableId, string customerFacingName, int categoryId)
         {
-            return Json(new { success = true, redirectUrl = Url.Action("FoodDetail"), itemId, outletId, tableId, customerFacingName });
+            return Json(new { success = true, redirectUrl = Url.Action("FoodDetail"), itemId, outletId, tableId, customerFacingName, categoryId });
         }
+
+
 
 
         public IActionResult FoodDetail()

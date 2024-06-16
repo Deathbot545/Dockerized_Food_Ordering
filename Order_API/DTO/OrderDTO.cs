@@ -35,6 +35,7 @@ namespace Order_API.DTO
         public int Quantity { get; set; }
         public string Note { get; set; }
         public string Size { get; set; } // Include the size in the DTO
+        public string? ExtraItems { get; set; } // Extra items in string format
     }
 
     public class MenuItemData

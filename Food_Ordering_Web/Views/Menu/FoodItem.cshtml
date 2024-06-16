@@ -119,9 +119,14 @@
     function updateOrderButton() {
         let quantity = parseInt($('#inputQuantitySelector').val());
         let sizePrice = parseFloat($('input[name="size"]:checked').data('price')) || 0;
-        let total = sizePrice * quantity;
+        let extraItemsPrice = 0;
+        $('input[name="extra-item"]:checked').each(function () {
+            extraItemsPrice += parseFloat($(this).data('price')) || 0;
+        });
+        let total = (sizePrice + extraItemsPrice) * quantity;
         $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
     }
+
 
     function goBack() {
         window.history.back();
@@ -221,19 +226,18 @@
             localStorage.setItem('cart', JSON.stringify(cart));
 
             let itemCount = cart.reduce((count, item) => count + item.qty, 0);
-            let total = 0;
-            cart.forEach(item => {
+            let total = cart.reduce((total, item) => {
                 let itemTotal = item.price * item.qty;
                 if (item.extraItems && item.extraItems.length > 0) {
                     item.extraItems.forEach(extraItem => {
                         itemTotal += extraItem.price * item.qty;
                     });
                 }
-                total += itemTotal;
-            });
+                return total + itemTotal;
+            }, 0).toFixed(2);
 
             $("#cart-items-count").text(itemCount);
-            $("#cart-total").text(total.toFixed(2));
+            $("#cart-total").text(total);
 
             if (itemCount > 0) {
                 $('#cart-button').show();
@@ -241,6 +245,7 @@
                 $('#cart-button').hide();
             }
         }
+
 
         $('#order-button').click(function () {
             const qty = parseInt($('#inputQuantitySelector').val());
@@ -258,6 +263,7 @@
             $('input[name="extra-item"]:checked').each(function () {
                 extraItems.push({
                     id: $(this).val(),
+                    name: $(this).siblings('label').text().trim(),
                     price: parseFloat($(this).data('price')) || 0
                 });
             });
@@ -276,9 +282,11 @@
         });
 
 
+
         function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let existingItem = cart.find(x => x.id === item.id && x.size === item.size);
+            let existingItem = cart.find(x => x.id === item.id && x.size === item.size && JSON.stringify(x.extraItems) === JSON.stringify(item.extraItems));
+
             let timestamp = new Date().getTime();
 
             if (existingItem) {
@@ -287,19 +295,19 @@
                 existingItem.tableId = item.tableId;
                 existingItem.outletId = item.outletId;
                 existingItem.note = item.note;
-                existingItem.extraItems = item.extraItems;
             } else {
                 item.timestamp = timestamp;
                 cart.push({
                     ...item,
                     outletId: '@ViewBag.OutletId',
-                    note: item.note,
-                    extraItems: item.extraItems
+                    note: item.note
                 });
             }
+
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartButton();
         }
+
 
 
 

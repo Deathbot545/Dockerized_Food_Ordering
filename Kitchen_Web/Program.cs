@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Lo
 builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true, reloadOnChange: true);
 
-// Setup We
+// Setup 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80); 

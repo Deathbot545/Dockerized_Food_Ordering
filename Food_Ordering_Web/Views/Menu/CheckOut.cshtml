@@ -252,15 +252,18 @@
         loadCheckoutPage();
     }
 
-    function removeExtraItemFromCart(itemId, extraItemId) {
+    function removeItemFromCart(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         console.log(`Before removal, cart contains:`, cart);
 
-        cart = cart.map(item => {
+        // Remove the item with the specified itemId
+        cart = cart.filter(item => {
             if (item.id === itemId.toString()) {
-                item.extraItems = item.extraItems.filter(extraItem => extraItem.id !== extraItemId.toString());
+                // Remove the extra items if any
+                item.extraItems = [];
+                return false;
             }
-            return item;
+            return true;
         });
 
         console.log(`After removal, cart now contains:`, cart);
@@ -268,5 +271,6 @@
         localStorage.setItem('cart', JSON.stringify(cart));
         loadCheckoutPage();
     }
+
 
 </script>

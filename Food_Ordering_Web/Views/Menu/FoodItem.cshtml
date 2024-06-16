@@ -253,6 +253,15 @@
             const outletId = '@ViewBag.OutletId';
             const size = $('input[name="size"]:checked').val();
 
+            // Get selected extra items
+            let extraItems = [];
+            $('input[name="extra-item"]:checked').each(function () {
+                extraItems.push({
+                    id: $(this).val(),
+                    price: parseFloat($(this).data('price')) || 0
+                });
+            });
+
             addToCart({
                 id: '@ViewBag.ItemId'.toString(),
                 name: name,
@@ -261,9 +270,11 @@
                 tableId: tableId,
                 outletId: outletId,
                 note: note,
-                size: size
+                size: size,
+                extraItems: extraItems // Include extra items here
             });
         });
+
 
         function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -289,6 +300,7 @@
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartButton();
         }
+
 
 
         $('#cart-button').click(function () {

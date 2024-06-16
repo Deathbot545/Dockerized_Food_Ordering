@@ -140,12 +140,13 @@
         const menuItemId = foodItemData.itemId;
         const customerFacingName = foodItemData.customerFacingName;
         const menuId = foodItemData.menuId; // Retrieve menu ID
+        const categoryId = foodItemData.categoryId;
 
         // Set the customer facing name
         $('#customerFacingName').text(customerFacingName);
 
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}?menuId=${menuId}`; // Use menu ID in API call
-        const extraItemsEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetCategoryWithExtraItems/${menuId}`; // Use menu ID to get extra items
+        const extraItemsEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetCategoryWithExtraItems/${categoryId}`; // Use menu ID to get extra items
         $('#inputQuantitySelector').on('input change', updateOrderButton);
 
         // Fetch menu item details

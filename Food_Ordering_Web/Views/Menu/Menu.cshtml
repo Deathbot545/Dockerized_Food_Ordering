@@ -259,7 +259,11 @@
                 let categoryMap = {};
                 let navbarItems = '';
 
+                console.log("Fetched Menu Items:", menuItems); // Log menu items
+
                 menuItems.forEach(menuItem => {
+                    console.log("Menu Item:", menuItem); // Log each menu item
+
                     if (!categoryMap[menuItem.categoryId]) {
                         categoryMap[menuItem.categoryId] = { name: menuItem.categoryName, items: [] };
                     }
@@ -300,7 +304,6 @@
                     console.log("Request failed:", textStatus, errorThrown);
                 });
         }
-
 
         function fetchAndDisplayOutletInfo() {
             let outletInfoEndpoint = `https://restosolutionssaas.com/api/OutletApi/outletInfo/${outletId}`;
@@ -389,10 +392,10 @@
             const customerFacingName = $("#outlet-name").text();
             const menuId = '@ViewBag.MenuId'; // Assuming the menu ID is available in ViewBag
 
-            console.log("Item ID:", itemId);
-            console.log("Category ID:", categoryId);
-            console.log("Outlet ID:", outletId);
-            console.log("Table ID:", tableId);
+            console.log("Clicked Item ID:", itemId);
+            console.log("Clicked Category ID:", categoryId);
+            console.log("Clicked Outlet ID:", outletId);
+            console.log("Clicked Table ID:", tableId);
 
             $.post('/Order/RedirectToDetail', {
                 itemId: itemId,
@@ -419,12 +422,11 @@
             });
         });
 
-
-
         $('#cart-button').click(function () {
             window.location.href = '/Order/Checkout';
         });
     });
+
 </script>
 
 

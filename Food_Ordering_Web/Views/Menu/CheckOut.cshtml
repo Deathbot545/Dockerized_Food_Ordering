@@ -129,24 +129,23 @@
             if (item.extraItems && item.extraItems.length > 0) {
                 item.extraItems.forEach(extraItem => {
                     extraItemsHtml += `
-                        <div class="extra-item">
-                            <span>${extraItem.name}</span>
-                            <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
-                                <button class="btn btn-sm remove-item" data-item-name="${item.name}" data-item-size="${item.size}">&times;</button>
-
-                        </div>`;
+                            <div class="extra-item">
+                                <span>${extraItem.name}</span>
+                                <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
+                                <button class="btn btn-sm remove-extra-item" data-item-id="${item.id}" data-extra-item-id="${extraItem.id}">&times;</button>
+                            </div>`;
                     itemTotal += extraItem.price; // Add the price of extra items to itemTotal
                 });
             }
 
             itemsHtml += `
-                <div class="mb-3">
-                    <span>${item.name} (x${item.qty})</span>
-                    <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                    <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
-                    ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
-                    ${extraItemsHtml}
-                </div>`;
+                    <div class="mb-3">
+                        <span>${item.name} (x${item.qty})</span>
+                        <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
+                        <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
+                        ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
+                        ${extraItemsHtml}
+                    </div>`;
         });
 
         let deliveryFee = $("input[name='delivery']:checked").attr("id") === "priority" ? 0 : 0;
@@ -162,6 +161,13 @@
             const itemId = $(this).data('item-id');
             console.log(`Attempting to remove item from cart: ${itemId}`);
             removeItemFromCart(itemId);
+        });
+
+        $(document).on('click', '.remove-extra-item', function () {
+            const itemId = $(this).data('item-id');
+            const extraItemId = $(this).data('extra-item-id');
+            console.log(`Attempting to remove extra item from cart: ${extraItemId}`);
+            removeExtraItemFromCart(itemId, extraItemId);
         });
     }
 
@@ -222,7 +228,7 @@
             });
 
         return false;
-        
+
     }
     function createHiddenInput(name, value) {
         let input = document.createElement('input');
@@ -236,6 +242,19 @@
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         cart = cart.filter(item => item.id !== itemId);
         localStorage.setItem('cart', JSON.stringify(cart));
+        loadCheckoutPage(); // Update the UI after removing the item
+        updateCartButton();
+    }
+
+    function removeExtraItemFromCart(itemId, extraItemId) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.forEach(item => {
+            if (item.id === itemId && item.extraItems) {
+                item.extraItems = item.extraItems.filter(extraItem => extraItem.id !== extraItemId);
+            }
+        });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        loadCheckoutPage(); // Update the UI after removing the extra item
         updateCartButton();
     }
 
@@ -267,5 +286,4 @@
             $('#cart-button').hide();
         }
     }
-
 </script>

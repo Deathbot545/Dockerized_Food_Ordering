@@ -283,7 +283,7 @@
 
         function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let itemKey = item.id + "-" + item.size + "-" + JSON.stringify(item.extraItems); // Create a unique key for the item
+            let itemKey = item.name + "-" + item.size + "-" + JSON.stringify(item.extraItems); // Create a unique key for the item
 
             let existingItem = cart.find(x => x.itemKey === itemKey);
 
@@ -298,12 +298,14 @@
             } else {
                 item.timestamp = timestamp;
                 item.itemKey = itemKey;
+                item.id = uuidv4(); // Generate a unique id for the item
                 cart.push(item);
             }
 
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartButton();
         }
+
 
 
         $('#cart-button').click(function () {

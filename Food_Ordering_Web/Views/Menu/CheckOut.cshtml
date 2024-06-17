@@ -140,13 +140,14 @@
             }
 
             itemsHtml += `
-                <div class="mb-3">
-                    <span>${item.name} (x${item.qty})</span>
-                    <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                    <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
-                    ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
-                    ${extraItemsHtml}
-                </div>`;
+        <div class="mb-3">
+            <span>${item.name} (x${item.qty})</span>
+            <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
+            <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
+            ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
+            ${extraItemsHtml}
+        </div>`;
+
         });
 
         let deliveryFee = $("input[name='delivery']:checked").attr("id") === "priority" ? 0 : 0;
@@ -164,7 +165,6 @@
             removeItemFromCart(itemId);
         });
     }
-
 
     $(document).ready(function () {
         console.log("Document ready. Loading checkout page.");

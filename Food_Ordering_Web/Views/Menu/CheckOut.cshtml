@@ -142,9 +142,7 @@
                 <div class="mb-3">
                     <span>${item.name} (x${item.qty})</span>
                     <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                                    <button class="btn btn-danger" onclick="removeItemFromCart('@ViewBag.ItemId')">Remove</button>
-
-
+                            <button class="btn btn-danger" onclick="removeItemFromCart('${item.id}')">Remove</button>
                     ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
                     ${extraItemsHtml}
                 </div>`;
@@ -231,23 +229,20 @@
             });
 
         return false;
+
+        function createHiddenInput(name, value) {
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            return input;
+        }
+
+        function removeItemFromCart(itemKey) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(item => item.itemKey !== itemKey);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartButton();
+        }
     }
-
-    function createHiddenInput(name, value) {
-        let input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;
-        input.value = value;
-        return input;
-    }
-
-    function removeItemFromCart(itemId) {
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart = cart.filter(item => item.id !== itemId); // Use itemId to filter out the item
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartButton(); // Update the cart button after removing the item
-    }
-
-
-
 </script>

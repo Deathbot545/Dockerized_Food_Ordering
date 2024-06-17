@@ -142,7 +142,7 @@
                 <div class="mb-3">
                     <span>${item.name} (x${item.qty})</span>
                     <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                            <button class="btn btn-danger" onclick="removeItemFromCart('${item.id}')">Remove</button>
+                    <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
                     ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
                     ${extraItemsHtml}
                 </div>`;
@@ -229,7 +229,6 @@
             });
 
         return false;
-
         function createHiddenInput(name, value) {
             let input = document.createElement('input');
             input.type = 'hidden';
@@ -245,4 +244,8 @@
             updateCartButton();
         }
     }
+
+   
+
+
 </script>

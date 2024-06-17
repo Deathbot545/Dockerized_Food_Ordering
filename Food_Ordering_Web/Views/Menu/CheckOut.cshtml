@@ -142,7 +142,8 @@
                 <div class="mb-3">
                     <span>${item.name} (x${item.qty})</span>
                     <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                    <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
+                                <button class="btn btn-danger" onclick="removeItemFromCart('@item.id')">Remove</button>
+
                     ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
                     ${extraItemsHtml}
                 </div>`;
@@ -239,18 +240,13 @@
         return input;
     }
 
-    function removeFromCart(itemKey) {
+    function removeItemFromCart(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        console.log("Attempting to remove item from cart: ", itemKey);
-
-        cart = cart.filter(item => item.itemKey !== itemKey);
-
+        cart = cart.filter(item => item.id !== itemId); // Use itemId to filter out the item
         localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartButton();
+        updateCartButton(); // Update the cart button after removing the item
     }
 
-
-    
 
 
 </script>

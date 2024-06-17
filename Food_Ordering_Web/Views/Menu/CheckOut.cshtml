@@ -229,23 +229,21 @@
             });
 
         return false;
-        function createHiddenInput(name, value) {
-            let input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value;
-            return input;
-        }
-
-        function removeItemFromCart(itemKey) {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart = cart.filter(item => item.itemKey !== itemKey);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartButton();
-        }
+        
+    }
+    function createHiddenInput(name, value) {
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        return input;
     }
 
-   
-
+    function removeItemFromCart(itemKey) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart = cart.filter(item => item.itemKey !== itemKey);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartButton();
+    }
 
 </script>

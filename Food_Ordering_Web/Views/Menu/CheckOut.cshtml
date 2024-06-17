@@ -142,7 +142,8 @@
                 <div class="mb-3">
                     <span>${item.name} (x${item.qty})</span>
                     <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                                <button class="btn btn-danger" onclick="removeItemFromCart('@item.id')">Remove</button>
+                                    <button class="btn btn-danger" onclick="removeItemFromCart('@ViewBag.ItemId')">Remove</button>
+
 
                     ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
                     ${extraItemsHtml}

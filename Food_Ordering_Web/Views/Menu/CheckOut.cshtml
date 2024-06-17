@@ -132,7 +132,8 @@
                         <div class="extra-item">
                             <span>${extraItem.name}</span>
                             <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
-                            <button class="btn btn-sm remove-extra-item" data-item-id="${item.id}" data-extra-item-id="${extraItem.id}">&times;</button>
+                                <button class="btn btn-sm remove-item" data-item-name="${item.name}" data-item-size="${item.size}">&times;</button>
+
                         </div>`;
                     itemTotal += extraItem.price; // Add the price of extra items to itemTotal
                 });
@@ -171,10 +172,12 @@
         loadCheckoutPage();
 
         $(document).on('click', '.remove-item', function () {
-            const itemId = $(this).data('item-id');
-            console.log(`Attempting to remove item from cart: ${itemId}`);
-            removeItemFromCart(itemId);
+            const itemName = $(this).data('item-name');
+            const itemSize = $(this).data('item-size');
+            console.log(`Attempting to remove item from cart: ${itemName}`);
+            removeItemFromCart(itemName, itemSize);
         });
+
 
         $('#order-button').click(function () {
             submitOrderForm();
@@ -239,13 +242,13 @@
         return input;
     }
 
-    function removeItemFromCart(itemId) {
-        console.log('Attempting to remove item from cart:', itemId);
+    function removeItemFromCart(itemName, itemSize) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart = cart.filter(item => item.id !== itemId);
+        cart = cart.filter(item => item.name !== itemName || item.size !== itemSize);
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartButton();
     }
+
 
     function updateCartButton() {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];

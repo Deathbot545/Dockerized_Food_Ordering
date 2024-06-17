@@ -158,11 +158,10 @@
         $(".taxes").text(`LKR ${taxes.toFixed(2)}`);
         $(".total").text(`LKR ${(subTotal + deliveryFee + taxes).toFixed(2)}`);
 
-        $(document).on('click', '.remove-extra-item', function () {
+        $(document).on('click', '.remove-item', function () {
             const itemId = $(this).data('item-id');
-            const extraItemId = $(this).data('extra-item-id');
-            console.log(`Attempting to remove extra item ${extraItemId} from item ${itemId}`);
-            removeExtraItemFromCart(itemId, extraItemId);
+            console.log(`Attempting to remove item from cart: ${itemId}`);
+            removeItemFromCart(itemId);
         });
     }
 
@@ -170,14 +169,6 @@
     $(document).ready(function () {
         console.log("Document ready. Loading checkout page.");
         loadCheckoutPage();
-
-        $(document).on('click', '.remove-item', function () {
-            const itemName = $(this).data('item-name');
-            const itemSize = $(this).data('item-size');
-            console.log(`Attempting to remove item from cart: ${itemName}`);
-            removeItemFromCart(itemName, itemSize);
-        });
-
 
         $('#order-button').click(function () {
             submitOrderForm();
@@ -242,13 +233,12 @@
         return input;
     }
 
-    function removeItemFromCart(itemName, itemSize) {
+    function removeItemFromCart(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart = cart.filter(item => item.name !== itemName || item.size !== itemSize);
+        cart = cart.filter(item => item.id !== itemId);
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartButton();
     }
-
 
     function updateCartButton() {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];

@@ -245,5 +245,33 @@
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartButton();
     }
+    function updateCartButton() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let currentTime = new Date().getTime();
+        let durationLimit = 24 * 60 * 60 * 1000;
+
+        cart = cart.filter(item => currentTime - item.timestamp < durationLimit);
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        let itemCount = cart.reduce((count, item) => count + item.qty, 0);
+        let total = cart.reduce((total, item) => {
+            let itemTotal = item.price * item.qty;
+            if (item.extraItems && item.extraItems.length > 0) {
+                item.extraItems.forEach(extraItem => {
+                    itemTotal += extraItem.price * item.qty;
+                });
+            }
+            return total + itemTotal;
+        }, 0).toFixed(2);
+
+        $("#cart-items-count").text(itemCount);
+        $("#cart-total").text(total);
+
+        if (itemCount > 0) {
+            $('#cart-button').show();
+        } else {
+            $('#cart-button').hide();
+        }
+    }
 
 </script>

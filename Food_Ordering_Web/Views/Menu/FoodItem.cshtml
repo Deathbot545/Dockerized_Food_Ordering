@@ -246,7 +246,6 @@
             }
         }
 
-
         $('#order-button').click(function () {
             const qty = parseInt($('#inputQuantitySelector').val());
             const sizePrice = parseFloat($('input[name="size"]:checked').data('price')) || 0;
@@ -269,7 +268,7 @@
             });
 
             addToCart({
-                id: '@ViewBag.ItemId'.toString(),
+                id: generateUniqueId(),
                 name: name,
                 qty: qty,
                 price: sizePrice,
@@ -281,11 +280,16 @@
             });
         });
 
+        function generateUniqueId() {
+            let uniqueIdCounter = parseInt(localStorage.getItem('uniqueIdCounter')) || 0;
+            uniqueIdCounter++;
+            localStorage.setItem('uniqueIdCounter', uniqueIdCounter);
+            return uniqueIdCounter.toString();
+        }
+
         function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let itemKey = cart.length + 1; // Use the length of the cart array as the item key
-
-            let existingItem = cart.find(x => x.itemKey === itemKey);
+            let existingItem = cart.find(x => x.id === item.id);
 
             let timestamp = new Date().getTime();
 
@@ -297,16 +301,12 @@
                 existingItem.note = item.note;
             } else {
                 item.timestamp = timestamp;
-                item.itemKey = itemKey;
                 cart.push(item);
             }
 
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartButton();
         }
-
-
-
 
         $('#cart-button').click(function () {
             window.location.href = '/Order/Checkout';
@@ -331,6 +331,7 @@
         });
 
         updateCartButton();
+
         function updateOrderButton() {
             let quantity = parseInt($('#inputQuantitySelector').val());
             let sizePrice = parseFloat($('input[name="size"]:checked').data('price')) || 0;
@@ -342,4 +343,5 @@
             $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
         }
     });
+
 </script>

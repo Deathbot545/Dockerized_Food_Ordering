@@ -128,8 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-   
-
     function handleCancellationAlert(order) {
         const notifiedCancellations = {};
         if (!notifiedCancellations[order.orderId]) {

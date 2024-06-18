@@ -11,9 +11,9 @@ namespace Kitchen_Web.DTO
 
         public int Id { get; set; }
         public DateTime OrderTime { get; set; }
-        // Changed to string to match the Order model and represent the customer as a user ID
         public string Customer { get; set; }
         public int TableId { get; set; }
+        public string TableName { get; set; }
         public int OutletId { get; set; }
         public OrderStatus Status { get; set; }
         public List<OrderDetailDTO> OrderDetails { get; set; }
@@ -24,9 +24,11 @@ namespace Kitchen_Web.DTO
         public int Id { get; set; }
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
-        public string Note { get; set; }    
         public MenuItemData MenuItem { get; set; }
         public int Quantity { get; set; }
+        public string Note { get; set; }
+        public string Size { get; set; } // Include the size in the DTO
+        public string? ExtraItems { get; set; } // Extra items in string format
     }
 
     public class MenuItemData
@@ -36,9 +38,7 @@ namespace Kitchen_Web.DTO
         public string Description { get; set; }
         public double Price { get; set; }
         public int MenuCategoryId { get; set; }
-        // This should be a simplified category information if needed, otherwise consider removing or adjusting based on actual usage
-
-        public string Image { get; set; } // Assuming this is a base64 encoded string for the image
+        public string Image { get; set; }
     }
     public enum OrderStatus
     {

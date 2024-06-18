@@ -158,14 +158,14 @@
         $(".total").text(`LKR ${(subTotal + deliveryFee + taxes).toFixed(2)}`);
 
         $(document).on('click', '.remove-item', function () {
-            const itemId = $(this).data('item-id');
+            const itemId = $(this).data('item-id').toString();
             console.log(`Attempting to remove item from cart: ${itemId}`);
             removeItemFromCart(itemId);
         });
 
         $(document).on('click', '.remove-extra-item', function () {
-            const itemId = $(this).data('item-id');
-            const extraItemId = $(this).data('extra-item-id');
+            const itemId = $(this).data('item-id').toString();
+            const extraItemId = $(this).data('extra-item-id').toString();
             console.log(`Attempting to remove extra item from cart: ${extraItemId}`);
             removeExtraItemFromCart(itemId, extraItemId);
         });
@@ -240,7 +240,7 @@
 
     function removeItemFromCart(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart = cart.filter(item => item.id !== itemId);
+        cart = cart.filter(item => item.id.toString() !== itemId);
         localStorage.setItem('cart', JSON.stringify(cart));
         loadCheckoutPage(); // Update the UI after removing the item
         updateCartButton();
@@ -249,8 +249,8 @@
     function removeExtraItemFromCart(itemId, extraItemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         cart.forEach(item => {
-            if (item.id === itemId && item.extraItems) {
-                item.extraItems = item.extraItems.filter(extraItem => extraItem.id !== extraItemId);
+            if (item.id.toString() === itemId && item.extraItems) {
+                item.extraItems = item.extraItems.filter(extraItem => extraItem.id.toString() !== extraItemId);
             }
         });
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -286,4 +286,13 @@
             $('#cart-button').hide();
         }
     }
+
+    function showLoadingOverlay() {
+        $('#loading-overlay').show();
+    }
+
+    function hideLoadingOverlay() {
+        $('#loading-overlay').hide();
+    }
 </script>
+

@@ -183,15 +183,17 @@
     function submitOrderForm() {
         showLoadingOverlay();
 
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        if (cart.length === 0) {
-            console.error("Attempted to submit order form with an empty cart.");
+        let foodItemData = JSON.parse(localStorage.getItem('foodItemData'));
+        if (!foodItemData || !foodItemData.tableId || !foodItemData.outletId) {
+            console.error("TableId or outletId not found in localStorage.");
             return; // Optionally show an error message to the user
         }
 
         const formData = new FormData();
-        formData.append('tableId', cart[0].tableId);
-        formData.append('outletId', cart[0].outletId);
+        formData.append('tableId', foodItemData.tableId);
+        formData.append('outletId', foodItemData.outletId);
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
         cart.forEach((item, index) => {
             console.log(`Item ${index} Note:`, item.note); // Log the note
             formData.append(`items[${index}].id`, item.id);

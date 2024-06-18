@@ -8,7 +8,7 @@ namespace Order_API.DTO
 {
     public class CartRequest
     {
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
         public int TableId { get; set; }
         public int OutletId { get; set; }
         public List<CartItem> MenuItems { get; set; }

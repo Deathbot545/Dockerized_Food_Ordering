@@ -8,22 +8,30 @@ namespace Order_API.DTO
 {
     public class CartRequest
     {
-        public List<CartItem> MenuItems { get; set; }
+        public string UserId { get; set; }
         public int TableId { get; set; }
         public int OutletId { get; set; }
-        public string? UserId { get; set; }
-
+        public List<CartItem> MenuItems { get; set; }
+        public bool AddUtensils { get; set; }
+        public List<ExtraItemRequest> ExtraItems { get; set; } // if extra items apply to the whole order
     }
 
     public class CartItem
     {
-        public int Id { get; set; }  // Change type to int
+        public int Id { get; set; }
         public int Qty { get; set; }
-        public string Name { get; set; }  // Add this
-        public decimal Price { get; set; }  // Assuming price is a decimal, add this
         public string Note { get; set; }
-        public string Size { get; internal set; }
+        public string Size { get; set; }
+        public List<ExtraItemRequest> ExtraItems { get; set; } // if extra items apply to individual cart items
     }
+
+    public class ExtraItemRequest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+
 
 
 }

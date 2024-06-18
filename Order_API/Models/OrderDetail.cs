@@ -15,7 +15,16 @@ namespace Order_API.Models
         public int Quantity { get; set; }
         public string Note { get; set; } // Note for special instructions
         public string Size { get; set; } // Add this line for size
-        public string? ExtraItems { get; set; } // Extra items in string format, nullable
+        public virtual List<ExtraItem> ExtraItems { get; set; } // Add this line for extra items
     }
+
+    public class ExtraItem
+    {
+        public int Id { get; set; }
+        public int OrderDetailId { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+
 
 }

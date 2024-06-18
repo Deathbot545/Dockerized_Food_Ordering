@@ -11,6 +11,10 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+// Add using directives for namespaces with aliases
+using OrderExtraItem = Order_API.Models.ExtraItem;
+using MenuExtraItem = Menu_API.Models.ExtraItem;
+
 
 namespace Order_API.Service.Orderser
 {
@@ -69,11 +73,26 @@ namespace Order_API.Service.Orderser
                         MenuItemId = menuItemDto.id,
                         Quantity = item.Qty,
                         Note = item.Note,
-                        Size = item.Size // Include the size from the request
+                        Size = item.Size,
+                        ExtraItems = new List<OrderExtraItem>() // Initialize ExtraItems list
                     };
 
-                    _logger.LogInformation($"Adding order detail: {@orderDetail}");
+                    // Add extras to the order detail if they exist
+                    if (item.ExtraItems != null)
+                    {
+                        foreach (var extraItem in item.ExtraItems)
+                        {
+                            var extraItemEntity = new OrderExtraItem
+                            {
+                                Name = extraItem.Name,
+                                Price = extraItem.Price
+                            };
 
+                            orderDetail.ExtraItems.Add(extraItemEntity);
+                        }
+                    }
+
+                    _logger.LogInformation($"Adding order detail: {@orderDetail}");
                     order.OrderDetails.Add(orderDetail);
                 }
                 catch (Exception ex)
@@ -96,6 +115,8 @@ namespace Order_API.Service.Orderser
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
+
+
 
 
         public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)

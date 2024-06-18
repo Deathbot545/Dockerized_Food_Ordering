@@ -203,9 +203,17 @@
             formData.append(`items[${index}].note`, item.note); // Ensure note is included
         });
 
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`); // Log the FormData entries
-        }
+        // Add UserId to the orderData object
+        let userId = ''; // Set the UserId to an empty string if it's not available
+        const orderData = {
+            UserId: userId,
+            TableId: foodItemData.tableId,
+            OutletId: foodItemData.outletId,
+            MenuItems: cart
+        };
+
+        const jsonPayload = JSON.stringify(orderData);
+        console.log(`Sending JSON payload to API: ${jsonPayload}`);
 
         fetch('/Order/CreateOrUpdateOrder', {
             method: 'POST',
@@ -230,8 +238,8 @@
             });
 
         return false;
-
     }
+
     function createHiddenInput(name, value) {
         let input = document.createElement('input');
         input.type = 'hidden';

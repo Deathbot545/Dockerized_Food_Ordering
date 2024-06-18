@@ -14,8 +14,8 @@ namespace Order_API.Models
         public int MenuItemId { get; set; }
         public int Quantity { get; set; }
         public string Note { get; set; } // Note for special instructions
-        public string Size { get; set; } // Add this line for size
-        public virtual List<ExtraItem> ExtraItems { get; set; } // Add this line for extra items
+        public string Size { get; set; }
+        public virtual List<ExtraItem>? ExtraItems { get; set; } // Allow null
     }
 
     public class ExtraItem

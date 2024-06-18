@@ -13,7 +13,7 @@ namespace Order_API.DTO
         public int OutletId { get; set; }
         public List<CartItem> MenuItems { get; set; }
         public bool AddUtensils { get; set; }
-        public List<ExtraItemRequest> ExtraItems { get; set; } // if extra items apply to the whole order
+        public List<ExtraItemRequest>? ExtraItems { get; set; } // Allow null
     }
 
     public class CartItem
@@ -22,7 +22,7 @@ namespace Order_API.DTO
         public int Qty { get; set; }
         public string Note { get; set; }
         public string Size { get; set; }
-        public List<ExtraItemRequest> ExtraItems { get; set; } // if extra items apply to individual cart items
+        public List<ExtraItemRequest>? ExtraItems { get; set; } // Allow null
     }
 
     public class ExtraItemRequest
@@ -31,7 +31,6 @@ namespace Order_API.DTO
         public string Name { get; set; }
         public decimal Price { get; set; }
     }
-
 
 
 }

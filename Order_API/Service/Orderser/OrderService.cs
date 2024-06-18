@@ -74,23 +74,12 @@ namespace Order_API.Service.Orderser
                         Quantity = item.Qty,
                         Note = item.Note,
                         Size = item.Size,
-                        ExtraItems = new List<OrderExtraItem>() // Initialize ExtraItems list
-                    };
-
-                    // Add extras to the order detail if they exist
-                    if (item.ExtraItems != null)
-                    {
-                        foreach (var extraItem in item.ExtraItems)
+                        ExtraItems = item.ExtraItems?.Select(extraItem => new OrderExtraItem
                         {
-                            var extraItemEntity = new OrderExtraItem
-                            {
-                                Name = extraItem.Name,
-                                Price = extraItem.Price
-                            };
-
-                            orderDetail.ExtraItems.Add(extraItemEntity);
-                        }
-                    }
+                            Name = extraItem.Name,
+                            Price = extraItem.Price
+                        }).ToList()
+                    };
 
                     _logger.LogInformation($"Adding order detail: {@orderDetail}");
                     order.OrderDetails.Add(orderDetail);
@@ -115,6 +104,7 @@ namespace Order_API.Service.Orderser
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
+
 
 
 

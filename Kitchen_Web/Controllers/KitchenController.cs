@@ -42,6 +42,18 @@ namespace Kitchen_Web.Controllers
                 var orders = await response.Content.ReadAsAsync<List<OrderDTO>>();
                 _logger.LogInformation("Orders successfully fetched and parsed, Count: {Count}", orders.Count);
 
+                foreach (var order in orders)
+                {
+                    _logger.LogInformation("OrderDTO: Id={Id}, OrderTime={OrderTime}, Customer={Customer}, TableId={TableId}, OutletId={OutletId}, Status={Status}",
+                        order.Id, order.OrderTime, order.Customer, order.TableId, order.OutletId, order.Status);
+
+                    foreach (var detail in order.OrderDetails)
+                    {
+                        _logger.LogInformation("OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, MenuItemName={MenuItemName}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
+                            detail.Id, detail.OrderId, detail.MenuItemId, detail.MenuItem?.Name, detail.Quantity, detail.Note, detail.Size, detail.ExtraItems);
+                    }
+                }
+
                 var model = new OutletViewModel { Orders = orders };
                 return View("~/Views/Home/Index.cshtml", model);
             }
@@ -51,6 +63,7 @@ namespace Kitchen_Web.Controllers
                 return View("Error", new ErrorViewModel { Message = "An error occurred." });
             }
         }
+
 
     }
 }

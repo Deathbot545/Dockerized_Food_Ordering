@@ -129,13 +129,14 @@ namespace Order_API.Service.Orderser
         {
             var currentTime = DateTime.UtcNow;
 
-            var orders = _context.Orders
+            var orders = await _context.Orders
                 .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.ExtraItems) // Include ExtraItems
                 .Where(o => o.OutletId == outletId &&
                             o.Status != OrderStatus.Cancelled &&
                             o.Status != OrderStatus.Rejected &&
                             (o.Status != OrderStatus.Served || o.OrderTime > currentTime.AddHours(-1)))
-                .ToList();
+                .ToListAsync();
 
             var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
 
@@ -164,7 +165,10 @@ namespace Order_API.Service.Orderser
                         }).FirstOrDefault(),
                     Quantity = od.Quantity,
                     Note = od.Note,
-                    Size = od.Size // Include the size in the DTO
+                    Size = od.Size, // Include the size in the DTO
+                    ExtraItems = od.ExtraItems != null
+                        ? string.Join(", ", od.ExtraItems.Select(ei => $"{ei.Name} (${ei.Price})"))
+                        : null // Join extra items into a single string
                 }).ToList()
             }).ToList();
 
@@ -173,12 +177,13 @@ namespace Order_API.Service.Orderser
                 _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
                 foreach (var detail in orderDto.OrderDetails)
                 {
-                    _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}");
+                    _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}, {detail.ExtraItems}");
                 }
             }
 
             return orderDtos;
         }
+
 
 
 

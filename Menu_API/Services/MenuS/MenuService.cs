@@ -153,6 +153,41 @@ namespace Menu_API.Services.MenuS
         }
 
 
+        public async Task<List<MenuItemWithExtrasDto>> GetMenuItemsWithExtrasByOutletIdAsync(int outletId)
+        {
+            var menu = await _context.Menus.FirstOrDefaultAsync(m => m.OutletId == outletId);
+            if (menu == null)
+            {
+                return null;
+            }
+
+            var menuItems = await _context.MenuItems
+                .Include(mi => mi.MenuCategory)  // Include the MenuCategory to access the name
+                .Include(mi => mi.MenuItemSizes) // Include the MenuItemSizes
+                .ThenInclude(size => size.MenuItem)
+                .Include(mi => mi.MenuCategory.ExtraItems) // Include ExtraItems
+                .Where(mi => mi.MenuCategory.MenuId == menu.Id)
+                .Select(mi => new MenuItemWithExtrasDto
+                {
+                    Id = mi.Id,
+                    Name = mi.Name,
+                    Description = mi.Description,
+                    Price = mi.Price,
+                    MenuCategoryId = mi.MenuCategoryId,
+                    CategoryName = mi.MenuCategory.Name,  // Assign the category name here
+                    Image = mi.Image != null ? Convert.ToBase64String(mi.Image) : null,  // Convert byte[] to base64 string
+                    Sizes = mi.MenuItemSizes.Select(size => size.Size).ToList(),
+                    ExtraItems = mi.MenuCategory.ExtraItems.Select(extra => new ExtraItemDto
+                    {
+                        Id = extra.Id,
+                        Name = extra.Name,
+                        Price = extra.Price
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return menuItems;
+        }
 
 
         public async Task<List<MenuItemDto>> GetMenuItemsByOutletIdAsync(int outletId)

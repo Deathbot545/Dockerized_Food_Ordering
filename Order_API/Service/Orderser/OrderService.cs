@@ -198,7 +198,7 @@ namespace Order_API.Service.Orderser
             var menuItemsDto = new List<MenuItemDto>();
 
             // Construct the URL to the Menu API endpoint
-            string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItems/{outletId}";
+            string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItemsWithExtras/{outletId}";
 
             try
             {

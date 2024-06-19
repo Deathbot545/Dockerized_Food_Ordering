@@ -131,6 +131,17 @@ namespace Menu_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex}");
             }
         }
+        [HttpGet("GetMenuItemsWithExtras/{outletId}")]
+        public async Task<IActionResult> GetMenuItemsWithExtras(int outletId)
+        {
+            var menuItems = await _menuService.GetMenuItemsWithExtrasByOutletIdAsync(outletId);
+            if (menuItems == null)
+            {
+                return NotFound();
+            }
+            return Ok(menuItems);
+        }
+
         [HttpGet("GetMenuItem/{menuItemId}")]              //MenuItem by Menu Item ID
         public async Task<IActionResult> GetMenuItem(int menuItemId)
         {

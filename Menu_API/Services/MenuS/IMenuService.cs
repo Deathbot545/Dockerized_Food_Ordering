@@ -18,7 +18,7 @@ namespace Menu_API.Services.MenuS
         Task<bool> DeleteCategoryAsync(int categoryId);
         Task<MenuItem> AddMenuItemAsync(MenuItemDto menuItemDto);
         Task<List<MenuItemDto>> GetMenuItemsByOutletIdAsync(int outletId);
-
+        Task<List<MenuItemWithExtrasDto>> GetMenuItemsWithExtrasByOutletIdAsync(int outletId);
         Task<MenuItemDto> GetMenuItemByIdAsync(int menuItemId);
         Task<bool> DeleteMenuItemAsync(int itemId);
         Task<bool> DeleteMenusByOutletIdAsync(int outletId);

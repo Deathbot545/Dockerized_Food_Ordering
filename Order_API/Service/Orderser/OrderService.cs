@@ -155,29 +155,30 @@ namespace Order_API.Service.Orderser
                 TableId = o.TableId,
                 OutletId = o.OutletId,
                 Status = o.Status,
-                OrderDetails = o.OrderDetails.Select(od => {
+                OrderDetails = o.OrderDetails.Select(od =>
+                {
+                    var menuItem = menuItemsDto.FirstOrDefault(mi => mi.id == od.MenuItemId);
+
                     var detailDto = new OrderDetailDTO
                     {
                         Id = od.Id,
                         OrderId = od.OrderId,
                         MenuItemId = od.MenuItemId,
-                        MenuItem = menuItemsDto.Where(mi => mi.id == od.MenuItemId)
-                            .Select(mi => new MenuItemData
-                            {
-                                Id = mi.id,
-                                Name = mi.Name,
-                                Description = mi.Description,
-                                Price = (decimal)mi.Price,
-                                MenuCategoryId = mi.MenuCategoryId,
-                                Image = mi.Image
-                            }).FirstOrDefault(),
+                        MenuItem = menuItem != null ? new MenuItemData
+                        {
+                            Id = menuItem.id,
+                            Name = menuItem.Name,
+                            Description = menuItem.Description,
+                            Price = menuItem.Price,
+                            MenuCategoryId = menuItem.MenuCategoryId,
+                            Image = menuItem.Image
+                        } : null,
                         Quantity = od.Quantity,
                         Note = od.Note,
                         Size = od.Size, // Include the size in the DTO
                         ExtraItems = od.ExtraItems != null
-    ? od.ExtraItems.Select(ei => new ExtraItemDto { Id = ei.Id, Name = ei.Name, Price = ei.Price }).ToList()
-    : null
-
+                            ? od.ExtraItems.Select(ei => new ExtraItemDto { Id = ei.Id, Name = ei.Name, Price = ei.Price }).ToList()
+                            : null
                     };
 
                     _logger.LogInformation("Mapped OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
@@ -191,6 +192,7 @@ namespace Order_API.Service.Orderser
 
             return orderDtos;
         }
+
 
 
         private async Task<List<MenuItemDto>> FetchMenuItemsByOutletIdAsync(int outletId)

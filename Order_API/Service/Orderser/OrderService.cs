@@ -167,7 +167,7 @@ namespace Order_API.Service.Orderser
                                 Id = mi.id,
                                 Name = mi.Name,
                                 Description = mi.Description,
-                                Price = (double)mi.Price,
+                                Price = (decimal)mi.Price,
                                 MenuCategoryId = mi.MenuCategoryId,
                                 Image = mi.Image
                             }).FirstOrDefault(),
@@ -220,6 +220,7 @@ namespace Order_API.Service.Orderser
 
             return menuItemsDto;
         }
+
 
 
         public async Task<bool> DeleteOrderAsync(int orderId)
@@ -288,7 +289,7 @@ namespace Order_API.Service.Orderser
                             Id = mi.id,
                             Name = mi.Name,
                             Description = mi.Description,
-                            Price = (double)mi.Price,
+                            Price = mi.Price,
                             MenuCategoryId = mi.MenuCategoryId,
                             Image = mi.Image
                         }).FirstOrDefault(),
@@ -337,7 +338,7 @@ namespace Order_API.Service.Orderser
                             Id = menuItemData.id,
                             Name = menuItemData.Name,
                             Description = menuItemData.Description,
-                            Price = (double)menuItemData.Price,
+                            Price = menuItemData.Price,
                             MenuCategoryId = menuItemData.MenuCategoryId,
                             Image = menuItemData.Image
                         } : null,

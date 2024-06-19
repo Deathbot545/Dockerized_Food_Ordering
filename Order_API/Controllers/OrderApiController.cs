@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Order_API.Data;
 using Order_API.DTO;
 using Order_API.Hubs;
+using Order_API.Models;
 using Order_API.Service.Orderser;
 using System.Text.Json;
 
@@ -16,15 +19,50 @@ namespace Order_API.Controllers
     {
          private readonly IHubContext<OrderStatusHub> _hubContext;
          private readonly IOrderService _orderService;
-         private ILogger<OrderApiController> _logger;    
+         private ILogger<OrderApiController> _logger;
+        private readonly OrderDbContext _context;
 
-         public OrderApiController(IOrderService orderService, IHubContext<OrderStatusHub> hubContext, ILogger<OrderApiController> logger)
+        public OrderApiController(IOrderService orderService, IHubContext<OrderStatusHub> hubContext, ILogger<OrderApiController> logger)
          {
              _orderService = orderService;
              _hubContext = hubContext;
              _logger = logger;
          }
         //ll
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Order>> GetOrder(int id)
+        {
+            _logger.LogInformation("Fetching order with ID: {OrderId}", id);
+
+            var order = await _context.Orders.FindAsync(id);
+
+            if (order == null)
+            {
+                _logger.LogInformation("Order with ID {OrderId} not found", id);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Order with ID {OrderId} found. Loading order details...", id);
+
+            await _context.Entry(order)
+                .Collection(o => o.OrderDetails)
+                .LoadAsync();
+
+            foreach (var detail in order.OrderDetails)
+            {
+                _logger.LogInformation("Loading extra items for order detail with ID: {OrderDetailId}", detail.Id);
+
+                await _context.Entry(detail)
+                    .Collection(d => d.ExtraItems)
+                    .LoadAsync();
+            }
+
+            _logger.LogInformation("Order with ID {OrderId} loaded successfully", id);
+
+            return order;
+        }
+
+
         // Add item to cart
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
@@ -33,9 +71,8 @@ namespace Order_API.Controllers
 
             try
             {
-                _logger.LogInformation("Calling ProcessOrderRequestAsync...");
+               
                 int orderId = await _orderService.ProcessOrderRequestAsync(request);
-                _logger.LogInformation($"Order processed with orderId: {orderId}. Fetching order details...");
 
                 var orderDto = await _orderService.GetOrderDetailsAsync(orderId);
                 if (orderDto != null)
@@ -82,9 +119,7 @@ namespace Order_API.Controllers
         {
             try
             {
-                _logger.LogInformation("Fetching orders for outlet ID: {OutletId}", outletId);
                 var ordersDTO = await _orderService.GetOrdersByOutletIdAsync(outletId);
-                _logger.LogInformation("Orders fetched successfully for outlet ID: {OutletId}", outletId);
                 return Ok(ordersDTO);  // Ensure ordersDTO does not contain non-serializable types
             }
             catch (Exception ex)

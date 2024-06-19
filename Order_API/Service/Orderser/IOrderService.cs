@@ -1,5 +1,6 @@
 ﻿
 using Menu_API.Models;
+using Microsoft.AspNetCore.Mvc;
 using Order_API.DTO;
 using Order_API.Models;
 using System;
@@ -12,7 +13,7 @@ namespace Order_API.Service.Orderser
 {
     public interface IOrderService
     {
-
+       
         Task UpdateOrderStatusAsync(int orderId, OrderStatus status);
         Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId);
         Task<int> ProcessOrderRequestAsync(CartRequest request);

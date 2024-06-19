@@ -82,7 +82,9 @@ namespace Order_API.Controllers
         {
             try
             {
+                _logger.LogInformation("Fetching orders for outlet ID: {OutletId}", outletId);
                 var ordersDTO = await _orderService.GetOrdersByOutletIdAsync(outletId);
+                _logger.LogInformation("Orders fetched successfully for outlet ID: {OutletId}", outletId);
                 return Ok(ordersDTO);  // Ensure ordersDTO does not contain non-serializable types
             }
             catch (Exception ex)
@@ -91,6 +93,7 @@ namespace Order_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
 
 
 

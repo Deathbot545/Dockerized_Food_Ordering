@@ -179,20 +179,24 @@ namespace Order_API.Service.Orderser
                     return detailDto;
                 }).ToList()
             }).ToList();
-
+            _logger.LogInformation("start loop");
             foreach (var orderDto in orderDtos)
             {
+                _logger.LogInformation("first loop");
                 _logger.LogInformation("OrderDTO: Id={Id}, OrderTime={OrderTime}, Customer={Customer}, TableId={TableId}, OutletId={OutletId}, Status={Status}",
                     orderDto.Id, orderDto.OrderTime, orderDto.Customer, orderDto.TableId, orderDto.OutletId, orderDto.Status);
-
+                _logger.LogInformation("inside loop");
                 foreach (var detail in orderDto.OrderDetails)
                 {
+                    _logger.LogInformation("second loop");
                     _logger.LogInformation("OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
                         detail.Id, detail.OrderId, detail.MenuItemId, detail.Quantity, detail.Note, detail.Size, detail.ExtraItems);
+                    _logger.LogInformation("end second loop");
                 }
+                _logger.LogInformation("loop end");
             }
 
-
+            _logger.LogInformation("end");
             return orderDtos;
         }
 

@@ -87,9 +87,11 @@ namespace Order_API.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Internal server error occurred while fetching orders for outlet ID: {OutletId}", outletId);
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
 
 
         [HttpDelete("DeleteOrder/{orderId}")]

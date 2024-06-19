@@ -174,15 +174,18 @@ namespace Order_API.Service.Orderser
 
             foreach (var orderDto in orderDtos)
             {
-                _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
+                _logger.LogInformation("OrderDTO: Id={Id}, OrderTime={OrderTime}, Customer={Customer}, TableId={TableId}, OutletId={OutletId}, Status={Status}",
+                    orderDto.Id, orderDto.OrderTime, orderDto.Customer, orderDto.TableId, orderDto.OutletId, orderDto.Status);
                 foreach (var detail in orderDto.OrderDetails)
                 {
-                    _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}, {detail.ExtraItems}");
+                    _logger.LogInformation("OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
+                        detail.Id, detail.OrderId, detail.MenuItemId, detail.Quantity, detail.Note, detail.Size, detail.ExtraItems);
                 }
             }
 
             return orderDtos;
         }
+
 
 
 

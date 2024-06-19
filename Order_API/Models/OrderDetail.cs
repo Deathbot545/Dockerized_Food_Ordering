@@ -13,7 +13,7 @@ namespace Order_API.Models
         public int OrderId { get; set; }
         public int MenuItemId { get; set; }
         public int Quantity { get; set; }
-        public string Note { get; set; } // Note for special instructions
+        public string Note { get; set; }
         public string Size { get; set; }
         public virtual List<ExtraItem>? ExtraItems { get; set; } // Allow null
     }
@@ -24,7 +24,9 @@ namespace Order_API.Models
         public int OrderDetailId { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
+        public virtual OrderDetail OrderDetail { get; set; } // Add this navigation property
     }
+
 
 
 }

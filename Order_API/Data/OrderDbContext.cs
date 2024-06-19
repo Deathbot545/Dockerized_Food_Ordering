@@ -19,6 +19,12 @@ namespace Order_API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+           
+            modelBuilder.Entity<OrderDetail>()
+       .HasMany(od => od.ExtraItems)
+       .WithOne(ei => ei.OrderDetail)
+       .HasForeignKey(ei => ei.OrderDetailId);
+
             base.OnModelCreating(modelBuilder);
             // Model configurations here, e.g., modelBuilder.Entity<Order>().ToTable("Orders");
         }

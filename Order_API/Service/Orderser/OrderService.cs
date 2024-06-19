@@ -12,9 +12,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 // Add using directives for namespaces with aliases
-using OrderExtraItem = Order_API.Models.ExtraItem;
-using MenuExtraItem = Menu_API.Models.ExtraItem;
-
+using ExtraItem = Order_API.Models.ExtraItem;
 
 namespace Order_API.Service.Orderser
 {
@@ -31,7 +29,7 @@ namespace Order_API.Service.Orderser
             _logger = logger;
          }
 
-      
+
 
         public async Task<int> ProcessOrderRequestAsync(CartRequest request)
         {
@@ -75,7 +73,7 @@ namespace Order_API.Service.Orderser
                         Quantity = item.Qty,
                         Note = item.Note,
                         Size = item.Size,
-                        ExtraItems = item.ExtraItems?.Select(extraItem => new OrderExtraItem
+                        ExtraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
                         {
                             Name = extraItem.Name,
                             Price = extraItem.Price
@@ -105,10 +103,7 @@ namespace Order_API.Service.Orderser
             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
             return order.Id;
         }
-
-
-
-
+ //Fuck this shit
 
         public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
          {

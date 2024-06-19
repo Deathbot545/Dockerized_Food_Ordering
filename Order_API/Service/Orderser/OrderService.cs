@@ -131,7 +131,8 @@ namespace Order_API.Service.Orderser
 
             var orders = await _context.Orders
                 .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.ExtraItems) // Include ExtraItems
+                .ThenInclude(od => od.ExtraItems)
+                .AsSplitQuery() // Use split query
                 .Where(o => o.OutletId == outletId &&
                             o.Status != OrderStatus.Cancelled &&
                             o.Status != OrderStatus.Rejected &&
@@ -185,6 +186,7 @@ namespace Order_API.Service.Orderser
 
             return orderDtos;
         }
+
 
 
 

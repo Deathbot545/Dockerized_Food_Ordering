@@ -149,27 +149,34 @@ namespace Order_API.Service.Orderser
                 TableId = o.TableId,
                 OutletId = o.OutletId,
                 Status = o.Status,
-                OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
-                {
-                    Id = od.Id,
-                    OrderId = od.OrderId,
-                    MenuItemId = od.MenuItemId,
-                    MenuItem = menuItemsDto.Where(mi => mi.id == od.MenuItemId)
-                        .Select(mi => new MenuItemData
-                        {
-                            Id = mi.id,
-                            Name = mi.Name,
-                            Description = mi.Description,
-                            Price = (double)mi.Price,
-                            MenuCategoryId = mi.MenuCategoryId,
-                            Image = mi.Image
-                        }).FirstOrDefault(),
-                    Quantity = od.Quantity,
-                    Note = od.Note,
-                    Size = od.Size, // Include the size in the DTO
-                    ExtraItems = od.ExtraItems != null
-                        ? string.Join(", ", od.ExtraItems.Select(ei => $"{ei.Name} (${ei.Price})"))
-                        : null // Join extra items into a single string
+                OrderDetails = o.OrderDetails.Select(od => {
+                    var detailDto = new OrderDetailDTO
+                    {
+                        Id = od.Id,
+                        OrderId = od.OrderId,
+                        MenuItemId = od.MenuItemId,
+                        MenuItem = menuItemsDto.Where(mi => mi.id == od.MenuItemId)
+                            .Select(mi => new MenuItemData
+                            {
+                                Id = mi.id,
+                                Name = mi.Name,
+                                Description = mi.Description,
+                                Price = (double)mi.Price,
+                                MenuCategoryId = mi.MenuCategoryId,
+                                Image = mi.Image
+                            }).FirstOrDefault(),
+                        Quantity = od.Quantity,
+                        Note = od.Note,
+                        Size = od.Size, // Include the size in the DTO
+                        ExtraItems = od.ExtraItems != null
+                            ? string.Join(", ", od.ExtraItems.Select(ei => $"{ei.Name} (${ei.Price})"))
+                            : null // Join extra items into a single string
+                    };
+
+                    _logger.LogInformation("Mapped OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
+                        detailDto.Id, detailDto.OrderId, detailDto.MenuItemId, detailDto.Quantity, detailDto.Note, detailDto.Size, detailDto.ExtraItems);
+
+                    return detailDto;
                 }).ToList()
             }).ToList();
 
@@ -186,6 +193,7 @@ namespace Order_API.Service.Orderser
 
             return orderDtos;
         }
+
 
 
 

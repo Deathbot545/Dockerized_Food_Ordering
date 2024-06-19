@@ -123,7 +123,6 @@ namespace Food_Ordering_Web.Controllers
                 }
             }
 
-
             CartRequest orderData = new CartRequest
             {
                 UserId = userId,

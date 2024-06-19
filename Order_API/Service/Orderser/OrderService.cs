@@ -125,74 +125,53 @@ namespace Order_API.Service.Orderser
              await _context.SaveChangesAsync();
          }
 
-        public async Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId)
+        public async Task<OrderDTO> GetOrderDetailsAsync(int orderId)
         {
-            var currentTime = DateTime.UtcNow;
+            _logger.LogInformation("Fetching order details for orderId: {OrderId}", orderId);
 
-            var orders = await _context.Orders
+            var order = await _context.Orders
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.ExtraItems)
-                .AsSplitQuery() // Use split query
-                .Where(o => o.OutletId == outletId &&
-                            o.Status != OrderStatus.Cancelled &&
-                            o.Status != OrderStatus.Rejected &&
-                            (o.Status != OrderStatus.Served || o.OrderTime > currentTime.AddHours(-1)))
-                .ToListAsync();
+                .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
-
-            var orderDtos = orders.Select(o => new OrderDTO
+            if (order == null)
             {
-                Id = o.Id,
-                OrderTime = o.OrderTime,
-                Customer = o.Customer,
-                TableId = o.TableId,
-                OutletId = o.OutletId,
-                Status = o.Status,
-                OrderDetails = o.OrderDetails.Select(od => {
-                    var detailDto = new OrderDetailDTO
-                    {
-                        Id = od.Id,
-                        OrderId = od.OrderId,
-                        MenuItemId = od.MenuItemId,
-                        MenuItem = menuItemsDto.Where(mi => mi.id == od.MenuItemId)
-                            .Select(mi => new MenuItemData
-                            {
-                                Id = mi.id,
-                                Name = mi.Name,
-                                Description = mi.Description,
-                                Price = (double)mi.Price,
-                                MenuCategoryId = mi.MenuCategoryId,
-                                Image = mi.Image
-                            }).FirstOrDefault(),
-                        Quantity = od.Quantity,
-                        Note = od.Note,
-                        Size = od.Size, // Include the size in the DTO
-                        ExtraItems = od.ExtraItems != null
-                            ? string.Join(", ", od.ExtraItems.Select(ei => $"{ei.Name} (${ei.Price})"))
-                            : null // Join extra items into a single string
-                    };
-
-                    _logger.LogInformation("Mapped OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
-                        detailDto.Id, detailDto.OrderId, detailDto.MenuItemId, detailDto.Quantity, detailDto.Note, detailDto.Size, detailDto.ExtraItems);
-
-                    return detailDto;
-                }).ToList()
-            }).ToList();
-
-            foreach (var orderDto in orderDtos)
-            {
-                _logger.LogInformation("OrderDTO: Id={Id}, OrderTime={OrderTime}, Customer={Customer}, TableId={TableId}, OutletId={OutletId}, Status={Status}",
-                    orderDto.Id, orderDto.OrderTime, orderDto.Customer, orderDto.TableId, orderDto.OutletId, orderDto.Status);
-                foreach (var detail in orderDto.OrderDetails)
-                {
-                    _logger.LogInformation("OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
-                        detail.Id, detail.OrderId, detail.MenuItemId, detail.Quantity, detail.Note, detail.Size, detail.ExtraItems);
-                }
+                _logger.LogInformation("Order not found for orderId: {OrderId}", orderId);
+                return null;
             }
 
-            return orderDtos;
+            _logger.LogInformation("Order found for orderId: {OrderId}. Mapping to OrderDTO...", orderId);
+
+            var menuItemsDto = await FetchMenuItemsByOutletIdAsync(order.OutletId);
+
+            var orderDto = new OrderDTO
+            {
+                Id = order.Id,
+                OrderTime = order.OrderTime,
+                Customer = order.Customer,
+                TableId = order.TableId,
+                OutletId = order.OutletId,
+                Status = order.Status,
+                OrderDetails = order.OrderDetails.Select(od => new OrderDetailDTO
+                {
+                    Id = od.Id,
+                    OrderId = od.OrderId,
+                    MenuItemId = od.MenuItemId,
+                    MenuItem = menuItemsDto.FirstOrDefault(mi => mi.Id == od.MenuItemId),
+                    Quantity = od.Quantity,
+                    Note = od.Note,
+                    Size = od.Size,
+                    ExtraItems = od.ExtraItems != null
+                        ? string.Join(", ", od.ExtraItems.Select(ei => $"{ei.Name} (${ei.Price})"))
+                        : null
+                }).ToList()
+            };
+
+            _logger.LogInformation("Order mapped to OrderDTO: {@OrderDTO}", orderDto);
+
+            return orderDto;
         }
+
 
 
 

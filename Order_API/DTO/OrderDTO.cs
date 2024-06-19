@@ -1,4 +1,5 @@
 ﻿
+
 using Microsoft.EntityFrameworkCore;
 using Order_API.Models;
 using System;
@@ -35,7 +36,12 @@ namespace Order_API.DTO
         public int Quantity { get; set; }
         public string Note { get; set; }
         public string Size { get; set; } // Include the size in the DTO
-        public string? ExtraItems { get; set; } // Extra items in string format
+        public List<ExtraItemDto> ExtraItems { get; set; } // List of extra items
+
+        public OrderDetailDTO()
+        {
+            ExtraItems = new List<ExtraItemDto>();
+        }
     }
 
     public class MenuItemData
@@ -47,4 +53,11 @@ namespace Order_API.DTO
         public int MenuCategoryId { get; set; }
         public string Image { get; set; }
     }
+    public class ExtraItemDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+
 }

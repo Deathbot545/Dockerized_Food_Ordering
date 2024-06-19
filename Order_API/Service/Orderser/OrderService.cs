@@ -129,6 +129,8 @@ namespace Order_API.Service.Orderser
         {
             var currentTime = DateTime.UtcNow;
 
+            _logger.LogInformation("Fetching orders for outletId {OutletId} at {CurrentTime}", outletId, currentTime);
+
             var orders = await _context.Orders
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.ExtraItems)
@@ -139,7 +141,11 @@ namespace Order_API.Service.Orderser
                             (o.Status != OrderStatus.Served || o.OrderTime > currentTime.AddHours(-1)))
                 .ToListAsync();
 
+            _logger.LogInformation("Fetched {Count} orders for outletId {OutletId}", orders.Count, outletId);
+
             var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
+
+            _logger.LogInformation("Fetched {Count} menu items for outletId {OutletId}", menuItemsDto.Count, outletId);
 
             var orderDtos = orders.Select(o => new OrderDTO
             {
@@ -169,8 +175,9 @@ namespace Order_API.Service.Orderser
                         Note = od.Note,
                         Size = od.Size, // Include the size in the DTO
                         ExtraItems = od.ExtraItems != null
-                            ? string.Join(", ", od.ExtraItems.Select(ei => $"{ei.Name} (${ei.Price})"))
-                            : null // Join extra items into a single string
+    ? od.ExtraItems.Select(ei => new ExtraItemDto { Id = ei.Id, Name = ei.Name, Price = ei.Price }).ToList()
+    : null
+
                     };
 
                     _logger.LogInformation("Mapped OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
@@ -179,33 +186,11 @@ namespace Order_API.Service.Orderser
                     return detailDto;
                 }).ToList()
             }).ToList();
-            _logger.LogInformation("start loop");
-            foreach (var orderDto in orderDtos)
-            {
-                _logger.LogInformation("first loop");
-                _logger.LogInformation("OrderDTO: Id={Id}, OrderTime={OrderTime}, Customer={Customer}, TableId={TableId}, OutletId={OutletId}, Status={Status}",
-                    orderDto.Id, orderDto.OrderTime, orderDto.Customer, orderDto.TableId, orderDto.OutletId, orderDto.Status);
-                _logger.LogInformation("inside loop");
-                foreach (var detail in orderDto.OrderDetails)
-                {
-                    _logger.LogInformation("second loop");
-                    _logger.LogInformation("OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
-                        detail.Id, detail.OrderId, detail.MenuItemId, detail.Quantity, detail.Note, detail.Size, detail.ExtraItems);
-                    _logger.LogInformation("end second loop");
-                }
-                _logger.LogInformation("loop end");
-            }
 
-            _logger.LogInformation("end");
+            _logger.LogInformation("Mapped {Count} orders to OrderDTOs", orderDtos.Count);
+
             return orderDtos;
         }
-
-
-
-
-
-
-
 
 
         private async Task<List<MenuItemDto>> FetchMenuItemsByOutletIdAsync(int outletId)

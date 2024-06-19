@@ -29,7 +29,7 @@ namespace Order_API.Controllers
              _logger = logger;
          }
         //ll
-        [HttpGet("{id}")]
+        [HttpGet("GetOrder/{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
             _logger.LogInformation("Fetching order with ID: {OrderId}", id);

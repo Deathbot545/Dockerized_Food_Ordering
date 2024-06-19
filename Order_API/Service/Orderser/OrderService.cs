@@ -143,6 +143,17 @@ namespace Order_API.Service.Orderser
 
             _logger.LogInformation("Fetched {Count} orders for outletId {OutletId}", orders.Count, outletId);
 
+            foreach (var order in orders)
+            {
+                _logger.LogInformation("Order ID {OrderId} has {OrderDetailsCount} OrderDetails", order.Id, order.OrderDetails.Count);
+
+                foreach (var od in order.OrderDetails)
+                {
+                    _logger.LogInformation("OrderDetail ID {OrderDetailId}, MenuItemId {MenuItemId}, Quantity {Quantity}, Note {Note}, Size {Size}, ExtraItemsCount {ExtraItemsCount}",
+                        od.Id, od.MenuItemId, od.Quantity, od.Note, od.Size, od.ExtraItems?.Count ?? 0);
+                }
+            }
+
             var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
 
             _logger.LogInformation("Fetched {Count} menu items for outletId {OutletId}", menuItemsDto.Count, outletId);
@@ -178,11 +189,11 @@ namespace Order_API.Service.Orderser
                         Size = od.Size, // Include the size in the DTO
                         ExtraItems = od.ExtraItems != null
                             ? od.ExtraItems.Select(ei => new ExtraItemDto { Id = ei.Id, Name = ei.Name, Price = ei.Price }).ToList()
-                            : null
+                            : new List<ExtraItemDto>()
                     };
 
-                    _logger.LogInformation("Mapped OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItems={ExtraItems}",
-                        detailDto.Id, detailDto.OrderId, detailDto.MenuItemId, detailDto.Quantity, detailDto.Note, detailDto.Size, detailDto.ExtraItems);
+                    _logger.LogInformation("Mapped OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItemsCount={ExtraItemsCount}",
+                        detailDto.Id, detailDto.OrderId, detailDto.MenuItemId, detailDto.Quantity, detailDto.Note, detailDto.Size, detailDto.ExtraItems.Count);
 
                     return detailDto;
                 }).ToList()
@@ -192,8 +203,6 @@ namespace Order_API.Service.Orderser
 
             return orderDtos;
         }
-
-
 
         private async Task<List<MenuItemDto>> FetchMenuItemsByOutletIdAsync(int outletId)
         {
@@ -222,6 +231,7 @@ namespace Order_API.Service.Orderser
 
             return menuItemsDto;
         }
+
 
 
 

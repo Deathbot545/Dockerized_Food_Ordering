@@ -129,7 +129,7 @@ namespace Order_API.Service.Orderser
         {
             var currentTime = DateTime.UtcNow;
 
-            _logger.LogInformation("Fetching orders for outletId {OutletId} at {CurrentTime}", outletId, currentTime);
+   
 
             var orders = await _context.Orders
                 .Include(o => o.OrderDetails)
@@ -141,22 +141,11 @@ namespace Order_API.Service.Orderser
                             (o.Status != OrderStatus.Served || o.OrderTime > currentTime.AddHours(-1)))
                 .ToListAsync();
 
-            _logger.LogInformation("Fetched {Count} orders for outletId {OutletId}", orders.Count, outletId);
-
-            foreach (var order in orders)
-            {
-                _logger.LogInformation("Order ID {OrderId} has {OrderDetailsCount} OrderDetails", order.Id, order.OrderDetails.Count);
-
-                foreach (var od in order.OrderDetails)
-                {
-                    _logger.LogInformation("OrderDetail ID {OrderDetailId}, MenuItemId {MenuItemId}, Quantity {Quantity}, Note {Note}, Size {Size}, ExtraItemsCount {ExtraItemsCount}",
-                        od.Id, od.MenuItemId, od.Quantity, od.Note, od.Size, od.ExtraItems?.Count ?? 0);
-                }
-            }
+ 
 
             var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
 
-            _logger.LogInformation("Fetched {Count} menu items for outletId {OutletId}", menuItemsDto.Count, outletId);
+           
 
             var orderDtos = orders.Select(o => new OrderDTO
             {
@@ -192,14 +181,12 @@ namespace Order_API.Service.Orderser
                             : new List<ExtraItemDto>()
                     };
 
-                    _logger.LogInformation("Mapped OrderDetailDTO: Id={Id}, OrderId={OrderId}, MenuItemId={MenuItemId}, Quantity={Quantity}, Note={Note}, Size={Size}, ExtraItemsCount={ExtraItemsCount}",
-                        detailDto.Id, detailDto.OrderId, detailDto.MenuItemId, detailDto.Quantity, detailDto.Note, detailDto.Size, detailDto.ExtraItems.Count);
+                   
 
                     return detailDto;
                 }).ToList()
             }).ToList();
 
-            _logger.LogInformation("Mapped {Count} orders to OrderDTOs", orderDtos.Count);
 
             return orderDtos;
         }
@@ -213,11 +200,15 @@ namespace Order_API.Service.Orderser
 
             try
             {
+                _logger.LogInformation("Fetching menu items for outletId {OutletId} from URL: {Url}", outletId, url);
+
                 var response = await _httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
                     // Deserialize the HTTP response content into a List<MenuItemDto>
                     menuItemsDto = await response.Content.ReadFromJsonAsync<List<MenuItemDto>>();
+
+                    _logger.LogInformation("Fetched {Count} menu items for outletId {OutletId}", menuItemsDto.Count, outletId);
                 }
                 else
                 {

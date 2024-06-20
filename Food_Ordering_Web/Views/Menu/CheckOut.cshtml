@@ -114,6 +114,15 @@
 <!-- Include your external JS file here or inline your JS code below -->
 
 <script>
+    $(document).ready(function () {
+        console.log("Document ready. Loading checkout page.");
+        loadCheckoutPage();
+
+        $('#order-button').click(function () {
+            submitOrderForm();
+        });
+    });
+
     function loadCheckoutPage() {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let itemsHtml = '';
@@ -129,33 +138,28 @@
             if (item.extraItems && item.extraItems.length > 0) {
                 item.extraItems.forEach(extraItem => {
                     extraItemsHtml += `
-                            <div class="extra-item">
-                                <span>${extraItem.name}</span>
-                                <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
-                                <button class="btn btn-sm remove-extra-item" data-item-id="${item.id}" data-extra-item-id="${extraItem.id}">&times;</button>
-                            </div>`;
+                        <div class="extra-item">
+                            <span>${extraItem.name}</span>
+                            <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
+                            <button class="btn btn-sm remove-extra-item" data-item-id="${item.id}" data-extra-item-id="${extraItem.id}">&times;</button>
+                        </div>`;
                     itemTotal += extraItem.price; // Add the price of extra items to itemTotal
                 });
             }
 
             itemsHtml += `
-                    <div class="mb-3">
-                        <span>${item.name} (x${item.qty})</span>
-                        <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                        <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
-                        ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
-                        ${extraItemsHtml}
-                    </div>`;
+                <div class="mb-3">
+                    <span>${item.name} (x${item.qty})</span>
+                    <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
+                    <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
+                    ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
+                    ${extraItemsHtml}
+                </div>`;
         });
-
-        let deliveryFee = $("input[name='delivery']:checked").attr("id") === "priority" ? 0 : 0;
-        let taxes = subTotal * 0;
 
         $("#order-summary-section").html(itemsHtml);
         $(".subtotal").text(`LKR ${subTotal.toFixed(2)}`);
-        $(".delivery-fee").text(`LKR ${deliveryFee.toFixed(2)}`);
-        $(".taxes").text(`LKR ${taxes.toFixed(2)}`);
-        $(".total").text(`LKR ${(subTotal + deliveryFee + taxes).toFixed(2)}`);
+        $(".total").text(`LKR ${subTotal.toFixed(2)}`);
 
         $(document).on('click', '.remove-item', function () {
             const itemId = $(this).data('item-id').toString();
@@ -171,15 +175,6 @@
         });
     }
 
-    $(document).ready(function () {
-        console.log("Document ready. Loading checkout page.");
-        loadCheckoutPage();
-
-        $('#order-button').click(function () {
-            submitOrderForm();
-        });
-    });
-
     function submitOrderForm() {
         showLoadingOverlay();
 
@@ -192,6 +187,7 @@
         const formData = new FormData();
         formData.append('tableId', foodItemData.tableId);
         formData.append('outletId', foodItemData.outletId);
+        formData.append('addUtensils', $('#addUtensils').is(':checked'));
 
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         cart.forEach((item, index) => {
@@ -201,15 +197,22 @@
             formData.append(`items[${index}].price`, item.price);
             formData.append(`items[${index}].name`, item.name);
             formData.append(`items[${index}].note`, item.note); // Ensure note is included
+            formData.append(`items[${index}].size`, item.size);
+            if (item.extraItems) {
+                item.extraItems.forEach((extraItem, extraIndex) => {
+                    formData.append(`items[${index}].extraItems[${extraIndex}].id`, extraItem.id);
+                    formData.append(`items[${index}].extraItems[${extraIndex}].name`, extraItem.name);
+                    formData.append(`items[${index}].extraItems[${extraIndex}].price`, extraItem.price);
+                });
+            }
         });
 
-        // Add UserId to the orderData object
-        let userId = ''; // Set the UserId to an empty string if it's not available
         const orderData = {
             UserId: userId,
             TableId: foodItemData.tableId,
             OutletId: foodItemData.outletId,
-            MenuItems: cart
+            MenuItems: cart,
+            AddUtensils: $('#addUtensils').is(':checked'),
         };
 
         const jsonPayload = JSON.stringify(orderData);
@@ -304,5 +307,6 @@
     function hideLoadingOverlay() {
         $('#loading-overlay').hide();
     }
+
 </script>
 

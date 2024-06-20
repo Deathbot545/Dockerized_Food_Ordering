@@ -13,8 +13,6 @@ namespace Food_Ordering_Web.DTO
         public int OutletId { get; set; }
         public List<CartItem> MenuItems { get; set; }
         public bool AddUtensils { get; set; }
-        
-        public List<ExtraItemRequest>? ExtraItems { get; set; } // Allow null
     }
 
     public class CartItem
@@ -23,8 +21,8 @@ namespace Food_Ordering_Web.DTO
         public int Qty { get; set; }
         public string Note { get; set; }
         public string Size { get; set; }
-        public decimal Price { get; set; } // Add this property
-        public List<ExtraItemRequest>? ExtraItems { get; set; } // Allow null
+        public decimal Price { get; set; }
+        public List<ExtraItemRequest>? ExtraItems { get; set; }
     }
 
     public class ExtraItemRequest
@@ -33,6 +31,4 @@ namespace Food_Ordering_Web.DTO
         public string Name { get; set; }
         public decimal Price { get; set; }
     }
-
-
 }

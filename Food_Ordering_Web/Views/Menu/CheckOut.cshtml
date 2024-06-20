@@ -277,5 +277,17 @@
 
         let itemCount = cart.reduce((count, item) => count + item.qty, 0);
         let total = cart.reduce((total, item) =>
+            total + item.qty * item.price + (item.extraItems ? item.extraItems.reduce((extraTotal, extraItem) => extraTotal + extraItem.price, 0) : 0), 0);
+        $(".cart-items-count").text(itemCount);
+        $(".cart-total").text(`LKR ${total.toFixed(2)}`);
+    }
 
+    function showLoadingOverlay() {
+        $("#loading-overlay").show();
+    }
+
+    function hideLoadingOverlay() {
+        $("#loading-overlay").hide();
+    }
+</script>
 

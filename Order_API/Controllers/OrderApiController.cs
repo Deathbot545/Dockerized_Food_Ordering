@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Order_API.Data;
 using Order_API.DTO;
 using Order_API.Hubs;
@@ -68,7 +69,8 @@ namespace Order_API.Controllers
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
-            _logger.LogInformation("Received order request with details: {@Request}", request);
+            _logger.LogInformation("Received order request with details: {@Request}", JsonConvert.SerializeObject(request));
+
 
             try
             {

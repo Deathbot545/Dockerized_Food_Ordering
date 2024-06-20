@@ -107,13 +107,10 @@
 </div>
 
 <script>
-    // Declare global variables to hold tableId, outletId, and userId
+    // Declare global variables to hold tableId and outletId
     var globalTableId = '@ViewBag.TableId';
     var globalOutletId = '@ViewBag.OutletId';
-</script>
-<!-- Include your external JS file here or inline your JS code below -->
 
-<script>
     $(document).ready(function () {
         console.log("Document ready. Loading checkout page.");
         loadCheckoutPage();
@@ -208,7 +205,6 @@
         });
 
         const orderData = {
-            UserId: userId,
             TableId: foodItemData.tableId,
             OutletId: foodItemData.outletId,
             MenuItems: cart,
@@ -268,7 +264,18 @@
         });
         localStorage.setItem('cart', JSON.stringify(cart));
         loadCheckoutPage(); // Update the UI after removing the extra item
+        updateCartButton();
     }
-</script>
+
+    function updateCartButton() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let currentTime = new Date().getTime();
+        let durationLimit = 24 * 60 * 60 * 1000;
+
+        cart = cart.filter(item => currentTime - item.timestamp < durationLimit);
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        let itemCount = cart.reduce((count, item) => count + item.qty, 0);
+        let total = cart.reduce((total, item) =>
 
 

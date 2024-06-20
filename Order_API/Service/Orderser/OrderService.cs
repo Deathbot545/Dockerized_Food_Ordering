@@ -53,16 +53,19 @@ namespace Order_API.Service.Orderser
                     Quantity = item.Qty,
                     Note = item.Note,
                     Size = item.Size,
-                    ExtraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
-                    {
-                        Name = extraItem.Name,
-                        Price = extraItem.Price
-                    }).ToList()
+                    ExtraItems = item.ExtraItems != null
+                        ? item.ExtraItems.Select(extraItem => new ExtraItem
+                        {
+                            Name = extraItem.Name,
+                            Price = extraItem.Price
+                        }).ToList()
+                        : new List<ExtraItem>()
                 };
 
                 _logger.LogInformation($"Adding order detail: {@orderDetail}");
                 order.OrderDetails.Add(orderDetail);
             }
+
 
 
             _logger.LogInformation("Final order before saving to the database: {@Order}", order);

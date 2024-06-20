@@ -107,7 +107,7 @@
 </div>
 
 <script>
-    // Declare global variables to hold tableId and outletId
+    // Declare global variables to hold tableId, outletId, and userId
     var globalTableId = '@ViewBag.TableId';
     var globalOutletId = '@ViewBag.OutletId';
 </script>
@@ -138,23 +138,23 @@
             if (item.extraItems && item.extraItems.length > 0) {
                 item.extraItems.forEach(extraItem => {
                     extraItemsHtml += `
-                        <div class="extra-item">
-                            <span>${extraItem.name}</span>
-                            <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
-                            <button class="btn btn-sm remove-extra-item" data-item-id="${item.id}" data-extra-item-id="${extraItem.id}">&times;</button>
-                        </div>`;
+                            <div class="extra-item">
+                                <span>${extraItem.name}</span>
+                                <span class="float-end">LKR ${extraItem.price.toFixed(2)}</span>
+                                <button class="btn btn-sm remove-extra-item" data-item-id="${item.id}" data-extra-item-id="${extraItem.id}">&times;</button>
+                            </div>`;
                     itemTotal += extraItem.price; // Add the price of extra items to itemTotal
                 });
             }
 
             itemsHtml += `
-                <div class="mb-3">
-                    <span>${item.name} (x${item.qty})</span>
-                    <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
-                    <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
-                    ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
-                    ${extraItemsHtml}
-                </div>`;
+                    <div class="mb-3">
+                        <span>${item.name} (x${item.qty})</span>
+                        <span class="float-end">LKR ${itemTotal.toFixed(2)}</span>
+                        <button class="btn btn-sm remove-item" data-item-id="${item.id}">&times;</button>
+                        ${item.note ? `<div class="note"><small>Note: ${item.note}</small></div>` : ''}
+                        ${extraItemsHtml}
+                    </div>`;
         });
 
         $("#order-summary-section").html(itemsHtml);
@@ -268,45 +268,7 @@
         });
         localStorage.setItem('cart', JSON.stringify(cart));
         loadCheckoutPage(); // Update the UI after removing the extra item
-        updateCartButton();
     }
-
-    function updateCartButton() {
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let currentTime = new Date().getTime();
-        let durationLimit = 24 * 60 * 60 * 1000;
-
-        cart = cart.filter(item => currentTime - item.timestamp < durationLimit);
-        localStorage.setItem('cart', JSON.stringify(cart));
-
-        let itemCount = cart.reduce((count, item) => count + item.qty, 0);
-        let total = cart.reduce((total, item) => {
-            let itemTotal = item.price * item.qty;
-            if (item.extraItems && item.extraItems.length > 0) {
-                item.extraItems.forEach(extraItem => {
-                    itemTotal += extraItem.price * item.qty;
-                });
-            }
-            return total + itemTotal;
-        }, 0).toFixed(2);
-
-        $("#cart-items-count").text(itemCount);
-        $("#cart-total").text(total);
-
-        if (itemCount > 0) {
-            $('#cart-button').show();
-        } else {
-            $('#cart-button').hide();
-        }
-    }
-
-    function showLoadingOverlay() {
-        $('#loading-overlay').show();
-    }
-
-    function hideLoadingOverlay() {
-        $('#loading-overlay').hide();
-    }
-
 </script>
+
 

@@ -49,48 +49,22 @@ namespace Order_API.Service.Orderser
             {
                 _logger.LogInformation($"Processing menu item with Id {item.Id} and note: {item.Note}");
 
-                string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItem/{item.Id}";
-
-                try
+                var orderDetail = new OrderDetail
                 {
-                    var response = await _httpClient.GetAsync(url);
-                    if (!response.IsSuccessStatusCode)
+                    MenuItemId = item.Id,
+                    Quantity = item.Qty,
+                    Note = item.Note,
+                    Size = item.Size,
+                    ExtraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
                     {
-                        _logger.LogError($"MenuItem with Id {item.Id} not found. Status code: {response.StatusCode}");
-                        throw new Exception($"MenuItem with Id {item.Id} not found.");
-                    }
+                        Name = extraItem.Name,
+                        Price = extraItem.Price
+                    }).ToList()
+                };
 
-                    var menuItemDto = await response.Content.ReadAsAsync<MenuItemDto>();
-                    if (menuItemDto == null || menuItemDto.id == 0)
-                    {
-                        _logger.LogError($"Invalid data received for MenuItem with Id {item.Id}");
-                        throw new Exception($"Invalid data received for MenuItem with Id {item.Id}");
-                    }
-
-                    var orderDetail = new OrderDetail
-                    {
-                        MenuItemId = menuItemDto.id,
-                        Quantity = item.Qty,
-                        Note = item.Note,
-                        Size = item.Size, // Assign the string directly
-                        ExtraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
-                        {
-                            Name = extraItem.Name,
-                            Price = extraItem.Price
-                        }).ToList()
-                    };
-
-
-                    _logger.LogInformation($"Adding order detail: {@orderDetail}");
-                    order.OrderDetails.Add(orderDetail);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"An error occurred while fetching menu item {item.Id}: {ex.Message}");
-                    throw;
-                }
+                _logger.LogInformation($"Adding order detail: {@orderDetail}");
+                order.OrderDetails.Add(orderDetail);
             }
-
 
             _logger.LogInformation("Final order before saving to the database: {@Order}", order);
 

@@ -72,13 +72,14 @@ namespace Order_API.Service.Orderser
                         MenuItemId = menuItemDto.id,
                         Quantity = item.Qty,
                         Note = item.Note,
-                        Size = item.Size,
+                        Size = item.Size, // Assign the string directly
                         ExtraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
                         {
                             Name = extraItem.Name,
                             Price = extraItem.Price
                         }).ToList()
                     };
+
 
                     _logger.LogInformation($"Adding order detail: {@orderDetail}");
                     order.OrderDetails.Add(orderDetail);
@@ -89,6 +90,7 @@ namespace Order_API.Service.Orderser
                     throw;
                 }
             }
+
 
             _logger.LogInformation("Final order before saving to the database: {@Order}", order);
 

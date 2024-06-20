@@ -127,7 +127,6 @@
         $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
     }
 
-
     function goBack() {
         window.history.back();
     }
@@ -177,11 +176,11 @@
                 let sizeOptionsHtml = '';
                 data.sizes.forEach(size => {
                     sizeOptionsHtml += `<div class="form-check">
-                                              <input class="form-check-input" type="radio" name="size" value="${size.size}" data-price="${size.price}" id="size-${size.size}">
-                                              <label class="form-check-label" for="size-${size.size}">
-                                                  ${size.size} - LKR ${size.price.toFixed(2)}
-                                              </label>
-                                           </div>`;
+                                                  <input class="form-check-input" type="radio" name="size" value="${size.size}" data-price="${size.price}" id="size-${size.size}">
+                                                  <label class="form-check-label" for="size-${size.size}">
+                                                      ${size.size} - LKR ${size.price.toFixed(2)}
+                                                  </label>
+                                               </div>`;
                 });
                 $('#size-options').html(sizeOptionsHtml);
                 $('input[name="size"]').on('change', updateOrderButton);
@@ -200,11 +199,11 @@
                     let extraItemsHtml = '';
                     data.extraItems.forEach(item => {
                         extraItemsHtml += `<div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="extra-item" value="${item.id}" data-price="${item.price}" id="extra-item-${item.id}">
-                                                <label class="form-check-label" for="extra-item-${item.id}">
-                                                    ${item.name} - LKR ${item.price.toFixed(2)}
-                                                </label>
-                                           </div>`;
+                                                    <input class="form-check-input" type="checkbox" name="extra-item" value="${item.id}" data-price="${item.price}" id="extra-item-${item.id}">
+                                                    <label class="form-check-label" for="extra-item-${item.id}">
+                                                        ${item.name} - LKR ${item.price.toFixed(2)}
+                                                    </label>
+                                               </div>`;
                     });
                     $('#extra-items').html(extraItemsHtml);
                     $('input[name="extra-item"]').on('change', updateOrderButton);
@@ -269,8 +268,7 @@
             });
 
             addToCart({
-                id: generateUniqueId(),
-                menuItemId: menuItemId, // Set menuItemId correctly
+                id: menuItemId.toString(), // Use menuItemId as id
                 name: name,
                 qty: qty,
                 price: sizePrice,
@@ -281,13 +279,6 @@
                 extraItems: extraItems // Include extra items here
             });
         });
-
-        function generateUniqueId() {
-            let uniqueIdCounter = parseInt(localStorage.getItem('uniqueIdCounter')) || 0;
-            uniqueIdCounter++;
-            localStorage.setItem('uniqueIdCounter', uniqueIdCounter);
-            return uniqueIdCounter.toString();
-        }
 
         function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -346,7 +337,9 @@
             let total = (sizePrice + extraItemsPrice) * quantity;
             $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
         }
+
+        $('#inputQuantitySelector').on('input change', updateOrderButton);
+        $('input[name="size"]').on('change', updateOrderButton);
+        $('input[name="extra-item"]').on('change', updateOrderButton);
     });
-
-
 </script>

@@ -151,6 +151,7 @@
         $('#customerFacingName').text(customerFacingName);
 
         const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItem/${menuItemId}?menuId=${menuId}`; // Use menu ID in API call
+
         const extraItemsEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetCategoryWithExtraItems/${categoryId}`; // Use menu ID to get extra items
         $('#inputQuantitySelector').on('input change', updateOrderButton);
 
@@ -269,6 +270,7 @@
 
             addToCart({
                 id: generateUniqueId(),
+                menuItemId: menuItemId, // Set menuItemId correctly
                 name: name,
                 qty: qty,
                 price: sizePrice,
@@ -299,6 +301,8 @@
                 existingItem.tableId = item.tableId;
                 existingItem.outletId = item.outletId;
                 existingItem.note = item.note;
+                existingItem.size = item.size;
+                existingItem.extraItems = item.extraItems; // Update extra items if changed
             } else {
                 item.timestamp = timestamp;
                 cart.push(item);

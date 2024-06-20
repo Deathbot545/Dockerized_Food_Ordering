@@ -177,11 +177,11 @@
                 let sizeOptionsHtml = '';
                 data.sizes.forEach(size => {
                     sizeOptionsHtml += `<div class="form-check">
-                                                  <input class="form-check-input" type="radio" name="size" value="${size.size}" data-price="${size.price}" id="size-${size.size}">
-                                                  <label class="form-check-label" for="size-${size.size}">
-                                                      ${size.size} - LKR ${size.price.toFixed(2)}
-                                                  </label>
-                                               </div>`;
+                                              <input class="form-check-input" type="radio" name="size" value="${size.size}" data-price="${size.price}" id="size-${size.size}">
+                                              <label class="form-check-label" for="size-${size.size}">
+                                                  ${size.size} - LKR ${size.price.toFixed(2)}
+                                              </label>
+                                           </div>`;
                 });
                 $('#size-options').html(sizeOptionsHtml);
                 $('input[name="size"]').on('change', updateOrderButton);
@@ -200,11 +200,11 @@
                     let extraItemsHtml = '';
                     data.extraItems.forEach(item => {
                         extraItemsHtml += `<div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="extra-item" value="${item.id}" data-price="${item.price}" id="extra-item-${item.id}">
-                                                    <label class="form-check-label" for="extra-item-${item.id}">
-                                                        ${item.name} - LKR ${item.price.toFixed(2)}
-                                                    </label>
-                                               </div>`;
+                                                <input class="form-check-input" type="checkbox" name="extra-item" value="${item.id}" data-price="${item.price}" id="extra-item-${item.id}">
+                                                <label class="form-check-label" for="extra-item-${item.id}">
+                                                    ${item.name} - LKR ${item.price.toFixed(2)}
+                                                </label>
+                                           </div>`;
                     });
                     $('#extra-items').html(extraItemsHtml);
                     $('input[name="extra-item"]').on('change', updateOrderButton);
@@ -251,41 +251,102 @@
             const qty = parseInt($('#inputQuantitySelector').val());
             const sizePrice = parseFloat($('input[name="size"]:checked').data('price')) || 0;
             const h2Text = $('h2').text();
-            const priceText = $('h2 span').text().replace('LKR ', '');
-            const price = parseFloat(priceText) + sizePrice;
+            const priceText = $('h2 span').text();
+            const name = h2Text.replace(priceText, '').trim();
             const note = $('#inputNote').val();
-            const size = $('input[name="size"]:checked').val() || '';
-            const extraItems = [];
+            const tableId = '@ViewBag.TableId';
+            const outletId = '@ViewBag.OutletId';
+            const size = $('input[name="size"]:checked').val();
 
+            // Get selected extra items
+            let extraItems = [];
             $('input[name="extra-item"]:checked').each(function () {
                 extraItems.push({
                     id: $(this).val(),
-                    name: $(this).siblings('label').text().split(' - ')[0],
-                    price: parseFloat($(this).data('price'))
+                    name: $(this).siblings('label').text().trim(),
+                    price: parseFloat($(this).data('price')) || 0
                 });
             });
 
-            const item = {
-                id: String(new Date().getTime()),
-                menuItemId: menuItemId,
-                name: h2Text.replace(priceText, '').trim(),
+            addToCart({
+                id: generateUniqueId(),
+                menuItemId: menuItemId, // Set menuItemId correctly
+                name: name,
                 qty: qty,
-                price: price,
-                tableId: "",
-                outletId: "",
+                price: sizePrice,
+                tableId: tableId,
+                outletId: outletId,
                 note: note,
                 size: size,
-                extraItems: extraItems,
-                timestamp: new Date().getTime()
-            };
+                extraItems: extraItems // Include extra items here
+            });
+        });
 
+        function generateUniqueId() {
+            let uniqueIdCounter = parseInt(localStorage.getItem('uniqueIdCounter')) || 0;
+            uniqueIdCounter++;
+            localStorage.setItem('uniqueIdCounter', uniqueIdCounter);
+            return uniqueIdCounter.toString();
+        }
+
+        function addToCart(item) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart.push(item);
-            localStorage.setItem('cart', JSON.stringify(cart));
+            let existingItem = cart.find(x => x.id === item.id);
 
+            let timestamp = new Date().getTime();
+
+            if (existingItem) {
+                existingItem.qty += item.qty;
+                existingItem.timestamp = timestamp;
+                existingItem.tableId = item.tableId;
+                existingItem.outletId = item.outletId;
+                existingItem.note = item.note;
+                existingItem.size = item.size;
+                existingItem.extraItems = item.extraItems; // Update extra items if changed
+            } else {
+                item.timestamp = timestamp;
+                cart.push(item);
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
             updateCartButton();
+        }
+
+        $('#cart-button').click(function () {
+            window.location.href = '/Order/Checkout';
+        });
+
+        $('#cart-button').on('click', '.call-waiter-button', function () {
+            const tableId = '@ViewBag.TableId';
+            console.log("Call Waiter button clicked. Table ID:", tableId);
+            $.ajax({
+                url: 'https://restosolutionssaas.com/api/OrderApi/CallWaiter',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ tableId: tableId }),
+                success: function () {
+                    console.log("Waiter call sent successfully.");
+                    alert("Waiter has been called!");
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error calling waiter:", textStatus, errorThrown);
+                }
+            });
         });
 
         updateCartButton();
+
+        function updateOrderButton() {
+            let quantity = parseInt($('#inputQuantitySelector').val());
+            let sizePrice = parseFloat($('input[name="size"]:checked').data('price')) || 0;
+            let extraItemsPrice = 0;
+            $('input[name="extra-item"]:checked').each(function () {
+                extraItemsPrice += parseFloat($(this).data('price')) || 0;
+            });
+            let total = (sizePrice + extraItemsPrice) * quantity;
+            $('#order-button').text(`Add ${quantity} • LKR ${total.toFixed(2)}`);
+        }
     });
+
+
 </script>

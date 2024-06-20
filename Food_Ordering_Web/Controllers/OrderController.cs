@@ -81,6 +81,9 @@ namespace Food_Ordering_Web.Controllers
         {
             _logger.LogInformation("Processing order update...");
 
+            // Log the entire form data
+            _logger.LogInformation("Form data received: {FormData}", form.ToDictionary(x => x.Key, x => x.Value.ToString()));
+
             if (!int.TryParse(form["tableId"], out int tableId))
             {
                 _logger.LogError("Invalid or missing tableId in form data.");
@@ -103,19 +106,18 @@ namespace Food_Ordering_Web.Controllers
                     decimal.TryParse(form[$"items[{i}].price"], out decimal price) &&
                     form.TryGetValue($"items[{i}].name", out var name) && !string.IsNullOrWhiteSpace(name) &&
                     form.TryGetValue($"items[{i}].note", out var note) &&
-                    form.TryGetValue($"items[{i}].size", out var size)) // Add this line
+                    form.TryGetValue($"items[{i}].size", out var size))
                 {
                     items.Add(new CartItem
                     {
                         Id = itemId,
                         Qty = qty,
-                        Name = name,
                         Price = price,
                         Note = note,
-                        Size = size // Set the Size value
+                        Size = size
                     });
 
-                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}, Size={size}"); // Update log message
+                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}, Size={size}");
                 }
                 else
                 {
@@ -130,6 +132,9 @@ namespace Food_Ordering_Web.Controllers
                 OutletId = outletId,
                 MenuItems = items
             };
+
+            // Log the orderData object before serialization
+            _logger.LogInformation("Order data: {@OrderData}", orderData);
 
             var jsonPayload = System.Text.Json.JsonSerializer.Serialize(orderData);
             _logger.LogInformation($"Sending JSON payload to API: {jsonPayload}");
@@ -149,8 +154,6 @@ namespace Food_Ordering_Web.Controllers
                 return Json(new { success = false, errorMessage = errorResponse });
             }
         }
-
-
 
         public class OrderResponse
         {

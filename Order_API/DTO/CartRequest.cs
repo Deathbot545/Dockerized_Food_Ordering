@@ -13,7 +13,6 @@ namespace Order_API.DTO
         public int OutletId { get; set; }
         public List<CartItem> MenuItems { get; set; }
         public bool AddUtensils { get; set; }
-        public List<ExtraItemRequest>? ExtraItems { get; set; } // Allow null
     }
 
     public class CartItem

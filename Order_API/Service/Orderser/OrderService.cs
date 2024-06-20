@@ -47,8 +47,6 @@ namespace Order_API.Service.Orderser
 
             foreach (var item in request.MenuItems)
             {
-                _logger.LogInformation($"Processing menu item with Id {item.Id} and note: {item.Note}");
-
                 var orderDetail = new OrderDetail
                 {
                     MenuItemId = item.Id,
@@ -65,6 +63,7 @@ namespace Order_API.Service.Orderser
                 _logger.LogInformation($"Adding order detail: {@orderDetail}");
                 order.OrderDetails.Add(orderDetail);
             }
+
 
             _logger.LogInformation("Final order before saving to the database: {@Order}", order);
 

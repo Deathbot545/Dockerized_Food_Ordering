@@ -108,32 +108,15 @@ namespace Food_Ordering_Web.Controllers
                     form.TryGetValue($"items[{i}].note", out var note) &&
                     form.TryGetValue($"items[{i}].size", out var size))
                 {
-                    var cartItem = new CartItem
+                    items.Add(new CartItem
                     {
                         Id = itemId,
                         Qty = qty,
                         Price = price,
                         Note = note,
-                        Size = size,
-                        ExtraItems = new List<ExtraItemRequest>()
-                    };
+                        Size = size
+                    });
 
-                    for (int j = 0; form.ContainsKey($"items[{i}].extraItems[{j}].id"); j++)
-                    {
-                        if (int.TryParse(form[$"items[{i}].extraItems[{j}].id"], out int extraItemId) &&
-                            form.TryGetValue($"items[{i}].extraItems[{j}].name", out var extraItemName) &&
-                            decimal.TryParse(form[$"items[{i}].extraItems[{j}].price"], out decimal extraItemPrice))
-                        {
-                            cartItem.ExtraItems.Add(new ExtraItemRequest
-                            {
-                                Id = extraItemId,
-                                Name = extraItemName,
-                                Price = extraItemPrice
-                            });
-                        }
-                    }
-
-                    items.Add(cartItem);
                     _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}, Size={size}");
                 }
                 else
@@ -147,8 +130,7 @@ namespace Food_Ordering_Web.Controllers
                 UserId = userId,
                 TableId = tableId,
                 OutletId = outletId,
-                MenuItems = items,
-                AddUtensils = bool.Parse(form["addUtensils"])
+                MenuItems = items
             };
 
             // Log the orderData object before serialization
@@ -172,6 +154,7 @@ namespace Food_Ordering_Web.Controllers
                 return Json(new { success = false, errorMessage = errorResponse });
             }
         }
+
 
 
         public class OrderResponse

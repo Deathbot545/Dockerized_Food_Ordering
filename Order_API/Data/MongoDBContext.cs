@@ -14,6 +14,11 @@ namespace Order_API.Data
             _logger = logger;
 
             var connectionString = settings?.Value?.ConnectionString;
+            var databaseName = settings?.Value?.DatabaseName;
+
+            _logger.LogInformation("MongoDB connection string from settings: {ConnectionString}", connectionString);
+            _logger.LogInformation("MongoDB database name from settings: {DatabaseName}", databaseName);
+
             if (string.IsNullOrEmpty(connectionString))
             {
                 _logger.LogError("MongoDB connection string is null or empty.");
@@ -23,7 +28,7 @@ namespace Order_API.Data
             try
             {
                 var client = new MongoClient(connectionString);
-                _database = client.GetDatabase(settings.Value.DatabaseName);
+                _database = client.GetDatabase(databaseName);
                 _logger.LogInformation("MongoDB connection successful.");
             }
             catch (Exception ex)
@@ -41,4 +46,6 @@ namespace Order_API.Data
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
     }
+
+
 }

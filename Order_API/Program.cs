@@ -20,7 +20,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     serverOptions.ListenAnyIP(80);
 });
 
-// Register HTTP client and servic
+// Register HTTP client and services
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
@@ -81,7 +81,7 @@ app.MapControllers();
 // Map SignalR hub
 app.MapHub<OrderStatusHub>("/api/OrderApi/orderStatusHub");
 
-// Log the MongoDB settin
+// Log the MongoDB settings
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("MongoDBSettings ConnectionString: {ConnectionString}", mongoSettings.ConnectionString);
 logger.LogInformation("MongoDBSettings DatabaseName: {DatabaseName}", mongoSettings.DatabaseName);
@@ -94,5 +94,6 @@ void ConfigureSwagger(WebApplicationBuilder builder)
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 }
+
 
 

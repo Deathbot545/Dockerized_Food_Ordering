@@ -28,7 +28,11 @@ namespace Order_API.Data
 
             try
             {
-                var client = new MongoClient(connectionString);
+                var clientSettings = MongoClientSettings.FromConnectionString(connectionString);
+                clientSettings.ServerSelectionTimeout = TimeSpan.FromSeconds(30);
+                clientSettings.ConnectTimeout = TimeSpan.FromSeconds(30);
+
+                var client = new MongoClient(clientSettings);
                 _database = client.GetDatabase(databaseName);
                 _logger.LogInformation("MongoDB connection successful.");
             }
@@ -41,6 +45,8 @@ namespace Order_API.Data
 
         public IMongoCollection<Order> Orders => _database.GetCollection<Order>("Orders");
     }
+
+
 
 
 

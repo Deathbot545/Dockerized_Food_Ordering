@@ -9,8 +9,5 @@
     "ConnectionString": "mongodb://postgres:NxPostgrsql@docdb-2024-06-21-11-52-22.cz0qqo02m0na.eu-west-1.docdb.amazonaws.com:27017/?retryWrites=false",
     "DatabaseName": "OrderDb"
   },
-  "ConnectionStrings": {
-    "OrderDbConnection": "Host=orderapi.cz0qqo02m0na.eu-west-1.rds.amazonaws.com;Port=5432;Database=OrderDb;User Id=postgres;Password=NxPostgrsql;"
-  },
   "AllowedHosts": "*"
 }

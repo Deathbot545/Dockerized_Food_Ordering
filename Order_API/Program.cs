@@ -1,5 +1,4 @@
-
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Order_API.Data;
 using Order_API.Hubs;
 using Order_API.Service.Orderser;
@@ -24,8 +23,8 @@ builder.Services.AddSignalR();
 // Add Controllers
 builder.Services.AddControllers();
 
+// Configure Swagger
 ConfigureSwagger(builder);
-ConfigureControllers(builder);
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -74,9 +73,3 @@ void ConfigureSwagger(WebApplicationBuilder builder)
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 }
-
-void ConfigureControllers(WebApplicationBuilder builder)
-{
-    builder.Services.AddControllers();
-}
-

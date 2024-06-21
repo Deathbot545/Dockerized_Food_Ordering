@@ -81,7 +81,7 @@ app.MapControllers();
 // Map SignalR hub
 app.MapHub<OrderStatusHub>("/api/OrderApi/orderStatusHub");
 
-// Log the MongoDB settings
+// Log the MongoDB settin
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("MongoDBSettings ConnectionString: {ConnectionString}", mongoSettings.ConnectionString);
 logger.LogInformation("MongoDBSettings DatabaseName: {DatabaseName}", mongoSettings.DatabaseName);

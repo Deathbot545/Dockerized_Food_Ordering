@@ -20,7 +20,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     serverOptions.ListenAnyIP(80);
 });
 
-// Register HTTP client and services
+// Register HTTP client and servic
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 

@@ -13,30 +13,32 @@ namespace Order_API.Data
         {
             _logger = logger;
 
-            var client = new MongoClient(settings.Value.ConnectionString);
-            if (client != null)
+            var connectionString = settings?.Value?.ConnectionString;
+            if (string.IsNullOrEmpty(connectionString))
             {
-                _logger.LogInformation("MongoDB connection successful.");
-                _database = client.GetDatabase(settings.Value.DatabaseName);
+                _logger.LogError("MongoDB connection string is null or empty.");
+                throw new ArgumentNullException(nameof(settings), "MongoDB connection string cannot be null.");
             }
-            else
+
+            try
             {
-                _logger.LogError("MongoDB connection failed.");
+                var client = new MongoClient(connectionString);
+                _database = client.GetDatabase(settings.Value.DatabaseName);
+                _logger.LogInformation("MongoDB connection successful.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "MongoDB connection failed.");
+                throw;
             }
         }
 
-        public IMongoCollection<Order> Orders
-        {
-            get
-            {
-                return _database.GetCollection<Order>("Orders");
-            }
-        }
+        public IMongoCollection<Order> Orders => _database.GetCollection<Order>("Orders");
     }
+
     public class MongoDBSettings
     {
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
     }
-
 }

@@ -21,14 +21,14 @@ namespace Order_API.Controllers
          private readonly IHubContext<OrderStatusHub> _hubContext;
          private readonly IOrderService _orderService;
          private ILogger<OrderApiController> _logger;
-        private readonly OrderDbContext _context;
+      //  private readonly OrderDbContext _context;
 
-        public OrderApiController(IOrderService orderService, IHubContext<OrderStatusHub> hubContext, ILogger<OrderApiController> logger,OrderDbContext context)
+        public OrderApiController(IOrderService orderService, IHubContext<OrderStatusHub> hubContext, ILogger<OrderApiController> logger/*,OrderDbContext context*/)
          {
              _orderService = orderService;
              _hubContext = hubContext;
              _logger = logger;
-            _context = context;
+           // _context = context;
          }
         //ll
       /*  [HttpGet("GetOrder/{id}")]

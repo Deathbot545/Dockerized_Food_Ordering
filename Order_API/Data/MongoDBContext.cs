@@ -9,7 +9,6 @@ namespace Order_API.Data
     {
         private readonly IMongoDatabase _database = null;
         private readonly ILogger<MongoDBContext> _logger;
-        private readonly string _pathToCAFile;
 
         public MongoDBContext(IOptions<MongoDBSettings> settings, ILogger<MongoDBContext> logger)
         {
@@ -40,17 +39,17 @@ namespace Order_API.Data
             }
         }
 
-
         public IMongoCollection<Order> Orders => _database.GetCollection<Order>("Orders");
     }
+
 
 
     public class MongoDBSettings
     {
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
-        public string PathToCAFile { get; set; } // Add this property
     }
+
 
 
 

@@ -68,11 +68,19 @@ namespace Order_API.Service.Orderser
 
             _logger.LogInformation("Final order before saving to the database: {@Order}", order);
 
-            await _context.Orders.InsertOneAsync(order);
-
-            _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
-            return order.Id;
+            try
+            {
+                await _context.Orders.InsertOneAsync(order);
+                _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
+                return order.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing order");
+                throw;
+            }
         }
+
         /* public async Task<int> ProcessOrderRequestAsync(CartRequest request)
          {
              _logger.LogInformation("Starting to process order request with details: {@Request}", request);
@@ -390,5 +398,5 @@ namespace Order_API.Service.Orderser
              return orderDtos;
          }*/
     }
-       
+
 }

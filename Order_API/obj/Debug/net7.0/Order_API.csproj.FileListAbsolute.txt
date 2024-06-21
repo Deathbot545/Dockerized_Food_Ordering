@@ -114,3 +114,16 @@ D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\refint\Order_API.dll
 D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\Order_API.pdb
 D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\Order_API.genruntimeconfig.cache
 D:\Dockerize\dockerize\Order_API\obj\Debug\net7.0\ref\Order_API.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\AWSSDK.Core.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\AWSSDK.SecurityToken.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\DnsClient.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\MongoDB.Bson.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\MongoDB.Driver.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\MongoDB.Driver.Core.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\MongoDB.Libmongocrypt.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\SharpCompress.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\Snappier.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\ZstdSharp.dll
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\runtimes\linux\native\libmongocrypt.so
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\runtimes\osx\native\libmongocrypt.dylib
+D:\Dockerize\dockerize\Order_API\bin\Debug\net7.0\runtimes\win\native\mongocrypt.dll

@@ -10,7 +10,7 @@ namespace Order_API.Data
 {
     public class OrderDbContext : DbContext
     {
-        public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options)
+      /*  public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options)
         {
         }
 
@@ -27,6 +27,6 @@ namespace Order_API.Data
 
             base.OnModelCreating(modelBuilder);
             // Model configurations here, e.g., modelBuilder.Entity<Order>().ToTable("Orders");
-        }
+        }*/
     }
 }

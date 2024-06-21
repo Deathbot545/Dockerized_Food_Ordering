@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Order_API.Models
 {
-    public enum OrderStatus
+   /* public enum OrderStatus
     {
         Pending,    // Just placed the order
         Preparing,  // Kitchen is working on it
@@ -14,5 +14,5 @@ namespace Order_API.Models
         Served,     // Delivered to the table
         Cancelled,  // Order cancelled by the customer or the staff
         Rejected    // Order rejected by the kitchen for some reason
-    }
+    }*/
 }

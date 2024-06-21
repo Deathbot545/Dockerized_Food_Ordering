@@ -194,6 +194,10 @@
               "target": "Package",
               "version": "[1.17.2, )"
             },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.26.0, )"
+            },
             "Npgsql": {
               "target": "Package",
               "version": "[7.0.6, )"

@@ -12,66 +12,45 @@ var configuration = builder.Configuration;
 
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
-    serverOptions.ListenAnyIP(80); 
-
+    serverOptions.ListenAnyIP(80);
 });
+
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-// S
+// Add SignalR
 builder.Services.AddSignalR();
 
+// Add Controllers
 builder.Services.AddControllers();
 
 ConfigureSwagger(builder);
 ConfigureControllers(builder);
 
-// Modiy your existing CORS policy setup in th
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigins", builder =>
     {
-        builder.WithOrigins(
-                 "https://restosolutionssaas.com:8443", // The first web application orig
-                 "https://restosolutionssaas.com" // The second web application origin
-               )
+        builder.WithOrigins("https://restosolutionssaas.com")
                .AllowAnyMethod()
                .AllowAnyHeader()
-               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
+               .AllowCredentials();
     });
 });
 
+// Configure MongoDB
+builder.Services.Configure<MongoDBSettings>(
+    builder.Configuration.GetSection(nameof(MongoDBSettings)));
 
-builder.Services.AddDbContext<OrderDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("OrderDbConnection")));
+builder.Services.AddSingleton<MongoDBContext>();
 
 var app = builder.Build();
-
-// Ensure Database is Created and Migrations are Applied gg
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var dbContext = services.GetRequiredService<OrderDbContext>();
-        if (dbContext.Database.GetPendingMigrations().Any())
-        {
-            // This ensures that the database is created and all migrations are applied.
-            dbContext.Database.Migrate();
-        }
-    }
-    catch (Exception ex)
-    {
-        // Log errors or handle them as needed
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred creating the DB.");
-    }
-}
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(); // By default, this will serve the Swagger UI at /swagger
+    app.UseSwaggerUI();
 }
 
 app.UseSwagger();
@@ -82,7 +61,6 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseCors("AllowMyOrigins");
-
 
 app.UseAuthorization();
 
@@ -101,3 +79,4 @@ void ConfigureControllers(WebApplicationBuilder builder)
 {
     builder.Services.AddControllers();
 }
+

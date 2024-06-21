@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Order_API.Models
 {
-    public class OrderDetail
+   /* public class OrderDetail
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
@@ -25,7 +25,7 @@ namespace Order_API.Models
         public string Name { get; set; }
         public decimal Price { get; set; }
         public virtual OrderDetail OrderDetail { get; set; } // Add this navigation property
-    }
+    }*/
 
 
 

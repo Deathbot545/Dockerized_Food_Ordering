@@ -5,15 +5,18 @@ using Order_API.Service.Orderser;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
+// Load configuration from appsettings.json
+builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
 var configuration = builder.Configuration;
 
+// Configure Kestrel to listen on port 80
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.ListenAnyIP(80);
 });
 
+// Register HTTP client and services
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
@@ -52,20 +55,29 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Enable Swagger in production
 app.UseSwagger();
 app.UseSwaggerUI();
 
+// Enable HTTPS redirection
 app.UseHttpsRedirection();
 
+// Enable routing
 app.UseRouting();
 
+// Enable CORS
 app.UseCors("AllowMyOrigins");
 
+// Enable authorization
 app.UseAuthorization();
 
+// Map controllers
 app.MapControllers();
+
+// Map SignalR hub
 app.MapHub<OrderStatusHub>("/api/OrderApi/orderStatusHub");
 
+// Run the application
 app.Run();
 
 void ConfigureSwagger(WebApplicationBuilder builder)
@@ -73,3 +85,4 @@ void ConfigureSwagger(WebApplicationBuilder builder)
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 }
+

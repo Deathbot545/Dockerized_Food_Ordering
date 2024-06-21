@@ -69,21 +69,15 @@ namespace Order_API.Controllers
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
-            _logger.LogInformation("Received order request with details: {@Request}", JsonConvert.SerializeObject(request));
-
-
             try
             {
-               
                 int orderId = await _orderService.ProcessOrderRequestAsync(request);
 
                 var orderDto = await _orderService.GetOrderDetailsAsync(orderId);
                 if (orderDto != null)
                 {
                     _logger.LogInformation("Order details fetched successfully. Order details: {@OrderDto}", orderDto);
-                    _logger.LogInformation("Sending order details to clients via SignalR...");
                     await _hubContext.Clients.All.SendAsync("NewOrderPlaced", orderDto);
-                    _logger.LogInformation("Order details sent to clients successfully.");
                     return Ok(new { orderId = orderId, message = "Order processed successfully." });
                 }
                 else

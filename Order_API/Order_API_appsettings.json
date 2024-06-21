@@ -6,7 +6,7 @@
     }
   },
   "MongoDBSettings": {
-    "ConnectionString": "mongodb://postgres:NxPostgrsql@docdb-2024-06-21-07-17-02.cz0qqo02m0na.eu-west-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&retryWrites=false,",
+    "ConnectionString": "mongodb://postgres:NxPostgrsql@docdb-2024-06-21-07-17-02.cz0qqo02m0na.eu-west-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&retryWrites=false",
     "DatabaseName": "OrderDb"
   },
   "ConnectionStrings": {

@@ -31,7 +31,7 @@ namespace Order_API.Controllers
             _context = context;
          }
         //ll
-        [HttpGet("GetOrder/{id}")]
+      /*  [HttpGet("GetOrder/{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
             _logger.LogInformation("Fetching order with ID: {OrderId}", id);
@@ -62,7 +62,7 @@ namespace Order_API.Controllers
             _logger.LogInformation("Order with ID {OrderId} loaded successfully", id);
 
             return order;
-        }
+        }*/
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
@@ -241,9 +241,9 @@ namespace Order_API.Controllers
              _logger.LogInformation($"CallWaiter: Sent waiter call for table ID {request.TableId} to KitchenGroup.");
 
              return Ok(new { message = "Waiter call sent successfully." });
-         }
+         }*/
 
-     }*/
+     }
 
         public class CallWaiterRequest
     {

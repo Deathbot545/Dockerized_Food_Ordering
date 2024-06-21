@@ -6,7 +6,7 @@
     }
   },
   "MongoDBSettings": {
-    "ConnectionString": "mongodb://postgres:NxPostgrsql@docdb-2024-06-21-01-54-19.cluster-cz0qqo02m0na.eu-west-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false",
+    "ConnectionString": "mongodb://postgres:NxPostgrsql@docdb-2024-06-21-01-54-19.cluster-cz0qqo02m0na.eu-west-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=/usr/local/share/ca-certificates/global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false",
     "DatabaseName": "OrderDb"
   },
   "ConnectionStrings": {

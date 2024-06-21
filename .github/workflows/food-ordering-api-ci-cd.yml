@@ -40,7 +40,7 @@ jobs:
 
     - name: Deploy to AWS EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i $HOME/rrr.pem ec2-user@ec2-54-217-143-203.eu-west-1.compute.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i $HOME/rrr.pem ec2-user@ec2-34-243-245-128.eu-west-1.compute.amazonaws.com << 'EOF'
         # Pull the latest Docker image for the API
         sudo docker pull deathbot545/foodorderingapi:latest
 

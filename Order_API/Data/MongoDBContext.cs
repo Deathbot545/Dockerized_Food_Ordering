@@ -17,7 +17,6 @@ namespace Order_API.Data
 
             var connectionString = settings?.Value?.ConnectionString;
             var databaseName = settings?.Value?.DatabaseName;
-            _pathToCAFile = settings?.Value?.PathToCAFile;
 
             _logger.LogInformation("MongoDB connection string from settings: {ConnectionString}", connectionString);
             _logger.LogInformation("MongoDB database name from settings: {DatabaseName}", databaseName);
@@ -30,14 +29,6 @@ namespace Order_API.Data
 
             try
             {
-                // ADD CA certificate to local trust store
-                X509Store localTrustStore = new X509Store(StoreName.Root);
-                X509Certificate2Collection certificateCollection = new X509Certificate2Collection();
-                certificateCollection.Import(_pathToCAFile);
-                localTrustStore.Open(OpenFlags.ReadWrite);
-                localTrustStore.AddRange(certificateCollection);
-                localTrustStore.Close();
-
                 var client = new MongoClient(connectionString);
                 _database = client.GetDatabase(databaseName);
                 _logger.LogInformation("MongoDB connection successful.");
@@ -48,6 +39,7 @@ namespace Order_API.Data
                 throw;
             }
         }
+
 
         public IMongoCollection<Order> Orders => _database.GetCollection<Order>("Orders");
     }

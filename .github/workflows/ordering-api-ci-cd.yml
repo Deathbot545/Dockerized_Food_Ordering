@@ -35,12 +35,12 @@ jobs:
     # Copy the SSH private key file from your repository to the runner's home directory and set permissions
     - name: Prepare SSH Key
       run: |
-        cp ./.github/workflows/Rast.pem $HOME/Rast.pem
-        chmod 600 $HOME/Rast.pem
+        cp ./.github/workflows/rrr.pem $HOME/rrr.pem
+        chmod 600 $HOME/rrr.pem
 
     - name: Deploy to AWS EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i $HOME/Rast.pem ec2-user@ec2-13-53-132-175.eu-north-1.compute.amazonaws.com << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i $HOME/rrr.pem ec2-user@ec2-34-244-196-189.eu-west-1.compute.amazonaws.com << 'EOF'
         # Pull the latest Docker image for the API
         sudo docker pull deathbot545/orderapi:latest
 

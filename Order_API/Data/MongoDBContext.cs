@@ -26,6 +26,12 @@ namespace Order_API.Data
                 throw new ArgumentNullException(nameof(settings), "MongoDB connection string cannot be null.");
             }
 
+            if (string.IsNullOrEmpty(databaseName))
+            {
+                _logger.LogError("MongoDB database name is null or empty.");
+                throw new ArgumentNullException(nameof(settings), "MongoDB database name cannot be null.");
+            }
+
             try
             {
                 var clientSettings = MongoClientSettings.FromConnectionString(connectionString);
@@ -45,13 +51,10 @@ namespace Order_API.Data
 
         public IMongoCollection<Order> Orders => _database.GetCollection<Order>("Orders");
     }
+
     public class MongoDBSettings
     {
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
     }
-
-
-
-
 }

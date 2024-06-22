@@ -94,6 +94,3 @@ void ConfigureSwagger(WebApplicationBuilder builder)
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 }
-
-
-

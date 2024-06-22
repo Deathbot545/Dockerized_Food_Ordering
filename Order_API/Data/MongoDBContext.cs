@@ -45,11 +45,6 @@ namespace Order_API.Data
 
         public IMongoCollection<Order> Orders => _database.GetCollection<Order>("Orders");
     }
-
-
-
-
-
     public class MongoDBSettings
     {
         public string ConnectionString { get; set; }

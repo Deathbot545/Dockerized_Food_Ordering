@@ -50,10 +50,31 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    connection.on("NewOrderPlaced", function (order) {
-        console.log("NewOrderPlaced method triggered with order:", order);
-        addNewOrderToUI(order);
+    connection.on("NewOrderPlaced", function (orderInfo) {
+        console.log("NewOrderPlaced method triggered with order info:", orderInfo);
+
+        // Fetch order details based on orderId
+        $.ajax({
+            url: 'https://restosolutionssaas.com/api/OrderApi/GetOrderDetails/' + orderInfo.orderId,
+            type: 'GET',
+            success: function (orderDetails) {
+                console.log("Received order details for orderId:", orderInfo.orderId, ":", orderDetails);
+                // Render order card using orderDetails
+                const orderHtml = renderOrderCard(orderDetails);
+                const sectionId = statusMappings[orderDetails.status]?.section || statusMappings.default.section;
+                $('#' + sectionId).append(orderHtml);
+            },
+            error: function (xhr, status, error) {
+                console.error(`Failed to fetch order details for orderId: ${orderInfo.orderId}. Error: ${error}`);
+            }
+        });
     });
+
+    function renderOrderCard(orderDetails) {
+        // Use the provided 'RenderOrderCard' function to render the order card
+        return RenderOrderCard(orderDetails, tables);
+    }
+
 
     connection.onreconnecting(error => {
         console.warn(`Connection lost due to error "${error}". Reconnecting.`);

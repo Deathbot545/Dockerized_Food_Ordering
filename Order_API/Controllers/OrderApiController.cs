@@ -31,19 +31,19 @@ namespace Order_API.Controllers
            // _context = context;
          }
 
-        [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
-            _logger.LogInformation("Received order request: {@Request}", request);
+            _logger.LogInformation("Received order request: {@Request}");
 
             try
             {
                 string orderId = await _orderService.ProcessOrderRequestAsync(request);
 
-                _logger.LogInformation("Order processed successfully with orderId: {OrderId}", orderId);
+                _logger.LogInformation("Order processed successfully with orderId: {OrderId}");
 
-                // Notify the kitchen about the new order
-                await _hubContext.Clients.Group("KitchenGroup").SendAsync("NewOrderPlaced", orderId);
+                // Notify the kitchen about the new order, including order details
+                var orderDetails = await _orderService.GetOrderByOrderIdAsync(orderId);
+                await _hubContext.Clients.Group("KitchenGroup").SendAsync("NewOrderPlaced", new { orderId, orderDetails });
 
                 return Ok(new { orderId });
             }
@@ -53,6 +53,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
         [HttpGet("GetOrdersForOutlet/{outletId}")]
         public async Task<IActionResult> GetOrdersForOutlet(int outletId)

@@ -73,6 +73,14 @@ namespace Order_API.Controllers
 
                 string orderId = await _orderService.ProcessOrderRequestAsync(requestData);
 
+                if (string.IsNullOrEmpty(orderId))
+                {
+                    _logger.LogError("Failed to process order. OrderId is null or empty.");
+                    return StatusCode(500, "Failed to process order.");
+                }
+
+                _logger.LogInformation("Order processed successfully. OrderId: {OrderId}", orderId);
+
                 return Ok(new { orderId }); // Return orderId in the response
             }
             catch (Exception ex)

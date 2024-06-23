@@ -27,11 +27,13 @@ namespace Order_API.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string MenuItemId { get; set; }
+        public string MenuItemName { get; set; } // New property to store the menu item name
         public int Quantity { get; set; }
         public string Note { get; set; }
         public string Size { get; set; }
         public List<ExtraItem> ExtraItems { get; set; } // Allow null
     }
+
 
     public class ExtraItem
     {

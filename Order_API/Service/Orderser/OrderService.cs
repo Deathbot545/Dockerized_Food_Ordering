@@ -114,12 +114,14 @@ namespace Order_API.Service.Orderser
                     Quantity = item.Qty,
                     Note = item.Note,
                     Size = item.Size,
-                    ExtraItems = extraItems
+                    ExtraItems = extraItems,
+                    MenuItemName = item.Name // Set the MenuItemName from the CartItem
                 };
 
                 _logger.LogInformation("Adding order detail: {OrderDetailJson}", JsonConvert.SerializeObject(orderDetail));
                 order.OrderDetails.Add(orderDetail);
             }
+
 
             _logger.LogInformation("Final order before saving to the database: {OrderJson}", JsonConvert.SerializeObject(order));
 

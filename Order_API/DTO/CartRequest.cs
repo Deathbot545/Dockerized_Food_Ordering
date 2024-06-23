@@ -18,11 +18,13 @@ namespace Order_API.DTO
     public class CartItem
     {
         public int Id { get; set; }
+        public string Name { get; set; } // Add this property
         public int Qty { get; set; }
         public string Note { get; set; }
         public string Size { get; set; }
-        public List<ExtraItemRequest>? ExtraItems { get; set; } // Allow null
+        public List<ExtraItemRequest>? ExtraItems { get; set; }
     }
+
 
     public class ExtraItemRequest
     {

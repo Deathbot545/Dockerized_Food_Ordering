@@ -220,10 +220,7 @@
                     console.error("Order placement failed or orderId missing in response");
                 }
             })
-            .catch(error => {
-                console.error('Error submitting order form:', error);
-                hideLoadingOverlay();
-            });
+           
 
         return false;
     }

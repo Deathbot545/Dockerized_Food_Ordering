@@ -207,7 +207,11 @@
         const orderData = {
             TableId: foodItemData.tableId,
             OutletId: foodItemData.outletId,
-            MenuItems: cart.map(item => ({ ...item, name: item.name })), // Include name property for each menu item
+            MenuItems: cart.map(item => ({
+                ...item,
+                Name: item.name, // Include the Name property
+                name: undefined // Remove the lowercase name property
+            })),
             AddUtensils: $('#addUtensils').is(':checked'),
         };
 

@@ -63,23 +63,23 @@ namespace Order_API.Controllers
 
               return order;
           }*/
-      [HttpPost("AddOrder")]
-public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
-{
-    try
-    {
-        _logger.LogInformation("Received order request: {@Request}", request); // Log the received order request
+        [HttpPost("AddOrder")]
+        public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received order request: {@Request}", request); // Log the received order request
 
-        string orderId = await _orderService.ProcessOrderRequestAsync(request);
+                string orderId = await _orderService.ProcessOrderRequestAsync(request);
 
-        return Ok(new { orderId });
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error processing order: {ex.Message}");
-        return BadRequest(new { message = ex.Message });
-    }
-}
+                return Ok(new { orderId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error processing order: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
 
 

@@ -99,6 +99,8 @@ namespace Order_API.Service.Orderser
 
             foreach (var item in request.MenuItems)
             {
+                _logger.LogInformation("Processing item {@Item}", item);
+
                 var extraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
                 {
                     Name = extraItem.Name,
@@ -132,6 +134,7 @@ namespace Order_API.Service.Orderser
                 throw;
             }
         }
+
 
 
 

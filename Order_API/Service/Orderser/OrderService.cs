@@ -86,7 +86,7 @@ namespace Order_API.Service.Orderser
         }
         public async Task<string> ProcessOrderRequestAsync(CartRequest request)
         {
-            _logger.LogInformation("Starting to process order request with details: {@Request}", JsonConvert.SerializeObject(request));
+            _logger.LogInformation("Starting to process order request with details: {RequestJson}", JsonConvert.SerializeObject(request));
 
             var order = new Order
             {
@@ -100,7 +100,7 @@ namespace Order_API.Service.Orderser
 
             foreach (var item in request.MenuItems)
             {
-                _logger.LogInformation("Processing item {@Item}", JsonConvert.SerializeObject(item));
+                _logger.LogInformation("Processing item: {ItemJson}", JsonConvert.SerializeObject(item));
 
                 var extraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
                 {
@@ -117,16 +117,16 @@ namespace Order_API.Service.Orderser
                     ExtraItems = extraItems
                 };
 
-                _logger.LogInformation($"Adding order detail: {@orderDetail}");
+                _logger.LogInformation("Adding order detail: {OrderDetailJson}", JsonConvert.SerializeObject(orderDetail));
                 order.OrderDetails.Add(orderDetail);
             }
 
-            _logger.LogInformation("Final order before saving to the database: {@Order}", JsonConvert.SerializeObject(order));
+            _logger.LogInformation("Final order before saving to the database: {OrderJson}", JsonConvert.SerializeObject(order));
 
             try
             {
                 await _context.Orders.InsertOneAsync(order);
-                _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
+                _logger.LogInformation("Order processed successfully with orderId: {OrderId}", order.Id);
                 return order.Id;
             }
             catch (Exception ex)
@@ -135,6 +135,7 @@ namespace Order_API.Service.Orderser
                 throw;
             }
         }
+
 
 
 

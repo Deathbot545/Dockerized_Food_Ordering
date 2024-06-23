@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Security.Claims;
 using Food_Ordering_Web.DTO;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -153,8 +154,11 @@ namespace Food_Ordering_Web.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<OrderResponse>();
-                return Json(new { success = true, orderId = result.OrderId, redirectUrl = Url.Action("OrderConfirmation", "Order", new { orderId = result.OrderId }) });
+                var result = await response.Content.ReadAsStringAsync();
+                dynamic responseObject = JObject.Parse(result);
+                var orderId = (string)responseObject.orderId;
+
+                return Json(new { success = true, orderId, redirectUrl = Url.Action("OrderConfirmation", "Order", new { orderId }) });
             }
             else
             {
@@ -162,6 +166,7 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogError($"API call failed: {errorResponse}");
                 return Json(new { success = false, errorMessage = errorResponse });
             }
+
         }
 
 

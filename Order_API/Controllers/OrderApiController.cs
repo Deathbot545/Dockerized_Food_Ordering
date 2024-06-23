@@ -73,7 +73,7 @@ namespace Order_API.Controllers
 
                 string orderId = await _orderService.ProcessOrderRequestAsync(requestData);
 
-                return Ok(new { orderId });
+                return Ok(new { orderId }); // Return orderId in the response
             }
             catch (Exception ex)
             {
@@ -81,6 +81,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
 
 

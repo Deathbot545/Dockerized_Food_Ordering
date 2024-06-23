@@ -68,17 +68,15 @@ namespace Order_API.Controllers
         {
             try
             {
-                _logger.LogInformation("Received order request: {@request}", request);
+                _logger.LogInformation("Received order request: {@Request}", request); // Log the received order request
 
                 string orderId = await _orderService.ProcessOrderRequestAsync(request);
-
-                _logger.LogInformation("Order processed successfully. OrderId: {orderId}", orderId);
 
                 return Ok(new { orderId });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing order: {message}", ex.Message);
+                _logger.LogError($"Error processing order: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
         }

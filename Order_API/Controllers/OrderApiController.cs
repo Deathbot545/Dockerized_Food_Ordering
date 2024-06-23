@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Order_API.Data;
 using Order_API.DTO;
 using Order_API.Hubs;
@@ -64,33 +63,23 @@ namespace Order_API.Controllers
 
               return order;
           }*/
-        [HttpPost("AddOrder")]
-        public async Task<IActionResult> AddOrder([FromBody] JObject requestData)
-        {
-            try
-            {
-                _logger.LogInformation("Received order request: {@Request}", requestData); // Log the received order request
+      [HttpPost("AddOrder")]
+public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
+{
+    try
+    {
+        _logger.LogInformation("Received order request: {@Request}", request); // Log the received order request
 
-                string orderId = await _orderService.ProcessOrderRequestAsync(requestData);
+        string orderId = await _orderService.ProcessOrderRequestAsync(request);
 
-                if (string.IsNullOrEmpty(orderId))
-                {
-                    _logger.LogError("Failed to process order. OrderId is null or empty.");
-                    return StatusCode(500, "Failed to process order.");
-                }
-
-                _logger.LogInformation("Order processed successfully. OrderId: {OrderId}", orderId);
-
-                return Ok(new { orderId }); // Return orderId in the response
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error processing order: {ex.Message}");
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-
+        return Ok(new { orderId });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error processing order: {ex.Message}");
+        return BadRequest(new { message = ex.Message });
+    }
+}
 
 
 

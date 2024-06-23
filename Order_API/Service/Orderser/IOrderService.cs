@@ -26,6 +26,7 @@ namespace Order_API.Service.Orderser
  */
         Task<string> ProcessOrderRequestAsync(JObject requestData);
         Task UpdateOrderStatusAsync(string orderId, OrderStatus status);
+        Task<string> ProcessOrderRequestAsync(CartRequest request);
 
 
         // Add other order-related methods as needed

@@ -83,7 +83,55 @@ namespace Order_API.Service.Orderser
                 throw;
             }
         }
+        public async Task<string> ProcessOrderRequestAsync(CartRequest request)
+        {
+            _logger.LogInformation("Starting to process order request with details: {@Request}", request);
 
+            var order = new Order
+            {
+                OrderTime = DateTime.UtcNow,
+                Customer = request.UserId,
+                TableId = request.TableId,
+                OutletId = request.OutletId,
+                Status = OrderStatus.Pending,
+                OrderDetails = new List<OrderDetail>()
+            };
+
+            foreach (var item in request.MenuItems)
+            {
+                var extraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
+                {
+                    Name = extraItem.Name,
+                    Price = extraItem.Price
+                }).ToList();
+
+                var orderDetail = new OrderDetail
+                {
+                    MenuItemId = item.Id.ToString(),
+                    Quantity = item.Qty,
+                    Note = item.Note,
+                    Size = item.Size,
+                    ExtraItems = extraItems
+                };
+
+                _logger.LogInformation($"Adding order detail: {@orderDetail}");
+                order.OrderDetails.Add(orderDetail);
+            }
+
+            _logger.LogInformation("Final order before saving to the database: {@Order}", order);
+
+            try
+            {
+                await _context.Orders.InsertOneAsync(order);
+                _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
+                return order.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing order");
+                throw;
+            }
+        }
 
 
 

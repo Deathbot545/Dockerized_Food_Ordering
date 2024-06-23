@@ -66,10 +66,10 @@ namespace Order_API.Controllers
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
-            _logger.LogInformation("Fuck this shit brro");
             try
             {
-                _logger.LogInformation("Received order request: {@Request}", JsonConvert.SerializeObject(request)); // Log the received order request
+                var requestJson = JsonConvert.SerializeObject(request);
+                _logger.LogInformation("Received order request: {RequestJson}", requestJson); // Log the received order request
 
                 string orderId = await _orderService.ProcessOrderRequestAsync(request);
 
@@ -81,6 +81,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
 
 

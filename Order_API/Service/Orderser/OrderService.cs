@@ -2,6 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Order_API.Data;
 using Order_API.DTO;
 using Order_API.Models;
@@ -47,19 +48,19 @@ namespace Order_API.Service.Orderser
 
             foreach (var item in request.MenuItems)
             {
+                var extraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
+                {
+                    Name = extraItem.Name,
+                    Price = extraItem.Price
+                }).ToList();
+
                 var orderDetail = new OrderDetail
                 {
                     MenuItemId = item.Id.ToString(),
                     Quantity = item.Qty,
                     Note = item.Note,
                     Size = item.Size,
-                    ExtraItems = item.ExtraItems != null
-                        ? item.ExtraItems.Select(extraItem => new ExtraItem
-                        {
-                            Name = extraItem.Name,
-                            Price = extraItem.Price
-                        }).ToList()
-                        : new List<ExtraItem>()
+                    ExtraItems = extraItems
                 };
 
                 _logger.LogInformation($"Adding order detail: {@orderDetail}");
@@ -82,75 +83,25 @@ namespace Order_API.Service.Orderser
         }
 
 
-        /* public async Task<int> ProcessOrderRequestAsync(CartRequest request)
-         {
-             _logger.LogInformation("Starting to process order request with details: {@Request}", request);
-
-             var order = new Order
-             {
-                 OrderTime = DateTime.UtcNow,
-                 Customer = request.UserId,
-                 TableId = request.TableId,
-                 OutletId = request.OutletId,
-                 Status = OrderStatus.Pending,
-                 OrderDetails = new List<OrderDetail>()
-             };
-
-             foreach (var item in request.MenuItems)
-             {
-                 var orderDetail = new OrderDetail
-                 {
-                     MenuItemId = item.Id,
-                     Quantity = item.Qty,
-                     Note = item.Note,
-                     Size = item.Size,
-                     ExtraItems = item.ExtraItems != null
-                         ? item.ExtraItems.Select(extraItem => new ExtraItem
-                         {
-                             Name = extraItem.Name,
-                             Price = extraItem.Price
-                         }).ToList()
-                         : new List<ExtraItem>()
-                 };
-
-                 _logger.LogInformation($"Adding order detail: {@orderDetail}");
-                 order.OrderDetails.Add(orderDetail);
-             }
 
 
 
-             _logger.LogInformation("Final order before saving to the database: {@Order}", order);
+        //Fuck this shit
 
-             foreach (var detail in order.OrderDetails)
-             {
-                 _logger.LogInformation($"Order detail before saving: {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}");
-             }
+        public async Task UpdateOrderStatusAsync(string orderId, OrderStatus status)
+        {
+            var filter = Builders<Order>.Filter.Eq(o => o.Id, orderId);
+            var update = Builders<Order>.Update.Set(o => o.Status, status);
 
-             _context.Orders.Add(order);
-             await _context.SaveChangesAsync();
+            var result = await _context.Orders.UpdateOneAsync(filter, update);
 
-             _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
-             return order.Id;
-         }
+            if (result.ModifiedCount == 0)
+            {
+                throw new Exception("Order not found.");
+            }
+        }
 
-         //Fuck this shit
-
-         public async Task UpdateOrderStatusAsync(int orderId, OrderStatus status)
-          {
-              // Retrieve the existing order from the database
-              var existingOrder = await _context.Orders.FindAsync(orderId);
-              if (existingOrder == null)
-              {
-                  throw new Exception("Order not found.");
-              }
-
-              // Update the status
-              existingOrder.Status = status;
-
-              // Save changes to the database
-              await _context.SaveChangesAsync();
-          }
-
+        /*
          public async Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId)
          {
              var currentTime = DateTime.UtcNow;

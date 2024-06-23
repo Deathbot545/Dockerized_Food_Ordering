@@ -2,6 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -34,56 +35,7 @@ namespace Order_API.Service.Orderser
          }
 
 
-        public async Task<string> ProcessOrderRequestAsync(JObject requestData)
-        {
-            _logger.LogInformation("Starting to process order request with details: {@Request}", requestData);
-
-            var order = new Order
-            {
-                OrderTime = DateTime.UtcNow,
-                Customer = requestData["userId"]?.ToString(),
-                TableId = Convert.ToInt32(requestData["tableId"]),
-                OutletId = Convert.ToInt32(requestData["outletId"]),
-                Status = OrderStatus.Pending,
-                OrderDetails = new List<OrderDetail>()
-            };
-
-            var menuItems = requestData["menuItems"];
-            foreach (var menuItem in menuItems)
-            {
-                var extraItems = menuItem["extraItems"]?.Select(extraItem => new ExtraItem
-                {
-                    Name = extraItem["name"]?.ToString(),
-                    Price = Convert.ToDecimal(extraItem["price"])
-                }).ToList();
-
-                var orderDetail = new OrderDetail
-                {
-                    MenuItemId = menuItem["id"]?.ToString(),
-                    Quantity = Convert.ToInt32(menuItem["qty"]),
-                    Note = menuItem["note"]?.ToString(),
-                    Size = menuItem["size"]?.ToString(),
-                    ExtraItems = extraItems
-                };
-
-                _logger.LogInformation($"Adding order detail: {@orderDetail}");
-                order.OrderDetails.Add(orderDetail);
-            }
-
-            _logger.LogInformation("Final order before saving to the database: {@Order}", order);
-
-            try
-            {
-                await _context.Orders.InsertOneAsync(order);
-                _logger.LogInformation($"Order processed successfully with orderId: {order.Id}");
-                return order.Id;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing order");
-                throw;
-            }
-        }
+       
         public async Task<string> ProcessOrderRequestAsync(CartRequest request)
         {
             _logger.LogInformation("Starting to process order request with details: {RequestJson}", JsonConvert.SerializeObject(request));
@@ -141,6 +93,8 @@ namespace Order_API.Service.Orderser
 
         public async Task UpdateOrderStatusAsync(string orderId, OrderStatus status)
         {
+            _logger.LogInformation("Updating status for Order ID: {OrderId} to Status: {Status}", orderId, status);
+
             var filter = Builders<Order>.Filter.Eq(o => o.Id, orderId);
             var update = Builders<Order>.Update.Set(o => o.Status, status);
 
@@ -148,9 +102,13 @@ namespace Order_API.Service.Orderser
 
             if (result.ModifiedCount == 0)
             {
+                _logger.LogWarning("No order found with ID: {OrderId}", orderId);
                 throw new Exception("Order not found.");
             }
+
+            _logger.LogInformation("Order ID: {OrderId} successfully updated to Status: {Status}", orderId, status);
         }
+
         public async Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId)
         {
             var currentTime = DateTime.UtcNow;
@@ -194,73 +152,80 @@ namespace Order_API.Service.Orderser
         }
 
 
+        /* public async Task<bool> DeleteOrderAsync(string orderId)
+         {
+             var orderObjectId = ObjectId.Parse(orderId);
+
+             var order = await _context.Orders.Find(o => o.Id == orderObjectId).FirstOrDefaultAsync();
+             if (order == null)
+             {
+                 // Order not found
+                 return false;
+             }
+
+             // Remove the order
+             var deleteResult = await _context.Orders.DeleteOneAsync(o => o.Id == orderObjectId);
+
+             return deleteResult.DeletedCount > 0; // Return true to indicate successful deletion
+         }
+         public async Task<int?> GetOrderStatusAsync(string orderId)
+         {
+             var orderObjectId = ObjectId.Parse(orderId);
+
+             var order = await _context.Orders.Find(o => o.Id == orderObjectId).FirstOrDefaultAsync();
+             if (order == null)
+             {
+                 _logger.LogError($"Order with Id {orderId} not found.");
+                 return null;
+             }
+             return (int)order.Status; // Return the integer value of the enum
+         }*/
+
+        public async Task<OrderDTO> GetOrderByOrderIdAsync(string orderId)
+        {
+            // Fetch order from MongoDB
+            var order = await _context.Orders.Find(o => o.Id == orderId).FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                // Order not found
+                return null;
+            }
+
+            // Transform order to DTO
+            var orderDto = new OrderDTO
+            {
+                Id = order.Id,
+                OrderTime = order.OrderTime,
+                Customer = order.Customer,
+                TableId = order.TableId,
+                OutletId = order.OutletId.ToString(), // Convert OutletId to string
+                Status = order.Status,
+                OrderDetails = order.OrderDetails.Select(od => new OrderDetailDTO
+                {
+                    Id = int.TryParse(od.Id, out int id) ? id : 0, // Convert Id to int
+                    OrderId = int.TryParse(order.Id, out int orderId) ? orderId : 0, // Convert OrderId to int
+                    MenuItemId = od.MenuItemId, // Keep MenuItemId as string
+                    MenuItemName = od.MenuItemName,
+                    Quantity = od.Quantity,
+                    Note = od.Note,
+                    Size = od.Size,
+                    ExtraItems = od.ExtraItems?.Select(ei => new ExtraItemDto
+                    {
+                        Id = int.TryParse(ei.Id, out int extraItemId) ? extraItemId : 0, // Convert ExtraItem Id to int
+                        Name = ei.Name,
+                        Price = ei.Price
+                    }).ToList() ?? new List<ExtraItemDto>()
+                }).ToList()
+            };
+
+            return orderDto;
+        }
+
+
 
         /*
-         public async Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId)
-         {
-             var currentTime = DateTime.UtcNow;
-
-
-
-             var orders = await _context.Orders
-                 .Include(o => o.OrderDetails)
-                     .ThenInclude(od => od.ExtraItems)
-                 .AsSplitQuery() // Use split query
-                 .Where(o => o.OutletId == outletId &&
-                             o.Status != OrderStatus.Cancelled &&
-                             o.Status != OrderStatus.Rejected &&
-                             (o.Status != OrderStatus.Served || o.OrderTime > currentTime.AddHours(-1)))
-                 .ToListAsync();
-
-
-
-             var menuItemsDto = await FetchMenuItemsByOutletIdAsync(outletId);
-
-
-
-             var orderDtos = orders.Select(o => new OrderDTO
-             {
-                 Id = o.Id,
-                 OrderTime = o.OrderTime,
-                 Customer = o.Customer,
-                 TableId = o.TableId,
-                 OutletId = o.OutletId,
-                 Status = o.Status,
-                 OrderDetails = o.OrderDetails.Select(od =>
-                 {
-                     var menuItem = menuItemsDto.FirstOrDefault(mi => mi.id == od.MenuItemId);
-
-                     var detailDto = new OrderDetailDTO
-                     {
-                         Id = od.Id,
-                         OrderId = od.OrderId,
-                         MenuItemId = od.MenuItemId,
-                         MenuItem = menuItem != null ? new MenuItemData
-                         {
-                             Id = menuItem.id,
-                             Name = menuItem.Name,
-                             Description = menuItem.Description,
-                             Price = menuItem.Price,
-                             MenuCategoryId = menuItem.MenuCategoryId,
-                             Image = menuItem.Image
-                         } : null,
-                         Quantity = od.Quantity,
-                         Note = od.Note,
-                         Size = od.Size, // Include the size in the DTO
-                         ExtraItems = od.ExtraItems != null
-                             ? od.ExtraItems.Select(ei => new ExtraItemDto { Id = ei.Id, Name = ei.Name, Price = ei.Price }).ToList()
-                             : new List<ExtraItemDto>()
-                     };
-
-
-
-                     return detailDto;
-                 }).ToList()
-             }).ToList();
-
-
-             return orderDtos;
-         }
+          
 
          private async Task<List<MenuItemDto>> FetchMenuItemsByOutletIdAsync(int outletId)
          {

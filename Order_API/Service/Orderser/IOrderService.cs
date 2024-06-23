@@ -24,10 +24,12 @@ namespace Order_API.Service.Orderser
          Task<OrderDTO> GetOrderDetailsAsync(int orderId);
          Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(string userId);
  */
-        Task<string> ProcessOrderRequestAsync(JObject requestData);
         Task UpdateOrderStatusAsync(string orderId, OrderStatus status);
         Task<string> ProcessOrderRequestAsync(CartRequest request);
         Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId);
+        Task<OrderDTO> GetOrderByOrderIdAsync(string orderId);
+
+
 
 
         // Add other order-related methods as needed

@@ -9,36 +9,48 @@ namespace Kitchen_Web.DTO
             OrderDetails = new List<OrderDetailDTO>();
         }
 
-        public int Id { get; set; }
+        public string Id { get; set; } // Update Id to string if it's stored as ObjectId
         public DateTime OrderTime { get; set; }
         public string Customer { get; set; }
         public int TableId { get; set; }
         public string TableName { get; set; }
-        public int OutletId { get; set; }
+        public string OutletId { get; set; } // Change OutletId to string
         public OrderStatus Status { get; set; }
         public List<OrderDetailDTO> OrderDetails { get; set; }
     }
+
 
     public class OrderDetailDTO
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
-        public int MenuItemId { get; set; }
+        public string MenuItemId { get; set; } // Keep MenuItemId as string
         public MenuItemData MenuItem { get; set; }
         public int Quantity { get; set; }
         public string Note { get; set; }
         public string Size { get; set; } // Include the size in the DTO
-        public string? ExtraItems { get; set; } // Extra items in string format
-    }
+        public List<ExtraItemDto> ExtraItems { get; set; } // List of extra items
 
+        public OrderDetailDTO()
+        {
+            ExtraItems = new List<ExtraItemDto>();
+        }
+    }
     public class MenuItemData
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         public int MenuCategoryId { get; set; }
         public string Image { get; set; }
+    }
+
+    public class ExtraItemDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
     }
     public enum OrderStatus
     {

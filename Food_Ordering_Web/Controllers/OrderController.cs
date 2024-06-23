@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
 using Food_Ordering_Web.DTO;
+using System.Text;
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -84,6 +85,13 @@ namespace Food_Ordering_Web.Controllers
             // Log the entire form data
             _logger.LogInformation("Form data received: {FormData}", form.ToDictionary(x => x.Key, x => x.Value.ToString()));
 
+            // Log the request body as JSON
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                string requestBodyJson = await reader.ReadToEndAsync();
+                _logger.LogInformation($"Received JSON payload: {requestBodyJson}");
+            }
+
             if (!int.TryParse(form["tableId"], out int tableId))
             {
                 _logger.LogError("Invalid or missing tableId in form data.");
@@ -143,7 +151,6 @@ namespace Food_Ordering_Web.Controllers
 
             var response = await client.PostAsJsonAsync("https://restosolutionssaas.com/api/OrderApi/AddOrder", orderData);
 
-
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<OrderResponse>();
@@ -156,6 +163,8 @@ namespace Food_Ordering_Web.Controllers
                 return Json(new { success = false, errorMessage = errorResponse });
             }
         }
+
+
 
 
 

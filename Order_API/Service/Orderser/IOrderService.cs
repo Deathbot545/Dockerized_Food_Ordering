@@ -1,6 +1,7 @@
 ﻿
 
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Order_API.DTO;
 using Order_API.Models;
 using System;
@@ -23,8 +24,9 @@ namespace Order_API.Service.Orderser
          Task<OrderDTO> GetOrderDetailsAsync(int orderId);
          Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(string userId);
  */
+        Task<string> ProcessOrderRequestAsync(JObject requestData);
+        Task UpdateOrderStatusAsync(string orderId, OrderStatus status);
 
-        Task<string> ProcessOrderRequestAsync(CartRequest request);
 
         // Add other order-related methods as needed
     }

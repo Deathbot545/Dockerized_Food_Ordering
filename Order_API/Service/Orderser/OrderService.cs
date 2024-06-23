@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 using Order_API.Data;
 using Order_API.DTO;
 using Order_API.Models;
@@ -32,34 +33,35 @@ namespace Order_API.Service.Orderser
          }
 
 
-        public async Task<string> ProcessOrderRequestAsync(CartRequest request)
+        public async Task<string> ProcessOrderRequestAsync(JObject requestData)
         {
-            _logger.LogInformation("Starting to process order request with details: {@Request}", request);
+            _logger.LogInformation("Starting to process order request with details: {@Request}", requestData);
 
             var order = new Order
             {
                 OrderTime = DateTime.UtcNow,
-                Customer = request.UserId,
-                TableId = request.TableId,
-                OutletId = request.OutletId,
+                Customer = requestData["userId"]?.ToString(),
+                TableId = Convert.ToInt32(requestData["tableId"]),
+                OutletId = Convert.ToInt32(requestData["outletId"]),
                 Status = OrderStatus.Pending,
                 OrderDetails = new List<OrderDetail>()
             };
 
-            foreach (var item in request.MenuItems)
+            var menuItems = requestData["menuItems"];
+            foreach (var menuItem in menuItems)
             {
-                var extraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
+                var extraItems = menuItem["extraItems"]?.Select(extraItem => new ExtraItem
                 {
-                    Name = extraItem.Name,
-                    Price = extraItem.Price
+                    Name = extraItem["name"]?.ToString(),
+                    Price = Convert.ToDecimal(extraItem["price"])
                 }).ToList();
 
                 var orderDetail = new OrderDetail
                 {
-                    MenuItemId = item.Id.ToString(),
-                    Quantity = item.Qty,
-                    Note = item.Note,
-                    Size = item.Size,
+                    MenuItemId = menuItem["id"]?.ToString(),
+                    Quantity = Convert.ToInt32(menuItem["qty"]),
+                    Note = menuItem["note"]?.ToString(),
+                    Size = menuItem["size"]?.ToString(),
                     ExtraItems = extraItems
                 };
 
@@ -81,6 +83,7 @@ namespace Order_API.Service.Orderser
                 throw;
             }
         }
+
 
 
 

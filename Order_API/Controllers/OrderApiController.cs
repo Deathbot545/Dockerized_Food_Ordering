@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Order_API.Data;
 using Order_API.DTO;
 using Order_API.Hubs;
@@ -64,13 +65,13 @@ namespace Order_API.Controllers
               return order;
           }*/
         [HttpPost("AddOrder")]
-        public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
+        public async Task<IActionResult> AddOrder([FromBody] JObject requestData)
         {
             try
             {
-                _logger.LogInformation("Received order request: {@Request}", request); // Log the received order request
+                _logger.LogInformation("Received order request: {@Request}", requestData); // Log the received order request
 
-                string orderId = await _orderService.ProcessOrderRequestAsync(request);
+                string orderId = await _orderService.ProcessOrderRequestAsync(requestData);
 
                 return Ok(new { orderId });
             }
@@ -80,6 +81,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
 
 

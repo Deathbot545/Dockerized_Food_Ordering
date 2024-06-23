@@ -25,6 +25,7 @@ namespace Kitchen_Web.DTO
         public int Id { get; set; }
         public int OrderId { get; set; }
         public string MenuItemId { get; set; } // Keep MenuItemId as string
+        public string MenuItemName { get; set; }
         public MenuItemData MenuItem { get; set; }
         public int Quantity { get; set; }
         public string Note { get; set; }

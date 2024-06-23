@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .build();
 
     console.log("SignalR connection object before adding method:", connection);
+ 
 
     connection.on("ReceiveOrderUpdate", function (order) {
         console.log("ReceiveOrderUpdate method triggered with order:", order);
@@ -49,11 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Order update is missing required properties", order);
         }
     });
-
     connection.on("NewOrderPlaced", function (orderInfo) {
         console.log("NewOrderPlaced method triggered with order info:", orderInfo);
+        addNewOrderToUI(orderInfo);
     });
-
     function renderOrderCard(orderDetails) {
         // Use the provided 'RenderOrderCard' function to render the order card
         return RenderOrderCard(orderDetails, tables);
@@ -75,6 +75,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     console.log("SignalR connection object after adding methods:", connection);
+    function addNewOrderToUI(order) {
+        console.log("Adding new order to UI:", order);
+        const orderHtml = createOrderHtml(order);
+        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+        $('#' + sectionId).append(orderHtml);
+    }
+
 
     function updateOrderUI(order) {
         console.log("Updating UI for order ID:", order.orderId, "with new status:", order.status);

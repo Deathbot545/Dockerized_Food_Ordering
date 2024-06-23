@@ -195,39 +195,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             },
             error: function (xhr, status, error) {
-                console.error("Error while updating order status:", status, error);
+                console.error("Error updating order status:", error);
             }
         });
     }
 
     function updateOrderStatusToCancelled(orderId) {
-        console.log("Sending update request to cancel Order ID:", orderId);
-        $.ajax({
-            url: 'https://restosolutionssaas.com/api/OrderApi/CancelOrder',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ OrderId: orderId }),
-            success: function () {
-                console.log("Successfully cancelled Order ID:", orderId);
-                const orderCard = $(`.order-card[data-order-id="${orderId}"]`);
-                orderCard.find('.btn').removeClass('active');
-                orderCard.find(`.btn[data-status="cancelled"]`).addClass('active');
-            },
-            error: function (xhr, status, error) {
-                console.error(`Failed to cancel Order ID: ${orderId}. Error: ${error}`);
-            }
-        });
+        updateOrderStatus(orderId, 'cancelled');
     }
 
     const statusMappings = {
-        0: { text: 'Pending', section: 'pendingOrders' },
-        1: { text: 'Preparing', section: 'preparingOrders' },
-        2: { text: 'Ready', section: 'readyOrders' },
-        3: { text: 'Served', section: 'servedOrders' },
-        4: { text: 'Cancelled', section: 'cancelledOrders' },
-        default: { text: 'Unknown', section: 'unknownOrders' }
+        pending: { text: "Pending", color: "orange", section: "pendingOrdersSection" },
+        preparing: { text: "Preparing", color: "blue", section: "preparingOrdersSection" },
+        ready: { text: "Ready", color: "green", section: "readyOrdersSection" },
+        served: { text: "Served", color: "grey", section: "servedOrdersSection" },
+        cancelled: { text: "Cancelled", color: "red", section: "cancelledOrdersSection" },
+        default: { text: "Unknown", color: "black", section: "pendingOrdersSection" }
     };
 
-    console.log("Status mappings:", statusMappings);
+    $(document).on('click', '.alert .close', function () {
+        $(this).closest('.alert').alert('close');
+    });
 });
-    

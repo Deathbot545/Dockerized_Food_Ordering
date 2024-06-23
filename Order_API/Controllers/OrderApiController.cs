@@ -125,11 +125,11 @@ namespace Order_API.Controllers
 
 
         [HttpGet("GetOrderStatus/{orderId}")]
-        public async Task<IActionResult> GetOrderStatus(int orderId)
+        public async Task<IActionResult> GetOrderStatus(string orderId)
         {
             try
             {
-                var status = await _orderService.GetOrderStatusAsync(orderId.ToString());
+                var status = await _orderService.GetOrderStatusAsync(orderId);
                 if (status == null)
                 {
                     _logger.LogError($"Order with Id {orderId} not found or has no status.");

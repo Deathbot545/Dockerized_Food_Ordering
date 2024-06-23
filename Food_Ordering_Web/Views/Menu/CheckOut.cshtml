@@ -192,7 +192,7 @@
             formData.append(`items[${index}].id`, item.id);
             formData.append(`items[${index}].qty`, item.qty);
             formData.append(`items[${index}].price`, item.price);
-            formData.append(`items[${index}].name`, item.name);
+            formData.append(`items[${index}].name`, item.name); // Ensure name is included
             formData.append(`items[${index}].note`, item.note); // Ensure note is included
             formData.append(`items[${index}].size`, item.size);
             if (item.extraItems) {

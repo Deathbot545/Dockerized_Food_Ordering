@@ -44,9 +44,6 @@ namespace Order_API.DTO
             ExtraItems = new List<ExtraItemDto>();
         }
     }
-
-
-
     public class MenuItemData
     {
         public int Id { get; set; }

@@ -172,24 +172,24 @@ namespace Order_API.Service.Orderser
                 Status = o.Status,
                 OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
                 {
-                    Id = int.Parse(od.Id), // Convert Id to int
-                    OrderId = int.Parse(o.Id), // Convert OrderId to int
+                    Id = int.TryParse(od.Id, out int id) ? id : 0, // Convert Id to int
+                    OrderId = int.TryParse(o.Id, out int orderId) ? orderId : 0, // Convert OrderId to int
                     MenuItemId = od.MenuItemId, // Keep MenuItemId as string
                     Quantity = od.Quantity,
                     Note = od.Note,
                     Size = od.Size,
                     ExtraItems = od.ExtraItems?.Select(ei => new ExtraItemDto
                     {
-                        Id = int.Parse(ei.Id), // Convert ExtraItem Id to int
+                        Id = int.TryParse(ei.Id, out int extraItemId) ? extraItemId : 0, // Convert ExtraItem Id to int
                         Name = ei.Name,
                         Price = ei.Price
                     }).ToList() ?? new List<ExtraItemDto>()
                 }).ToList()
             }).ToList();
 
-
             return orderDtos;
         }
+
 
 
         /*

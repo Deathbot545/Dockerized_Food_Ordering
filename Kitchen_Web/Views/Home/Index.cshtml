@@ -24,7 +24,26 @@
 
         foreach (var detail in order.OrderDetails)
         {
-            html.Append($"<li>{detail.MenuItem?.Name} x {detail.Quantity} <br><small>Note: {detail.Note}</small></li>");
+            html.Append($"<li>{detail.MenuItem?.Name} x {detail.Quantity}");
+
+            if (!string.IsNullOrEmpty(detail.Note))
+            {
+                html.Append($"<br><small>Note: {detail.Note}</small>");
+            }
+
+            if (detail.ExtraItems != null && detail.ExtraItems.Any())
+            {
+                html.Append("<ul>");
+
+                foreach (var extraItem in detail.ExtraItems)
+                {
+                    html.Append($"<li>{extraItem.Name} x {detail.Quantity} - {extraItem.Price:C2}</li>");
+                }
+
+                html.Append("</ul>");
+            }
+
+            html.Append("</li>");
         }
 
         html.Append("</ul><div class=\"btn-group\" role=\"group\" aria-label=\"Order Status\">");
@@ -37,6 +56,7 @@
 
         return html.ToString();
     }
+
 }
 
 @{

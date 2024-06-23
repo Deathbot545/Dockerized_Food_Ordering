@@ -177,6 +177,7 @@ namespace Order_API.Service.Orderser
                     Id = int.TryParse(od.Id, out int id) ? id : 0, // Convert Id to int
                     OrderId = int.TryParse(o.Id, out int orderId) ? orderId : 0, // Convert OrderId to int
                     MenuItemId = od.MenuItemId, // Keep MenuItemId as string
+                    MenuItemName=od.MenuItemName,
                     Quantity = od.Quantity,
                     Note = od.Note,
                     Size = od.Size,

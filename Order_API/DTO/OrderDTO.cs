@@ -32,6 +32,7 @@ namespace Order_API.DTO
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
+        public string MenuItemName { get; set; }
         public string MenuItemId { get; set; } // Keep MenuItemId as string
         public MenuItemData MenuItem { get; set; }
         public int Quantity { get; set; }

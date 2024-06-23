@@ -18,6 +18,7 @@ namespace Food_Ordering_Web.DTO
     public class CartItem
     {
         public int Id { get; set; }
+        public string Name { get; set; }
         public int Qty { get; set; }
         public string Note { get; set; }
         public string Size { get; set; }

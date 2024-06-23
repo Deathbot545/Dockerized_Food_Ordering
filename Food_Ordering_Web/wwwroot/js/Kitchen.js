@@ -24,12 +24,6 @@ window.mapEnumToStatusText = function (statusValue) {
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM content loaded");
 
-    let currentOrder = JSON.parse(localStorage.getItem('currentOrder'));
-    if (currentOrder && typeof currentOrder.status === "number") {
-        currentOrder.status = mapEnumToStatusText(currentOrder.status);
-        localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
-    }
-
     const connection = new signalR.HubConnectionBuilder()
         .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true`)
         .configureLogging(signalR.LogLevel.Information)
@@ -37,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .build();
 
     console.log("SignalR connection object before adding method:", connection);
- 
 
     connection.on("ReceiveOrderUpdate", function (order) {
         console.log("ReceiveOrderUpdate method triggered with order:", order);
@@ -50,14 +43,12 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Order update is missing required properties", order);
         }
     });
+
     connection.on("NewOrderPlaced", function (orderInfo) {
         console.log("NewOrderPlaced method triggered with order info:", orderInfo);
         addNewOrderToUI(orderInfo);
     });
-    function renderOrderCard(orderDetails) {
-        // Use the provided 'RenderOrderCard' function to render the order card
-        return RenderOrderCard(orderDetails, tables);
-    }
+
     connection.onreconnecting(error => {
         console.warn(`Connection lost due to error "${error}". Reconnecting.`);
     });
@@ -75,13 +66,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     console.log("SignalR connection object after adding methods:", connection);
+
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
         const orderHtml = createOrderHtml(order);
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
         $('#' + sectionId).append(orderHtml);
     }
-
 
     function updateOrderUI(order) {
         console.log("Updating UI for order ID:", order.orderId, "with new status:", order.status);
@@ -98,33 +89,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function addNewOrderToUI(order) {
-        console.log("Adding new order to UI:", order);
-        const orderHtml = createOrderHtml(order);
-        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-        $('#' + sectionId).append(orderHtml);
-    }
-
-    function updateExistingOrderCard($orderCard, order, statusText, color) {
-        const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-        `).join("");
-
-        $orderCard.find('.card-body ul').html(detailsHtml);
-        $orderCard.find('.btn').removeClass('active');
-        $orderCard.find(`.btn[data-status="${statusText.toLowerCase()}"]`).addClass('active');
-        $orderCard.find('.card-header').html(
-            `Order #${order.orderId} | Table: ${order.tableId} | Date: ${new Date(order.orderTime).toLocaleString('en-US', { hour12: false })} | STATUS: ${statusText}`
-        ).css('background-color', color);
-        console.log(`Order ${order.orderId} UI updated to ${statusText}`);
-    }
-
     function createOrderHtml(order) {
         const statusText = mapEnumToStatusText(order.status);
         const color = getStatusColor(order.status);
         const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
         const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+            <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
         `).join("");
         const tableIdentifier = `Table: ${order.tableId}`;
 
@@ -148,8 +118,23 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>`;
     }
 
+    function updateExistingOrderCard($orderCard, order, statusText, color) {
+        const detailsHtml = order.orderDetails.map(detail => `
+            <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
+
+        $orderCard.find('.card-body ul').html(detailsHtml);
+        $orderCard.find('.btn').removeClass('active');
+        $orderCard.find(`.btn[data-status="${statusText.toLowerCase()}"]`).addClass('active');
+        $orderCard.find('.card-header').html(
+            `Order #${order.orderId} | Table: ${order.tableId} | Date: ${new Date(order.orderTime).toLocaleString('en-US', { hour12: false })} | STATUS: ${statusText}`
+        ).css('background-color', color);
+        console.log(`Order ${order.orderId} UI updated to ${statusText}`);
+    }
+
+    const notifiedCancellations = {};
+
     function handleCancellationAlert(order) {
-        const notifiedCancellations = {};
         if (!notifiedCancellations[order.orderId]) {
             const cancellationAlert = `
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -205,11 +190,12 @@ document.addEventListener("DOMContentLoaded", function () {
             success: function () {
                 console.log("Successfully updated status for Order ID:", orderId);
                 const orderCard = $(`.order-card[data-order-id="${orderId}"]`);
-                orderCard.find('.btn').removeClass('active');
-                orderCard.find(`.btn[data-status="${newStatus.toLowerCase()}"]`).addClass('active');
+                orderCard.fadeOut(500, function () {
+                    orderCard.remove();
+                });
             },
             error: function (xhr, status, error) {
-                console.error(`Failed to update status for Order ID: ${orderId}. Error: ${error}`);
+                console.error("Error while updating order status:", status, error);
             }
         });
     }

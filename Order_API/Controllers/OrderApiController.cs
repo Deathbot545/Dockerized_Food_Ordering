@@ -82,7 +82,20 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        [HttpGet("GetOrdersForOutlet/{outletId}")]
+        public async Task<IActionResult> GetOrdersForOutlet(int outletId)
+        {
+            try
+            {
+                var ordersDTO = await _orderService.GetOrdersByOutletIdAsync(outletId);
+                return Ok(ordersDTO);  // Ensure ordersDTO does not contain non-serializable types
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Internal server error occurred while fetching orders for outlet ID: {OutletId}", outletId);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
 
 
@@ -135,20 +148,7 @@ namespace Order_API.Controllers
          }
 
 
-         [HttpGet("GetOrdersForOutlet/{outletId}")]
-         public async Task<IActionResult> GetOrdersForOutlet(int outletId)
-         {
-             try
-             {
-                 var ordersDTO = await _orderService.GetOrdersByOutletIdAsync(outletId);
-                 return Ok(ordersDTO);  // Ensure ordersDTO does not contain non-serializable types
-             }
-             catch (Exception ex)
-             {
-                 _logger.LogError(ex, "Internal server error occurred while fetching orders for outlet ID: {OutletId}", outletId);
-                 return StatusCode(500, $"Internal server error: {ex.Message}");
-             }
-         }
+       
 
 
 

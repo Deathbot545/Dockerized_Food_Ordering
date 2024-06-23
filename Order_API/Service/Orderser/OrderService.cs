@@ -137,14 +137,6 @@ namespace Order_API.Service.Orderser
         }
 
 
-
-
-
-
-
-
-        //Fuck this shit
-
         public async Task UpdateOrderStatusAsync(string orderId, OrderStatus status)
         {
             var filter = Builders<Order>.Filter.Eq(o => o.Id, orderId);
@@ -157,6 +149,48 @@ namespace Order_API.Service.Orderser
                 throw new Exception("Order not found.");
             }
         }
+        public async Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId)
+        {
+            var currentTime = DateTime.UtcNow;
+
+            // Fetch orders from MongoDB
+            var orders = await _context.Orders
+                .Find(o => o.OutletId == outletId &&
+                           o.Status != OrderStatus.Cancelled &&
+                           o.Status != OrderStatus.Rejected &&
+                           (o.Status != OrderStatus.Served || o.OrderTime > currentTime.AddHours(-1)))
+                .ToListAsync();
+
+            // Transform orders to DTOs
+            var orderDtos = orders.Select(o => new OrderDTO
+            {
+                Id = o.Id,
+                OrderTime = o.OrderTime,
+                Customer = o.Customer,
+                TableId = o.TableId,
+                OutletId = o.OutletId.ToString(), // Convert OutletId to string
+                Status = o.Status,
+                OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
+                {
+                    Id = int.Parse(od.Id), // Convert Id to int
+                    OrderId = int.Parse(o.Id), // Convert OrderId to int
+                    MenuItemId = od.MenuItemId, // Keep MenuItemId as string
+                    Quantity = od.Quantity,
+                    Note = od.Note,
+                    Size = od.Size,
+                    ExtraItems = od.ExtraItems?.Select(ei => new ExtraItemDto
+                    {
+                        Id = int.Parse(ei.Id), // Convert ExtraItem Id to int
+                        Name = ei.Name,
+                        Price = ei.Price
+                    }).ToList() ?? new List<ExtraItemDto>()
+                }).ToList()
+            }).ToList();
+
+
+            return orderDtos;
+        }
+
 
         /*
          public async Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId)

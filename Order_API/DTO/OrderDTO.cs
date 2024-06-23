@@ -17,21 +17,22 @@ namespace Order_API.DTO
             OrderDetails = new List<OrderDetailDTO>();
         }
 
-        public int Id { get; set; }
+        public string Id { get; set; } // Update Id to string if it's stored as ObjectId
         public DateTime OrderTime { get; set; }
         public string Customer { get; set; }
         public int TableId { get; set; }
         public string TableName { get; set; }
-        public int OutletId { get; set; }
+        public string OutletId { get; set; } // Change OutletId to string
         public OrderStatus Status { get; set; }
         public List<OrderDetailDTO> OrderDetails { get; set; }
     }
+
 
     public class OrderDetailDTO
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
-        public int MenuItemId { get; set; }
+        public string MenuItemId { get; set; } // Keep MenuItemId as string
         public MenuItemData MenuItem { get; set; }
         public int Quantity { get; set; }
         public string Note { get; set; }
@@ -43,6 +44,8 @@ namespace Order_API.DTO
             ExtraItems = new List<ExtraItemDto>();
         }
     }
+
+
 
     public class MenuItemData
     {

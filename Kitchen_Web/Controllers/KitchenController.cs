@@ -26,7 +26,7 @@ namespace Kitchen_Web.Controllers
                 _logger.LogInformation("No outletId provided, returning default view.");
                 return View("~/Views/Home/Index.cshtml");
             }
-
+            //kolk
             try
             {
                 var httpClient = _httpClientFactory.CreateClient();

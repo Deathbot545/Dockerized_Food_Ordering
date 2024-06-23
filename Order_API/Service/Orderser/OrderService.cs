@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Order_API.Data;
 using Order_API.DTO;
@@ -85,7 +86,7 @@ namespace Order_API.Service.Orderser
         }
         public async Task<string> ProcessOrderRequestAsync(CartRequest request)
         {
-            _logger.LogInformation("Starting to process order request with details: {@Request}", request);
+            _logger.LogInformation("Starting to process order request with details: {@Request}", JsonConvert.SerializeObject(request));
 
             var order = new Order
             {
@@ -99,7 +100,7 @@ namespace Order_API.Service.Orderser
 
             foreach (var item in request.MenuItems)
             {
-                _logger.LogInformation("Processing item {@Item}", item);
+                _logger.LogInformation("Processing item {@Item}", JsonConvert.SerializeObject(item));
 
                 var extraItems = item.ExtraItems?.Select(extraItem => new ExtraItem
                 {
@@ -120,7 +121,7 @@ namespace Order_API.Service.Orderser
                 order.OrderDetails.Add(orderDetail);
             }
 
-            _logger.LogInformation("Final order before saving to the database: {@Order}", order);
+            _logger.LogInformation("Final order before saving to the database: {@Order}", JsonConvert.SerializeObject(order));
 
             try
             {
@@ -134,6 +135,7 @@ namespace Order_API.Service.Orderser
                 throw;
             }
         }
+
 
 
 

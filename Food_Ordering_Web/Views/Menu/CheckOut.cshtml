@@ -181,36 +181,18 @@
             return; // Optionally show an error message to the user
         }
 
-        const formData = new FormData();
-        formData.append('tableId', foodItemData.tableId);
-        formData.append('outletId', foodItemData.outletId);
-        formData.append('addUtensils', $('#addUtensils').is(':checked'));
-
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart.forEach((item, index) => {
-            console.log(`Item ${index} Note:`, item.note); // Log the note
-            formData.append(`items[${index}].id`, item.id);
-            formData.append(`items[${index}].name`, item.name); // Make sure name is included
-            formData.append(`items[${index}].qty`, item.qty);
-            formData.append(`items[${index}].price`, item.price);
-            formData.append(`items[${index}].note`, item.note); // Ensure note is included
-            formData.append(`items[${index}].size`, item.size);
-            if (item.extraItems) {
-                item.extraItems.forEach((extraItem, extraIndex) => {
-                    formData.append(`items[${index}].extraItems[${extraIndex}].id`, extraItem.id);
-                    formData.append(`items[${index}].extraItems[${extraIndex}].name`, extraItem.name);
-                    formData.append(`items[${index}].extraItems[${extraIndex}].price`, extraItem.price);
-                });
-            }
-        });
-
         const orderData = {
             TableId: foodItemData.tableId,
             OutletId: foodItemData.outletId,
             MenuItems: cart.map(item => ({
-                ...item,
-                Name: item.name, // Include the Name property
-                name: undefined // Remove the lowercase name property
+                Id: item.id,
+                Name: item.name, // Ensure Name property is set correctly
+                Qty: item.qty,
+                Price: item.price,
+                Note: item.note,
+                Size: item.size,
+                ExtraItems: item.extraItems || []
             })),
             AddUtensils: $('#addUtensils').is(':checked'),
         };
@@ -220,7 +202,10 @@
 
         fetch('/Order/CreateOrUpdateOrder', {
             method: 'POST',
-            body: formData
+            body: jsonPayload,
+            headers: {
+                'Content-Type': 'application/json'
+            }
         })
             .then(response => response.json())
             .then(data => {
@@ -242,6 +227,7 @@
 
         return false;
     }
+
 
     function createHiddenInput(name, value) {
         let input = document.createElement('input');

@@ -143,6 +143,7 @@ namespace Food_Ordering_Web.Controllers
                     items.Add(new CartItem
                     {
                         Id = itemId,
+                        Name = name, // Include Name field
                         Qty = qty,
                         Price = price,
                         Note = note,
@@ -158,23 +159,21 @@ namespace Food_Ordering_Web.Controllers
                 }
             }
 
-            CartRequest orderData = new CartRequest
+            var orderDataObject = new JObject
             {
-                UserId = userId,
-                TableId = tableId,
-                OutletId = outletId,
-                MenuItems = items
+                ["UserId"] = userId,
+                ["TableId"] = tableId,
+                ["OutletId"] = outletId,
+                ["MenuItems"] = JArray.FromObject(items)
             };
 
-            // Log the orderData object before serialization
-            var jsonPayload = JsonConvert.SerializeObject(orderData);
+            var jsonPayload = orderDataObject.ToString();
             _logger.LogInformation($"Sending JSON payload to API: {jsonPayload}");
 
             var client = _httpClientFactory.CreateClient();
-            // Log the request before sending
             _logger.LogInformation($"Sending request to API: {jsonPayload}");
 
-            var response = await client.PostAsJsonAsync("https://restosolutionssaas.com/api/OrderApi/AddOrder", orderData);
+            var response = await client.PostAsJsonAsync("https://restosolutionssaas.com/api/OrderApi/AddOrder", orderDataObject);
 
             if (response.IsSuccessStatusCode)
             {
@@ -191,6 +190,7 @@ namespace Food_Ordering_Web.Controllers
                 return Json(new { success = false, errorMessage = errorResponse });
             }
         }
+
 
 
 

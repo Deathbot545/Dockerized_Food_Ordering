@@ -31,53 +31,59 @@ namespace Order_API.Controllers
            // _context = context;
          }
         //ll
-      /*  [HttpGet("GetOrder/{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
-        {
-            _logger.LogInformation("Fetching order with ID: {OrderId}", id);
+        /*  [HttpGet("GetOrder/{id}")]
+          public async Task<ActionResult<Order>> GetOrder(int id)
+          {
+              _logger.LogInformation("Fetching order with ID: {OrderId}", id);
 
-            var order = await _context.Orders.FindAsync(id);
+              var order = await _context.Orders.FindAsync(id);
 
-            if (order == null)
-            {
-                _logger.LogInformation("Order with ID {OrderId} not found", id);
-                return NotFound();
-            }
+              if (order == null)
+              {
+                  _logger.LogInformation("Order with ID {OrderId} not found", id);
+                  return NotFound();
+              }
 
-            _logger.LogInformation("Order with ID {OrderId} found. Loading order details...", id);
+              _logger.LogInformation("Order with ID {OrderId} found. Loading order details...", id);
 
-            await _context.Entry(order)
-                .Collection(o => o.OrderDetails)
-                .LoadAsync();
+              await _context.Entry(order)
+                  .Collection(o => o.OrderDetails)
+                  .LoadAsync();
 
-            foreach (var detail in order.OrderDetails)
-            {
-                _logger.LogInformation("Loading extra items for order detail with ID: {OrderDetailId}", detail.Id);
+              foreach (var detail in order.OrderDetails)
+              {
+                  _logger.LogInformation("Loading extra items for order detail with ID: {OrderDetailId}", detail.Id);
 
-                await _context.Entry(detail)
-                    .Collection(d => d.ExtraItems)
-                    .LoadAsync();
-            }
+                  await _context.Entry(detail)
+                      .Collection(d => d.ExtraItems)
+                      .LoadAsync();
+              }
 
-            _logger.LogInformation("Order with ID {OrderId} loaded successfully", id);
+              _logger.LogInformation("Order with ID {OrderId} loaded successfully", id);
 
-            return order;
-        }*/
+              return order;
+          }*/
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
             try
             {
-                string orderId = await _orderService.ProcessOrderRequestAsync(request); // Updated to string
+                _logger.LogInformation("Received order request: {@request}", request);
 
-                return Ok(new { orderId }); // Return the orderId as part of the response
+                string orderId = await _orderService.ProcessOrderRequestAsync(request);
+
+                _logger.LogInformation("Order processed successfully. OrderId: {orderId}", orderId);
+
+                return Ok(new { orderId });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error processing order: {ex.Message}");
+                _logger.LogError(ex, "Error processing order: {message}", ex.Message);
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+
 
 
         // Add item to cart
@@ -243,9 +249,9 @@ namespace Order_API.Controllers
              return Ok(new { message = "Waiter call sent successfully." });
          }*/
 
-     }
+    }
 
-        public class CallWaiterRequest
+    public class CallWaiterRequest
     {
         public string TableId { get; set; }
     }

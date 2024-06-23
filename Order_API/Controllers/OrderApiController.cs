@@ -66,6 +66,7 @@ namespace Order_API.Controllers
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
+            _logger.LogInformation("Rebuibi");
             try
             {
                 var requestJson = JsonConvert.SerializeObject(request);

@@ -170,9 +170,7 @@ namespace Order_API.Service.Orderser
         }
         public async Task<int?> GetOrderStatusAsync(string orderId)
         {
-            var orderObjectId = ObjectId.Parse(orderId);
-
-            var order = await _context.Orders.Find(o => o.Id == orderObjectId.ToString()).FirstOrDefaultAsync();
+            var order = await _context.Orders.Find(o => o.Id == orderId).FirstOrDefaultAsync();
             if (order == null)
             {
                 _logger.LogError($"Order with Id {orderId} not found.");
@@ -183,7 +181,8 @@ namespace Order_API.Service.Orderser
         }
 
 
-       
+
+
 
         public async Task<OrderDTO> GetOrderByOrderIdAsync(string orderId)
         {

@@ -190,7 +190,7 @@
         cart.forEach((item, index) => {
             console.log(`Item ${index} Note:`, item.note); // Log the note
             formData.append(`items[${index}].id`, item.id);
-            formData.append(`items[${index}].name`, item.name);
+            formData.append(`items[${index}].name`, item.name); // Make sure name is included
             formData.append(`items[${index}].qty`, item.qty);
             formData.append(`items[${index}].price`, item.price);
             formData.append(`items[${index}].note`, item.note); // Ensure note is included
@@ -207,7 +207,7 @@
         const orderData = {
             TableId: foodItemData.tableId,
             OutletId: foodItemData.outletId,
-            MenuItems: cart,
+            MenuItems: cart.map(item => ({ ...item, name: item.name })), // Include name property for each menu item
             AddUtensils: $('#addUtensils').is(':checked'),
         };
 

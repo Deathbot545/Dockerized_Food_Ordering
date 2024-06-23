@@ -134,13 +134,15 @@ namespace Food_Ordering_Web.Controllers
             };
 
             // Log the orderData object before serialization
-            _logger.LogInformation("Order data: {@OrderData}", orderData);
-
             var jsonPayload = System.Text.Json.JsonSerializer.Serialize(orderData);
             _logger.LogInformation($"Sending JSON payload to API: {jsonPayload}");
 
             var client = _httpClientFactory.CreateClient();
+            // Log the request before sending
+            _logger.LogInformation($"Sending request to API: {jsonPayload}");
+
             var response = await client.PostAsJsonAsync("https://restosolutionssaas.com/api/OrderApi/AddOrder", orderData);
+
 
             if (response.IsSuccessStatusCode)
             {

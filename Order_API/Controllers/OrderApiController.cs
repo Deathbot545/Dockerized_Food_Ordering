@@ -30,19 +30,21 @@ namespace Order_API.Controllers
              _logger = logger;
            // _context = context;
          }
-      
+
         [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
-            _logger.LogInformation("Rebuibi");
+            _logger.LogInformation("Received order request: {@Request}", request);
+
             try
             {
-                var requestJson = JsonConvert.SerializeObject(request);
-                _logger.LogInformation("Received order request: {RequestJson}", requestJson); // Log the received order request
-
                 string orderId = await _orderService.ProcessOrderRequestAsync(request);
 
-                _logger.LogInformation("Order processed successfully with orderId: {OrderId}", orderId); // Log successful order processing
+                _logger.LogInformation("Order processed successfully with orderId: {OrderId}", orderId);
+
+                // Notify the kitchen about the new order
+                await _hubContext.Clients.Group("KitchenGroup").SendAsync("NewOrderPlaced", orderId);
+
                 return Ok(new { orderId });
             }
             catch (Exception ex)
@@ -51,6 +53,7 @@ namespace Order_API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpGet("GetOrdersForOutlet/{outletId}")]
         public async Task<IActionResult> GetOrdersForOutlet(int outletId)
         {
@@ -65,13 +68,6 @@ namespace Order_API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
-
-
-
-
-
-
         [HttpPost("UpdateOrderStatus")]
         public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusDto updateOrderDto)
         {
@@ -106,6 +102,26 @@ namespace Order_API.Controllers
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+        [HttpDelete("DeleteOrder/{orderId}")]
+        public async Task<IActionResult> DeleteOrder(string orderId)
+        {
+            try
+            {
+                var result = await _orderService.DeleteOrderAsync(orderId);
+                if (result)
+                {
+                    return Ok(new { message = "Order deleted successfully." });
+                }
+                else
+                {
+                    return NotFound(new { message = $"Order with Id {orderId} not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
 
 
@@ -113,19 +129,7 @@ namespace Order_API.Controllers
 
         /*
 
-                 [HttpDelete("DeleteOrder/{orderId}")]
-                  public async Task<IActionResult> DeleteOrder(int orderId)
-                  {
-                      try
-                      {
-                          await _orderService.DeleteOrderAsync(orderId);
-                          return Ok(new { message = "Order deleted successfully." });
-                      }
-                      catch (Exception ex)
-                      {
-                          return BadRequest(new { message = ex.Message });
-                      }
-                  }
+                
 
                   [HttpGet("GetOrderStatus/{orderId}")]
                   public async Task<IActionResult> GetOrderStatus(int orderId)

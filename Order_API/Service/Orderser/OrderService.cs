@@ -152,34 +152,36 @@ namespace Order_API.Service.Orderser
         }
 
 
-        /* public async Task<bool> DeleteOrderAsync(string orderId)
-         {
-             var orderObjectId = ObjectId.Parse(orderId);
+        public async Task<bool> DeleteOrderAsync(string orderId)
+        {
+            var orderObjectId = ObjectId.Parse(orderId);
 
-             var order = await _context.Orders.Find(o => o.Id == orderObjectId).FirstOrDefaultAsync();
-             if (order == null)
-             {
-                 // Order not found
-                 return false;
-             }
+            var order = await _context.Orders.Find(o => o.Id == orderObjectId.ToString()).FirstOrDefaultAsync();
+            if (order == null)
+            {
+                // Order not found
+                return false;
+            }
 
-             // Remove the order
-             var deleteResult = await _context.Orders.DeleteOneAsync(o => o.Id == orderObjectId);
+            // Remove the order
+            var deleteResult = await _context.Orders.DeleteOneAsync(o => o.Id == orderObjectId.ToString());
 
-             return deleteResult.DeletedCount > 0; // Return true to indicate successful deletion
-         }
-         public async Task<int?> GetOrderStatusAsync(string orderId)
-         {
-             var orderObjectId = ObjectId.Parse(orderId);
+            return deleteResult.DeletedCount > 0; // Return true to indicate successful deletion
+        }
 
-             var order = await _context.Orders.Find(o => o.Id == orderObjectId).FirstOrDefaultAsync();
-             if (order == null)
-             {
-                 _logger.LogError($"Order with Id {orderId} not found.");
-                 return null;
-             }
-             return (int)order.Status; // Return the integer value of the enum
-         }*/
+
+        /*   public async Task<int?> GetOrderStatusAsync(string orderId)
+           {
+               var orderObjectId = ObjectId.Parse(orderId);
+
+               var order = await _context.Orders.Find(o => o.Id == orderObjectId).FirstOrDefaultAsync();
+               if (order == null)
+               {
+                   _logger.LogError($"Order with Id {orderId} not found.");
+                   return null;
+               }
+               return (int)order.Status; // Return the integer value of the enum
+           }*/
 
         public async Task<OrderDTO> GetOrderByOrderIdAsync(string orderId)
         {
@@ -226,43 +228,6 @@ namespace Order_API.Service.Orderser
 
         /*
           
-
-         private async Task<List<MenuItemDto>> FetchMenuItemsByOutletIdAsync(int outletId)
-         {
-             var menuItemsDto = new List<MenuItemDto>();
-
-             // Construct the URL to the Menu API endpoint
-             string url = $"https://restosolutionssaas.com/api/MenuApi/GetMenuItemsWithExtras/{outletId}";
-
-             try
-             {
-                 _logger.LogInformation("Fetching menu items for outletId {OutletId} from URL: {Url}", outletId, url);
-
-                 var response = await _httpClient.GetAsync(url);
-                 if (response.IsSuccessStatusCode)
-                 {
-                     // Deserialize the HTTP response content into a List<MenuItemDto>
-                     menuItemsDto = await response.Content.ReadFromJsonAsync<List<MenuItemDto>>();
-
-                     _logger.LogInformation("Fetched {Count} menu items for outletId {OutletId}", menuItemsDto.Count, outletId);
-                 }
-                 else
-                 {
-                     _logger.LogError($"Failed to fetch menu items for outlet {outletId}. Status code: {response.StatusCode}");
-                 }
-             }
-             catch (Exception ex)
-             {
-                 _logger.LogError($"An error occurred while fetching menu items for outlet {outletId}: {ex.Message}");
-             }
-
-             return menuItemsDto;
-         }
-
-
-
-
-
          public async Task<bool> DeleteOrderAsync(int orderId)
           {
               var order = await _context.Orders.FindAsync(orderId);
@@ -295,58 +260,7 @@ namespace Order_API.Service.Orderser
               return (int)order.Status; // Return the integer value of the enum
           }
 
-         public async Task<OrderDTO> GetOrderDetailsAsync(int orderId)
-         {
-             var order = await _context.Orders
-                 .Include(o => o.OrderDetails)
-                 .AsNoTracking()
-                 .FirstOrDefaultAsync(o => o.Id == orderId);
-
-             if (order == null)
-             {
-                 _logger.LogWarning($"Order with orderId {orderId} not found.");
-                 return null;
-             }
-
-             var menuItems = await FetchMenuItemsByOutletIdAsync(order.OutletId);
-
-             var orderDto = new OrderDTO
-             {
-                 Id = order.Id,
-                 OrderTime = order.OrderTime,
-                 Customer = order.Customer,
-                 TableId = order.TableId,
-                 OutletId = order.OutletId,
-                 Status = order.Status,
-                 OrderDetails = order.OrderDetails.Select(od => new OrderDetailDTO
-                 {
-                     Id = od.Id,
-                     OrderId = od.OrderId,
-                     MenuItemId = od.MenuItemId,
-                     MenuItem = menuItems.Where(mi => mi.id == od.MenuItemId)
-                         .Select(mi => new MenuItemData
-                         {
-                             Id = mi.id,
-                             Name = mi.Name,
-                             Description = mi.Description,
-                             Price = mi.Price,
-                             MenuCategoryId = mi.MenuCategoryId,
-                             Image = mi.Image
-                         }).FirstOrDefault(),
-                     Quantity = od.Quantity,
-                     Note = od.Note,
-                     Size = od.Size // Include the size in the DTO
-                 }).ToList()
-             };
-
-             _logger.LogInformation($"OrderDTO: {orderDto.Id}, {orderDto.OrderTime}, {orderDto.Customer}, {orderDto.TableId}, {orderDto.OutletId}, {orderDto.Status}");
-             foreach (var detail in orderDto.OrderDetails)
-             {
-                 _logger.LogInformation($"OrderDetailDTO: {detail.Id}, {detail.OrderId}, {detail.MenuItemId}, {detail.Quantity}, {detail.Note}, {detail.Size}");
-             }
-
-             return orderDto;
-         }
+        
 
 
 

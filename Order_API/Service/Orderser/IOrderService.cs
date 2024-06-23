@@ -28,6 +28,7 @@ namespace Order_API.Service.Orderser
         Task<string> ProcessOrderRequestAsync(CartRequest request);
         Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId);
         Task<OrderDTO> GetOrderByOrderIdAsync(string orderId);
+        Task<bool> DeleteOrderAsync(string orderId);
 
 
 

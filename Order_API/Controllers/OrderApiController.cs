@@ -30,7 +30,7 @@ namespace Order_API.Controllers
              _logger = logger;
            // _context = context;
          }
-
+        [HttpPost("AddOrder")]
         public async Task<IActionResult> AddOrder([FromBody] CartRequest request)
         {
             _logger.LogInformation("Received order request: {@Request}");

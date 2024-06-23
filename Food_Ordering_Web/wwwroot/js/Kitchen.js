@@ -52,30 +52,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     connection.on("NewOrderPlaced", function (orderInfo) {
         console.log("NewOrderPlaced method triggered with order info:", orderInfo);
-
-        // Fetch order details based on orderId
-        $.ajax({
-            url: 'https://restosolutionssaas.com/api/OrderApi/GetOrderDetails/' + orderInfo.orderId,
-            type: 'GET',
-            success: function (orderDetails) {
-                console.log("Received order details for orderId:", orderInfo.orderId, ":", orderDetails);
-                // Render order card using orderDetails
-                const orderHtml = renderOrderCard(orderDetails);
-                const sectionId = statusMappings[orderDetails.status]?.section || statusMappings.default.section;
-                $('#' + sectionId).append(orderHtml);
-            },
-            error: function (xhr, status, error) {
-                console.error(`Failed to fetch order details for orderId: ${orderInfo.orderId}. Error: ${error}`);
-            }
-        });
     });
 
     function renderOrderCard(orderDetails) {
         // Use the provided 'RenderOrderCard' function to render the order card
         return RenderOrderCard(orderDetails, tables);
     }
-
-
     connection.onreconnecting(error => {
         console.warn(`Connection lost due to error "${error}". Reconnecting.`);
     });
@@ -129,36 +111,6 @@ document.addEventListener("DOMContentLoaded", function () {
         ).css('background-color', color);
         console.log(`Order ${order.orderId} UI updated to ${statusText}`);
     }
-
-    function createOrderHtml(order) {
-        const statusText = mapEnumToStatusText(order.status);
-        const color = getStatusColor(order.status);
-        const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-        const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-        `).join("");
-        const tableIdentifier = `Table: ${order.tableId}`;
-
-        const cancelButtonHtml = (order.status === 2 || order.status === 3) ? "" :
-            `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
-
-        return `
-            <div class="card mb-3 order-card" data-order-id="${order.orderId}" data-table-id="${order.tableId}" style="background-color: ${color};">
-                <div class="card-header">
-                    Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
-                </div>
-                <div class="card-body">
-                    <ul>${detailsHtml}</ul>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                        <button type="button" class="btn btn-primary" data-status="preparing">Preparing</button>
-                        <button type="button" class="btn btn-success" data-status="ready">Ready</button>
-                        ${cancelButtonHtml}
-                    </div>
-                </div>
-            </div>`;
-    }
-
     function handleCancellationAlert(order) {
         const notifiedCancellations = {};
         if (!notifiedCancellations[order.orderId]) {

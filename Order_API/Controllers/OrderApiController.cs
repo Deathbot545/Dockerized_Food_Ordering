@@ -124,6 +124,27 @@ namespace Order_API.Controllers
         }
 
 
+        [HttpGet("GetOrderStatus/{orderId}")]
+        public async Task<IActionResult> GetOrderStatus(int orderId)
+        {
+            try
+            {
+                var status = await _orderService.GetOrderStatusAsync(orderId.ToString());
+                if (status == null)
+                {
+                    _logger.LogError($"Order with Id {orderId} not found or has no status.");
+                    return NotFound(new { message = $"Order with Id {orderId} not found or has no status." });
+                }
+
+                _logger.LogInformation($"Order status for OrderId {orderId}: {status}");
+                return Ok(new { orderId = orderId, status = status });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving order status for orderId {orderId}: {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
 
 
 
@@ -131,27 +152,7 @@ namespace Order_API.Controllers
 
                 
 
-                  [HttpGet("GetOrderStatus/{orderId}")]
-                  public async Task<IActionResult> GetOrderStatus(int orderId)
-                  {
-                      try
-                      {
-                          var status = await _orderService.GetOrderStatusAsync(orderId);
-                          if (status == null)
-                          {
-                              _logger.LogError($"Order with Id {orderId} not found or has no status.");
-                              return NotFound(new { message = $"Order with Id {orderId} not found or has no status." });
-                          }
-
-                          _logger.LogInformation($"Order status for OrderId {orderId}: {status}");
-                          return Ok(new { orderId = orderId, status = status });
-                      }
-                      catch (Exception ex)
-                      {
-                          _logger.LogError($"Error retrieving order status for orderId {orderId}: {ex.Message}");
-                          return StatusCode(500, "Internal Server Error");
-                      }
-                  }
+                  
                   
 
                   [HttpGet("GetOrdersByUser/{userId}")]

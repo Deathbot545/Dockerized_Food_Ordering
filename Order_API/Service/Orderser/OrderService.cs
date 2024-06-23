@@ -168,20 +168,22 @@ namespace Order_API.Service.Orderser
 
             return deleteResult.DeletedCount > 0; // Return true to indicate successful deletion
         }
+        public async Task<int?> GetOrderStatusAsync(string orderId)
+        {
+            var orderObjectId = ObjectId.Parse(orderId);
+
+            var order = await _context.Orders.Find(o => o.Id == orderObjectId.ToString()).FirstOrDefaultAsync();
+            if (order == null)
+            {
+                _logger.LogError($"Order with Id {orderId} not found.");
+                return null;
+            }
+
+            return (int)order.Status; // Return the integer value of the enum
+        }
 
 
-        /*   public async Task<int?> GetOrderStatusAsync(string orderId)
-           {
-               var orderObjectId = ObjectId.Parse(orderId);
-
-               var order = await _context.Orders.Find(o => o.Id == orderObjectId).FirstOrDefaultAsync();
-               if (order == null)
-               {
-                   _logger.LogError($"Order with Id {orderId} not found.");
-                   return null;
-               }
-               return (int)order.Status; // Return the integer value of the enum
-           }*/
+       
 
         public async Task<OrderDTO> GetOrderByOrderIdAsync(string orderId)
         {

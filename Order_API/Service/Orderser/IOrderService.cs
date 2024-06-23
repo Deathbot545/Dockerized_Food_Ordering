@@ -29,6 +29,7 @@ namespace Order_API.Service.Orderser
         Task<IEnumerable<OrderDTO>> GetOrdersByOutletIdAsync(int outletId);
         Task<OrderDTO> GetOrderByOrderIdAsync(string orderId);
         Task<bool> DeleteOrderAsync(string orderId);
+        Task<int?> GetOrderStatusAsync(string orderId);
 
 
 

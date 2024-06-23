@@ -5,6 +5,7 @@ using System.Security.Claims;
 using Food_Ordering_Web.DTO;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Food_Ordering_Web.Controllers
 {
@@ -117,16 +118,39 @@ namespace Food_Ordering_Web.Controllers
                     form.TryGetValue($"items[{i}].note", out var note) &&
                     form.TryGetValue($"items[{i}].size", out var size))
                 {
+                    var extraItems = new List<ExtraItemRequest>();
+                    for (int j = 0; form.ContainsKey($"items[{i}].extraItems[{j}].id"); j++)
+                    {
+                        if (int.TryParse(form[$"items[{i}].extraItems[{j}].id"], out int extraItemId) &&
+                            decimal.TryParse(form[$"items[{i}].extraItems[{j}].price"], out decimal extraItemPrice) &&
+                            form.TryGetValue($"items[{i}].extraItems[{j}].name", out var extraItemName) && !string.IsNullOrWhiteSpace(extraItemName))
+                        {
+                            extraItems.Add(new ExtraItemRequest
+                            {
+                                Id = extraItemId,
+                                Name = extraItemName,
+                                Price = extraItemPrice
+                            });
+
+                            _logger.LogInformation($"Processing extra item {j} for item {i}: ID={extraItemId}, Name={extraItemName}, Price={extraItemPrice}");
+                        }
+                        else
+                        {
+                            _logger.LogError($"Invalid data for extra item at index {j} for item {i}.");
+                        }
+                    }
+
                     items.Add(new CartItem
                     {
                         Id = itemId,
                         Qty = qty,
                         Price = price,
                         Note = note,
-                        Size = size
+                        Size = size,
+                        ExtraItems = extraItems
                     });
 
-                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}, Size={size}");
+                    _logger.LogInformation($"Processing item {i}: ID={itemId}, Qty={qty}, Price={price}, Name={name}, Note={note}, Size={size}, ExtraItems={JsonConvert.SerializeObject(extraItems)}");
                 }
                 else
                 {
@@ -143,7 +167,7 @@ namespace Food_Ordering_Web.Controllers
             };
 
             // Log the orderData object before serialization
-            var jsonPayload = System.Text.Json.JsonSerializer.Serialize(orderData);
+            var jsonPayload = JsonConvert.SerializeObject(orderData);
             _logger.LogInformation($"Sending JSON payload to API: {jsonPayload}");
 
             var client = _httpClientFactory.CreateClient();
@@ -166,8 +190,8 @@ namespace Food_Ordering_Web.Controllers
                 _logger.LogError($"API call failed: {errorResponse}");
                 return Json(new { success = false, errorMessage = errorResponse });
             }
-
         }
+
 
 
 

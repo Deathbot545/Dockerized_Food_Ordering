@@ -1,4 +1,4 @@
-window.makeorder = function (order) {
+window.makeOrder = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
@@ -30,6 +30,7 @@ window.makeorder = function (order) {
             </div>
         </div>`;
 }
+
 
 window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);

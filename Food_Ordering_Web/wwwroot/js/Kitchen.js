@@ -1,4 +1,4 @@
-window.createOrderHtml = function (order) {
+window.makeorder = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
-        const orderHtml = createOrderHtml(order);
+        const orderHtml = makeorder(order);
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
         document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
     }
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (orderCard) {
             updateExistingOrderCard(orderCard, order, orderStatusText, color);
         } else {
-            const orderHtml = createOrderHtml(order);
+            const orderHtml = makeorder(order);
             const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
             document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
         }

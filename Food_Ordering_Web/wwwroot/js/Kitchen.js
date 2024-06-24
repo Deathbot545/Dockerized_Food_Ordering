@@ -200,6 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
     function updateOrderStatusToCancelled(orderId) {
         fetch('https://restosolutionssaas.com/api/OrderApi/CancelOrder', {
             method: 'POST',

@@ -167,7 +167,30 @@
                 console.error("Undefined status for order ID:", orderId);
             }
         });
-       
+        async function updateOrderStatusToCancelled(orderId) {
+            const cancelledStatus = 4; // Assuming 4 represents "Cancelled"
+            try {
+                const response = await fetch(`https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        OrderId: orderId,
+                        Status: cancelledStatus
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`Failed to update order status: ${response.statusText}`);
+                }
+                alert('Order cancelled successfully.');
+                location.reload(); // Optionally, you might want to reload or update UI in a different way
+            } catch (error) {
+                console.error('Error updating order status to cancelled:', error);
+                alert('Error cancelling order. Please try again.');
+            }
+        }
+
         function addWaiterCallToTable(tableId) {
             const tableIdentifier = `Table: ${tableId}`;
             const callId = Math.floor(Math.random() * 1000); // Generate a random Call ID for demonstration purposes

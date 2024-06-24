@@ -79,8 +79,6 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("NewOrderPlaced method triggered with order info:", orderInfo);
         addNewOrderToUI(orderInfo);
     });
-
-
     connection.start()
         .then(function () {
             console.log("SignalR connection established");

@@ -145,27 +145,7 @@
 </footer>
 <script>
     $(document).ready(function () {
-        let connection;
-
-        function handleCancellationAlert(order) {
-            if (!notifiedCancellations[order.orderId]) {
-                const cancellationAlert = `
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        Order #${order.orderId} has been cancelled by the customer.
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>`;
-                $('#cancelledOrders').prepend(cancellationAlert);
-                notifiedCancellations[order.orderId] = true;
-
-                setTimeout(() => {
-                    $(`.alert:contains('Order #${order.orderId}')`).alert('close');
-                    delete notifiedCancellations[order.orderId];
-                }, 300000); // 5 minutes
-            }
-        }
-
+        
 
         $(document).on('click', '.btn-group .btn', function () {
             const $btn = $(this);
@@ -188,52 +168,7 @@
             }
         });
 
-        // Handle new orders and updates
-        connection.on("NewOrderPlaced", function (order) {
-            handleOrder(order, false);
-        });
 
-        connection.on("ReceiveOrderUpdate", function (order) {
-            console.log("Update received for order", order.orderId, "New status:", order.status);
-            updateOrderStatusUI(order);
-        });
-
-        // Function to handle new orders and updates
-        function handleOrder(order, isUpdate) {
-            const existingCard = $(`.order-card[data-order-id="${order.id}"]`);
-            if (existingCard.length === 0 && !isUpdate) {
-                // If it's a new order and no card exists
-                addNewOrderToDOM(order);
-            } else if (existingCard.length > 0 && isUpdate) {
-                // If it's an update and the card exists
-                updateOrderCard(order, existingCard);
-            }
-        }
-
-        function updateOrderStatus(orderId, newStatus) {
-            let statusEnumValue = statusMappings[newStatus]?.value;
-            console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
-            if (statusEnumValue === undefined) {
-                console.error("Invalid status value for update:", newStatus);
-                return; // Exit if status is invalid
-            }
-
-            $.ajax({
-                url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
-                success: function () {
-                    console.log("Successfully updated status for Order ID:", orderId);
-                    connection.invoke("ReceiveOrderUpdate", { orderId: orderId, status: statusEnumValue }).catch(function (err) {
-                        console.error("SignalR Error:", err);
-                    });
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.error("AJAX Error:", textStatus, "Response Text:", jqXHR.responseText, "Error Thrown:", errorThrown);
-                }
-            });
-        }
         async function updateOrderStatusToCancelled(orderId) {
             const cancelledStatus = 4; // Assuming 4 represents "Cancelled"
             try {

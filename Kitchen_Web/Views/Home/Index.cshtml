@@ -144,30 +144,8 @@
     </div>
 </footer>
 <script>
-    window.getStatusColor = function (status) {
-        console.log("Called getStatusColor from Kitchen Application", status);
-        switch (status) {
-            case 0: return "orange"; // Pending
-            case 1: return "blue";   // Preparing
-            case 2: return "green";  // Ready
-            case 3: return "grey";   // Served
-            case 4: return "red";    // Cancelled
-            default: return "black"; // Unknown status or the default color
-        }
-    };
 
-    window.mapEnumToStatusText = function (statusValue) {
-        switch (statusValue) {
-            case 0: return "Pending";
-            case 1: return "Preparing";
-            case 2: return "Ready";
-            case 3: return "Served";
-            case 4: return "Cancelled";
-            default: return "Unknown";
-        }
-    };
-
-    document.addEventListener("DOMContentLoaded", function () {
+    $(document).ready(function () {
         console.log("DOM content loaded");
 
         const connection = new signalR.HubConnectionBuilder()
@@ -229,16 +207,10 @@
             </div>
         `;
         }
-}
-    $(document).ready(function () {
         let connection;
 
         if (!connection) {
-            connection = new signalR.HubConnectionBuilder()
-                .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
-                .configureLogging(signalR.LogLevel.Information)
-                .withAutomaticReconnect()
-                .build();
+          
 
             // Define the ReceiveWaiterCall method before starting the connection
             connection.on("ReceiveWaiterCall", function (tableId) {

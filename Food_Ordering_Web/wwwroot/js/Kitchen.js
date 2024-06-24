@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
             tableId: order.TableId,
             outletId: order.OutletId,
             status: order.Status,
-            orderDetails: order.OrderDetails.map(detail => ({
+            orderDetails: (order.OrderDetails || []).map(detail => ({
                 id: detail.Id,
                 orderId: detail.OrderId,
                 menuItemName: detail.MenuItemName,
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 quantity: detail.Quantity,
                 note: detail.Note,
                 size: detail.Size,
-                extraItems: detail.ExtraItems.map(extraItem => ({
+                extraItems: (detail.ExtraItems || []).map(extraItem => ({
                     id: extraItem.Id,
                     name: extraItem.Name,
                     price: extraItem.Price
@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error(`Section with ID ${sectionId} not found`);
         }
     }
+
 
 
 

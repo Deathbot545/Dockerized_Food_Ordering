@@ -78,8 +78,8 @@ document.addEventListener("DOMContentLoaded", function () {
     connection.on("NewOrderPlaced", function (orderInfo) {
         console.log("NewOrderPlaced method triggered with order info:", orderInfo);
         addNewOrderToUI(orderInfo);
-        window.createOrderHtml(orderInfo);
     });
+
 
     connection.start()
         .then(function () {

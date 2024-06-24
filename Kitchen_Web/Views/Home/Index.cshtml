@@ -179,14 +179,7 @@
             });
         }
 
-        const statusMappings = {
-            pending: { value: 0, text: "Pending", color: "#FFDDC1", section: 'pendingOrders' },
-            preparing: { value: 1, text: "In Progress", color: "#C1CEFF", section: 'preparingOrders' },
-            completed: { value: 2, text: "Completed", color: "#C1FFD7", section: 'readyOrders' },
-            served: { value: 3, text: "Served", color: "#FFC1C1", section: 'servedOrders' },
-            cancelled: { value: 4, text: "Cancelled", color: "grey" },
-            default: { value: -1, text: "Unknown", color: "#FFFFFF", section: 'unknownOrders' }
-        };
+      
 
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
@@ -272,8 +265,6 @@
                 console.error("Undefined status for order ID:", orderId);
             }
         });
-
-
 
         // Handle new orders and updates
         connection.on("NewOrderPlaced", function (order) {

@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
         if (Array.isArray(order.orderDetails)) {
-            const orderHtml = makeorder(order);
+            const orderHtml = makeOrderCard(order);
             const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
             document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
         } else {
@@ -98,26 +98,30 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function makeOrderCard(orderInfo) {
+        return `
+        <div class="card">
+            <div class="card-header">
+                Order #${orderInfo.orderId}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Order Details:</h5>
+                <ul>
+                    ${orderInfo.orderDetails.map(detail => `
+                        <li>${detail.quantity} x ${detail.itemName}</li>
+                    `).join('')}
+                </ul>
+            </div>
+        </div>
+    `;
+    }
+
+
 
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `
         <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
     `).join("") : "";
-
-        orderCard.querySelector('.card-body ul').innerHTML = detailsHtml;
-        orderCard.querySelector('.btn').classList.remove('active');
-        orderCard.querySelector(`.btn[data-status="${statusText.toLowerCase()}"]`).classList.add('active');
-        orderCard.querySelector('.card-header').innerHTML =
-            `Order #${order.orderId} | Table: ${order.tableId} | Date: ${new Date(order.orderTime).toLocaleString('en-US', { hour12: false })} | STATUS: ${statusText}`;
-        orderCard.querySelector('.card-header').style.backgroundColor = color;
-        console.log(`Order ${order.orderId} UI updated to ${statusText}`);
-    }
-
-    
-    function updateExistingOrderCard(orderCard, order, statusText, color) {
-        const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-        `).join("");
 
         orderCard.querySelector('.card-body ul').innerHTML = detailsHtml;
         orderCard.querySelector('.btn').classList.remove('active');

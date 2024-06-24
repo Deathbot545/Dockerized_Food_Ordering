@@ -31,7 +31,6 @@ window.makeorder = function (order) {
         </div>`;
 }
 
-
 window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);
     switch (status) {
@@ -54,6 +53,7 @@ window.mapEnumToStatusText = function (statusValue) {
         default: return "Unknown";
     }
 };
+
 window.statusMappings = {
     0: { text: "Pending", section: "pendingOrders" },
     1: { text: "Preparing", section: "preparingOrders" },
@@ -62,7 +62,6 @@ window.statusMappings = {
     4: { text: "Cancelled", section: "cancelledOrders" },
     default: { text: "Unknown", section: "unknownOrders" }
 };
-
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM content loaded");
@@ -101,10 +100,20 @@ document.addEventListener("DOMContentLoaded", function () {
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
 
-        const orderHtml = makeorder(order);
+        const normalizedOrder = {
+            orderId: order.orderId,
+            orderTime: order.orderTime,
+            customer: order.customer,
+            tableId: order.tableId,
+            outletId: order.outletId,
+            status: order.status,
+            orderDetails: order.orderDetails.orderDetails
+        };
+
+        const orderHtml = makeorder(normalizedOrder);
         console.log("Generated order HTML:", orderHtml);
 
-        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+        const sectionId = statusMappings[normalizedOrder.status]?.section || statusMappings.default.section;
         console.log("Target section ID:", sectionId);
 
         const targetElement = document.getElementById(sectionId);
@@ -116,9 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error(`Section with ID ${sectionId} not found`);
         }
     }
-
-
-
 
     const notifiedCancellations = {};
 
@@ -217,11 +223,26 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(data => {
                 console.log("Order cancelled successfully for order ID:", orderId, "with response:", data);
-                connection.invoke("SendOrderUpdate", { orderId: orderId, status: 4 }) // Assuming 4 is the status for Cancelled
-                    .catch(err => console.error("Error sending cancellation to hub for order ID:", orderId, "with error:", err));
+                connection.invoke("SendOrderUpdate", { orderId: orderId, status: 4 })
+                    .catch(err => console.error("Error sending cancellation update to hub for order ID:", orderId, "with error:", err));
             })
             .catch(err => {
                 console.error("Error cancelling order for order ID:", orderId, "with error:", err);
             });
+    }
+
+    function updateOrderUI(order) {
+        const cardElement = document.querySelector(`.order-card[data-order-id="${order.orderId}"]`);
+        if (cardElement) {
+            const statusText = mapEnumToStatusText(order.status);
+            const color = getStatusColor(order.status);
+            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
+            const tableIdentifier = `Table: ${order.tableId}`;
+
+            cardElement.style.backgroundColor = color;
+            cardElement.querySelector('.card-header').textContent = `Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}`;
+        } else {
+            console.error("No order card found for order ID:", order.orderId);
+        }
     }
 });

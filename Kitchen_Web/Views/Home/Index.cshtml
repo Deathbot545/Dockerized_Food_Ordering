@@ -147,36 +147,6 @@
     $(document).ready(function () {
         let connection;
 
-        if (!connection) {
-            connection = new signalR.HubConnectionBuilder()
-                .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
-                .configureLogging(signalR.LogLevel.Information)
-                .withAutomaticReconnect()
-                .build();
-
-            // Define the ReceiveWaiterCall method before starting the connection
-            connection.on("ReceiveWaiterCall", function (tableId) {
-                console.log("ReceiveWaiterCall method triggered for table ID:", tableId);
-                addWaiterCallToTable(tableId);
-            });
-
-            connection.on("ReceiveOrderUpdate", function (order) {
-                console.log("ReceiveOrderUpdate method triggered with order:", order);
-                console.log("Order details received:", order.orderDetails);
-                if (order && order.orderId && typeof order.status !== 'undefined') {
-                    updateOrderStatusUI(order);
-                } else {
-                    console.error("Order update is missing required properties", order);
-                }
-            });
-
-            connection.start().then(function () {
-                console.log("SignalR connection established");
-            }).catch(function (err) {
-                console.error("SignalR connection error:", err);
-            });
-        }
-
         function handleCancellationAlert(order) {
             if (!notifiedCancellations[order.orderId]) {
                 const cancellationAlert = `
@@ -196,54 +166,6 @@
             }
         }
 
-        function updateOrderStatusUI(order) {
-            const orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
-            const sectionId = statusMappings[getKeyByValue(statusMappings, order.status)]?.section || statusMappings.default.section;
-
-            if (order.status === 4) { // Cancelled
-                orderCard.remove(); // Remove from current section
-            } else {
-                if (orderCard.length) {
-                    updateOrderCard(order, orderCard);
-                } else {
-                    addNewOrderToDOM(order);
-                }
-                if (!orderCard.closest(`#${sectionId}`).length) {
-                    orderCard.detach().appendTo(`#${sectionId}`); // Move to the correct section if needed
-                }
-            }
-        }
-
-        function updateOrderCard(order, orderCard) {
-            const statusText = statusMappings[getKeyByValue(statusMappings, order.status)]?.text || statusMappings.default.text;
-            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-
-            let detailsHtml = "";
-            if (Array.isArray(order.orderDetails)) {
-                detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-        `).join("");
-            }
-
-
-            orderCard.find('.card-header').html(
-                `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`
-            );
-
-
-            orderCard.find('.card-body ul').html(detailsHtml);
-
-            const sectionId = statusMappings[getKeyByValue(statusMappings, order.status)]?.section || statusMappings.default.section;
-            if (!orderCard.closest(`#${sectionId}`).length) {
-                orderCard.detach().appendTo(`#${sectionId}`);
-            }
-        }
-
-        function addNewOrderToDOM(order) {
-            const orderHtml = makeorder(order);
-            const sectionId = statusMappings[getKeyByValue(statusMappings, order.status)]?.section || statusMappings.default.section;
-            $('#' + sectionId).append(orderHtml);
-        }
 
         $(document).on('click', '.btn-group .btn', function () {
             const $btn = $(this);

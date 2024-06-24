@@ -1,4 +1,4 @@
-window.makeorder = function (order) {
+/*window.makeorder = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
@@ -31,90 +31,6 @@ window.makeorder = function (order) {
         </div>`;
 }
 
-window.getStatusColor = function (status) {
-    console.log("Called getStatusColor from Kitchen Application", status);
-    switch (status) {
-        case 0: return "orange"; // Pending
-        case 1: return "blue";   // Preparing
-        case 2: return "green";  // Ready
-        case 3: return "grey";   // Served
-        case 4: return "red";    // Cancelled
-        default: return "black"; // Unknown status or the default color
-    }
-};
-
-window.mapEnumToStatusText = function (statusValue) {
-    switch (statusValue) {
-        case 0: return "Pending";
-        case 1: return "Preparing";
-        case 2: return "Ready";
-        case 3: return "Served";
-        case 4: return "Cancelled";
-        default: return "Unknown";
-    }
-};
-
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM content loaded");
-
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true`)
-        .configureLogging(signalR.LogLevel.Information)
-        .withAutomaticReconnect()
-        .build();
-
-    connection.on("ReceiveOrderUpdate", function (order) {
-        console.log("ReceiveOrderUpdate method triggered with order:", order);
-        if (order && order.orderId && typeof order.status !== 'undefined') {
-            if (order.status === 4) { // Assuming 4 means 'Cancelled'
-                handleCancellationAlert(order);
-            }
-            updateOrderUI(order);
-        } else {
-            console.error("Order update is missing required properties", order);
-        }
-    });
-
-    connection.on("NewOrderPlaced", function (orderInfo) {
-        console.log("NewOrderPlaced method triggered with order info:", orderInfo);
-        addNewOrderToUI(orderInfo);
-    });
-    connection.start()
-        .then(function () {
-            console.log("SignalR connection established");
-        })
-        .catch(function (err) {
-            console.error("Error while starting SignalR connection:", err);
-        });
-
-    function addNewOrderToUI(order) {
-        console.log("Adding new order to UI:", order);
-        if (Array.isArray(order.orderDetails)) {
-            const orderHtml = makeOrderCard(order);
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-            document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
-        } else {
-            console.error("Invalid order details for order:", order);
-        }
-    }
-
-    function makeOrderCard(orderInfo) {
-        return `
-        <div class="card">
-            <div class="card-header">
-                Order #${orderInfo.orderId}
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">Order Details:</h5>
-                <ul>
-                    ${Array.isArray(orderInfo.orderDetails) ? orderInfo.orderDetails.map(detail => `
-                        <li>${detail.quantity} x ${detail.itemName}</li>
-                    `).join('') : ''}
-                </ul>
-            </div>
-        </div>
-    `;
-    }
 
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `
@@ -235,3 +151,4 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 });
+*/

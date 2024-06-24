@@ -99,11 +99,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
-       
-            const orderHtml = makeorder(order);
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-        
+        const newOrder = {
+            Id: order.orderId,
+            OrderTime: new Date(order.orderTime),
+            Customer: null, // Assuming this is not provided by the hub
+            TableId: order.tableId,
+            TableName: null, // Assuming this is not provided by the hub
+            OutletId: order.outletId,
+            Status: order.status,
+            OrderDetails: order.orderDetails.map(detail => ({
+                Id: 0, // Assign a unique id or use detail.orderId if available
+                OrderId: 0, // Assign the order id or use detail.orderId if available
+                MenuItemId: detail.menuItemId,
+                MenuItemName: detail.menuItemName,
+                MenuItem: null, // Assuming this is not provided by the hub
+                Quantity: detail.quantity,
+                Note: detail.note,
+                Size: detail.size,
+                ExtraItems: detail.extraItems.map(extraItem => ({
+                    Id: 0, // Assign a unique id or use extraItem.id if available
+                    Name: extraItem.name,
+                    Price: extraItem.price
+                }))
+            }))
+        };
+
+        const orderHtml = RenderOrderCard(newOrder, []);
+        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+        document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
     }
+
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `
         <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>

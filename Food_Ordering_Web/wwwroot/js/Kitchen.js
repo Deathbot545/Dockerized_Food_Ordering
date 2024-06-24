@@ -187,33 +187,31 @@ document.addEventListener("DOMContentLoaded", function () {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
-            success: function () {
-                console.log("Successfully updated status for Order ID:", orderId);
-                const orderCard = $(`.order-card[data-order-id="${orderId}"]`);
-                orderCard.fadeOut(500, function () {
-                    orderCard.remove();
-                });
+            success: function (response) {
+                console.log("Order status updated successfully for order ID:", orderId, "with response:", response);
+                connection.invoke("SendOrderUpdate", { orderId: orderId, status: statusEnumValue })
+                    .catch(err => console.error("Error sending update to hub for order ID:", orderId, "with error:", err));
             },
             error: function (xhr, status, error) {
-                console.error("Error updating order status:", error);
+                console.error("Error updating order status for order ID:", orderId, "with error:", error);
             }
         });
     }
 
     function updateOrderStatusToCancelled(orderId) {
-        updateOrderStatus(orderId, 'cancelled');
+        $.ajax({
+            url: 'https://restosolutionssaas.com/api/OrderApi/CancelOrder',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ OrderId: orderId }),
+            success: function (response) {
+                console.log("Order cancelled successfully for order ID:", orderId, "with response:", response);
+                connection.invoke("SendOrderUpdate", { orderId: orderId, status: 4 }) // Assuming 4 is the status for Cancelled
+                    .catch(err => console.error("Error sending cancellation to hub for order ID:", orderId, "with error:", err));
+            },
+            error: function (xhr, status, error) {
+                console.error("Error cancelling order for order ID:", orderId, "with error:", error);
+            }
+        });
     }
-
-    const statusMappings = {
-        pending: { text: "Pending", color: "orange", section: "pendingOrdersSection" },
-        preparing: { text: "Preparing", color: "blue", section: "preparingOrdersSection" },
-        ready: { text: "Ready", color: "green", section: "readyOrdersSection" },
-        served: { text: "Served", color: "grey", section: "servedOrdersSection" },
-        cancelled: { text: "Cancelled", color: "red", section: "cancelledOrdersSection" },
-        default: { text: "Unknown", color: "black", section: "pendingOrdersSection" }
-    };
-
-    $(document).on('click', '.alert .close', function () {
-        $(this).closest('.alert').alert('close');
-    });
 });

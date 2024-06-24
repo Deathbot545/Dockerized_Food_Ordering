@@ -124,10 +124,24 @@ document.addEventListener("DOMContentLoaded", function () {
             })) : []
         };
 
+        console.log("New order object:", newOrder);
+
         const orderHtml = makeorder(newOrder, []);
+        console.log("Generated order HTML:", orderHtml);
+
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-        document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
+        console.log("Target section ID:", sectionId);
+
+        const targetElement = document.getElementById(sectionId);
+        console.log("Target element:", targetElement);
+
+        if (targetElement) {
+            targetElement.insertAdjacentHTML('beforeend', orderHtml);
+        } else {
+            console.error(`Section with ID ${sectionId} not found`);
+        }
     }
+
 
 
     function updateExistingOrderCard(orderCard, order, statusText, color) {

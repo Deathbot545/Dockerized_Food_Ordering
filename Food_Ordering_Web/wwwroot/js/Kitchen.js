@@ -1,4 +1,4 @@
-window.makeOrder = function (order) {
+window.makeorder = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
@@ -30,7 +30,6 @@ window.makeOrder = function (order) {
             </div>
         </div>`;
 }
-
 
 window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);
@@ -125,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })) : []
         };
 
-        const orderHtml = makeorder(newOrder, []);
+        const orderHtml = RenderOrderCard(newOrder, []);
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
         document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
     }

@@ -53,6 +53,15 @@ window.mapEnumToStatusText = function (statusValue) {
         default: return "Unknown";
     }
 };
+window.statusMappings = {
+    0: { text: "Pending", section: "pendingOrders" },
+    1: { text: "Preparing", section: "preparingOrders" },
+    2: { text: "Ready", section: "readyOrders" },
+    3: { text: "Served", section: "servedOrders" },
+    4: { text: "Cancelled", section: "cancelledOrders" },
+    default: { text: "Unknown", section: "unknownOrders" }
+};
+
 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM content loaded");
@@ -90,13 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
-        if (Array.isArray(order.orderDetails)) {
+       
             const orderHtml = makeorder(order);
             const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-            document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
-        } else {
-            console.error("Invalid order details for order:", order);
-        }
+        
     }
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `

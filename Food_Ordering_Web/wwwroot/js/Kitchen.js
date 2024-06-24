@@ -31,6 +31,7 @@ window.makeorder = function (order) {
         </div>`;
 }
 
+
 window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);
     switch (status) {
@@ -100,35 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
 
-        // Log the entire order object to understand its structure
-        console.log("Full order object:", order);
-
-        const formattedOrder = {
-            orderId: order.OrderId,
-            orderTime: order.OrderTime,
-            customer: order.Customer,
-            tableId: order.TableId,
-            outletId: order.OutletId,
-            status: order.Status,
-            orderDetails: (order.OrderDetails || []).map(detail => ({
-                id: detail.Id,
-                orderId: detail.OrderId,
-                menuItemName: detail.MenuItemName,
-                menuItemId: detail.MenuItemId,
-                quantity: detail.Quantity,
-                note: detail.Note,
-                size: detail.Size,
-                extraItems: (detail.ExtraItems || []).map(extraItem => ({
-                    id: extraItem.Id,
-                    name: extraItem.Name,
-                    price: extraItem.Price
-                }))
-            }))
-        };
-
-        console.log("Formatted order object:", formattedOrder);
-
-        const orderHtml = makeorder(formattedOrder);
+        const orderHtml = makeorder(order);
         console.log("Generated order HTML:", orderHtml);
 
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
@@ -143,6 +116,8 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error(`Section with ID ${sectionId} not found`);
         }
     }
+
+
 
 
     const notifiedCancellations = {};

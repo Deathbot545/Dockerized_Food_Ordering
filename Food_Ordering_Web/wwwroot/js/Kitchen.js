@@ -1,26 +1,4 @@
-window.getStatusColor = function (status) {
-    console.log("Called getStatusColor from Kitchen Application", status);
-    switch (status) {
-        case 0: return "orange"; // Pending
-        case 1: return "blue";   // Preparing
-        case 2: return "green";  // Ready
-        case 3: return "grey";   // Served
-        case 4: return "red";    // Cancelled
-        default: return "black"; // Unknown status or the default color
-    }
-};
-
-window.mapEnumToStatusText = function (statusValue) {
-    switch (statusValue) {
-        case 0: return "Pending";
-        case 1: return "Preparing";
-        case 2: return "Ready";
-        case 3: return "Served";
-        case 4: return "Cancelled";
-        default: return "Unknown";
-    }
-};
-window.createOrderHtml= function (order) {
+window.createOrderHtml = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
@@ -48,6 +26,29 @@ window.createOrderHtml= function (order) {
                 </div>
             </div>`;
 }
+window.getStatusColor = function (status) {
+    console.log("Called getStatusColor from Kitchen Application", status);
+    switch (status) {
+        case 0: return "orange"; // Pending
+        case 1: return "blue";   // Preparing
+        case 2: return "green";  // Ready
+        case 3: return "grey";   // Served
+        case 4: return "red";    // Cancelled
+        default: return "black"; // Unknown status or the default color
+    }
+};
+
+window.mapEnumToStatusText = function (statusValue) {
+    switch (statusValue) {
+        case 0: return "Pending";
+        case 1: return "Preparing";
+        case 2: return "Ready";
+        case 3: return "Served";
+        case 4: return "Cancelled";
+        default: return "Unknown";
+    }
+};
+
 
 
 document.addEventListener("DOMContentLoaded", function () {

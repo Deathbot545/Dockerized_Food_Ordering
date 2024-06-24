@@ -29,7 +29,6 @@ window.makeorder = function (order) {
         </div>`;
 }
 
-
 window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);
     switch (status) {
@@ -199,6 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Error updating order status for order ID:", orderId, "with error:", err);
             });
     }
+
 
     function updateOrderStatusToCancelled(orderId) {
         fetch('https://restosolutionssaas.com/api/OrderApi/CancelOrder', {

@@ -89,10 +89,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
-        const orderHtml = makeorder(order);
-        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-        document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
+        if (Array.isArray(order.orderDetails)) {
+            const orderHtml = makeorder(order);
+            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+            document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
+        } else {
+            console.error("Invalid order details for order:", order);
+        }
     }
+
 
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `

@@ -30,8 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .withAutomaticReconnect()
         .build();
 
-    console.log("SignalR connection object before adding method:", connection);
-
     connection.on("ReceiveOrderUpdate", function (order) {
         console.log("ReceiveOrderUpdate method triggered with order:", order);
         if (order && order.orderId && typeof order.status !== 'undefined') {
@@ -49,14 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
         addNewOrderToUI(orderInfo);
     });
 
-    connection.onreconnecting(error => {
-        console.warn(`Connection lost due to error "${error}". Reconnecting.`);
-    });
-
-    connection.onreconnected(connectionId => {
-        console.log(`Connection reestablished. Connected with connectionId "${connectionId}".`);
-    });
-
     connection.start()
         .then(function () {
             console.log("SignalR connection established");
@@ -65,27 +55,25 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error while starting SignalR connection:", err);
         });
 
-    console.log("SignalR connection object after adding methods:", connection);
-
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
         const orderHtml = createOrderHtml(order);
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-        $('#' + sectionId).append(orderHtml);
+        document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
     }
 
     function updateOrderUI(order) {
         console.log("Updating UI for order ID:", order.orderId, "with new status:", order.status);
         let orderStatusText = mapEnumToStatusText(order.status);
         let color = getStatusColor(order.status);
-        const $orderCard = $(`.order-card[data-order-id="${order.orderId}"]`);
+        const orderCard = document.querySelector(`.order-card[data-order-id="${order.orderId}"]`);
 
-        if ($orderCard.length) {
-            updateExistingOrderCard($orderCard, order, orderStatusText, color);
+        if (orderCard) {
+            updateExistingOrderCard(orderCard, order, orderStatusText, color);
         } else {
             const orderHtml = createOrderHtml(order);
             const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-            $('#' + sectionId).append(orderHtml);
+            document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
         }
     }
 
@@ -118,17 +106,17 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>`;
     }
 
-    function updateExistingOrderCard($orderCard, order, statusText, color) {
+    function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = order.orderDetails.map(detail => `
             <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
         `).join("");
 
-        $orderCard.find('.card-body ul').html(detailsHtml);
-        $orderCard.find('.btn').removeClass('active');
-        $orderCard.find(`.btn[data-status="${statusText.toLowerCase()}"]`).addClass('active');
-        $orderCard.find('.card-header').html(
-            `Order #${order.orderId} | Table: ${order.tableId} | Date: ${new Date(order.orderTime).toLocaleString('en-US', { hour12: false })} | STATUS: ${statusText}`
-        ).css('background-color', color);
+        orderCard.querySelector('.card-body ul').innerHTML = detailsHtml;
+        orderCard.querySelector('.btn').classList.remove('active');
+        orderCard.querySelector(`.btn[data-status="${statusText.toLowerCase()}"]`).classList.add('active');
+        orderCard.querySelector('.card-header').innerHTML =
+            `Order #${order.orderId} | Table: ${order.tableId} | Date: ${new Date(order.orderTime).toLocaleString('en-US', { hour12: false })} | STATUS: ${statusText}`;
+        orderCard.querySelector('.card-header').style.backgroundColor = color;
         console.log(`Order ${order.orderId} UI updated to ${statusText}`);
     }
 
@@ -143,27 +131,33 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>`;
-            $('#cancelledOrders').prepend(cancellationAlert);
+            document.getElementById('cancelledOrders').insertAdjacentHTML('afterbegin', cancellationAlert);
             notifiedCancellations[order.orderId] = true;
 
             setTimeout(() => {
-                $(`.alert:contains('Order #${order.orderId}')`).alert('close');
+                const alert = document.querySelector(`.alert:contains('Order #${order.orderId}')`);
+                if (alert) {
+                    alert.parentNode.removeChild(alert);
+                }
                 delete notifiedCancellations[order.orderId];
             }, 300000); // 5 minutes
         }
     }
 
-    $(document).on('click', '.btn-group .btn', function () {
-        const $btn = $(this);
-        const orderId = $btn.closest('.order-card').data('order-id');
-        const newStatus = $btn.data('status');
+    document.addEventListener('click', function (event) {
+        const button = event.target.closest('.btn-group .btn');
+        if (!button) return;
 
-        if ($btn.hasClass('disabled')) {
+        const orderCard = button.closest('.order-card');
+        const orderId = orderCard.dataset.orderId;
+        const newStatus = button.dataset.status;
+
+        if (button.classList.contains('disabled')) {
             console.error("Button is disabled for order ID:", orderId);
             return;
         }
 
-        console.log("Clicked button:", $btn.text().trim(), "for order ID:", orderId, "to change status to:", newStatus);
+        console.log("Clicked button:", button.textContent.trim(), "for order ID:", orderId, "to change status to:", newStatus);
 
         if (newStatus === "cancelled") {
             updateOrderStatusToCancelled(orderId);
@@ -182,36 +176,52 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        $.ajax({
-            url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
-            success: function (response) {
-                console.log("Order status updated successfully for order ID:", orderId, "with response:", response);
+        fetch('https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ OrderId: orderId, Status: statusEnumValue })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Failed to update order status");
+                }
+            })
+            .then(data => {
+                console.log("Order status updated successfully for order ID:", orderId, "with response:", data);
                 connection.invoke("SendOrderUpdate", { orderId: orderId, status: statusEnumValue })
                     .catch(err => console.error("Error sending update to hub for order ID:", orderId, "with error:", err));
-            },
-            error: function (xhr, status, error) {
-                console.error("Error updating order status for order ID:", orderId, "with error:", error);
-            }
-        });
+            })
+            .catch(err => {
+                console.error("Error updating order status for order ID:", orderId, "with error:", err);
+            });
     }
 
     function updateOrderStatusToCancelled(orderId) {
-        $.ajax({
-            url: 'https://restosolutionssaas.com/api/OrderApi/CancelOrder',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ OrderId: orderId }),
-            success: function (response) {
-                console.log("Order cancelled successfully for order ID:", orderId, "with response:", response);
+        fetch('https://restosolutionssaas.com/api/OrderApi/CancelOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ OrderId: orderId })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Failed to cancel order");
+                }
+            })
+            .then(data => {
+                console.log("Order cancelled successfully for order ID:", orderId, "with response:", data);
                 connection.invoke("SendOrderUpdate", { orderId: orderId, status: 4 }) // Assuming 4 is the status for Cancelled
                     .catch(err => console.error("Error sending cancellation to hub for order ID:", orderId, "with error:", err));
-            },
-            error: function (xhr, status, error) {
-                console.error("Error cancelling order for order ID:", orderId, "with error:", error);
-            }
-        });
+            })
+            .catch(err => {
+                console.error("Error cancelling order for order ID:", orderId, "with error:", err);
+            });
     }
 });

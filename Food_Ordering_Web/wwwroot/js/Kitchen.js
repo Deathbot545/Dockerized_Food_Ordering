@@ -1,8 +1,8 @@
 window.makeorder = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
-    const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-    const tableIdentifier = `Table: ${order.tableId}`;
+    const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false }) || 'Invalid Date';
+    const tableIdentifier = `Table: ${order.tableId || 'Unknown'}`;
 
     const cancelButtonHtml = (order.status === 2 || order.status === 3) ? "" :
         `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
@@ -97,23 +97,17 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error while starting SignalR connection:", err);
         });
 
-    function addNewOrderToUI(order) {
-        console.log("Adding new order to UI:", order);
+    function addNewOrderToUI(orderInfo) {
+        console.log("Adding new order to UI:", orderInfo);
 
-        const normalizedOrder = {
-            orderId: order.orderId,
-            orderTime: order.orderTime,
-            customer: order.customer,
-            tableId: order.tableId,
-            outletId: order.outletId,
-            status: order.status,
-            orderDetails: order.orderDetails.orderDetails
-        };
+        const order = orderInfo.orderDetails || {};
+        order.orderId = orderInfo.orderId;
+        order.status = orderInfo.status;
 
-        const orderHtml = makeorder(normalizedOrder);
+        const orderHtml = makeorder(order);
         console.log("Generated order HTML:", orderHtml);
 
-        const sectionId = statusMappings[normalizedOrder.status]?.section || statusMappings.default.section;
+        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
         console.log("Target section ID:", sectionId);
 
         const targetElement = document.getElementById(sectionId);
@@ -236,8 +230,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (cardElement) {
             const statusText = mapEnumToStatusText(order.status);
             const color = getStatusColor(order.status);
-            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-            const tableIdentifier = `Table: ${order.tableId}`;
+            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false }) || 'Invalid Date';
+            const tableIdentifier = `Table: ${order.tableId || 'Unknown'}`;
 
             cardElement.style.backgroundColor = color;
             cardElement.querySelector('.card-header').textContent = `Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}`;

@@ -2,30 +2,35 @@ window.createOrderHtml = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
-    const detailsHtml = order.orderDetails.map(detail => `
-            <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-        `).join("");
     const tableIdentifier = `Table: ${order.tableId}`;
 
     const cancelButtonHtml = (order.status === 2 || order.status === 3) ? "" :
         `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
 
+    let detailsHtml = "";
+    if (Array.isArray(order.orderDetails)) {
+        detailsHtml = order.orderDetails.map(detail => `
+            <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
+    }
+
     return `
-            <div class="card mb-3 order-card" data-order-id="${order.orderId}" data-table-id="${order.tableId}" style="background-color: ${color};">
-                <div class="card-header">
-                    Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
+        <div class="card mb-3 order-card" data-order-id="${order.orderId}" data-table-id="${order.tableId}" style="background-color: ${color};">
+            <div class="card-header">
+                Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
+            </div>
+            <div class="card-body">
+                <ul>${detailsHtml}</ul>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
+                    <button type="button" class="btn btn-primary" data-status="preparing">Preparing</button>
+                    <button type="button" class="btn btn-success" data-status="ready">Ready</button>
+                    ${cancelButtonHtml}
                 </div>
-                <div class="card-body">
-                    <ul>${detailsHtml}</ul>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                        <button type="button" class="btn btn-primary" data-status="preparing">Preparing</button>
-                        <button type="button" class="btn btn-success" data-status="ready">Ready</button>
-                        ${cancelButtonHtml}
-                    </div>
-                </div>
-            </div>`;
+            </div>
+        </div>`;
 }
+
 window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);
     switch (status) {

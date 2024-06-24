@@ -99,8 +99,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
+
+        // Log the entire order object to understand its structure
+        console.log("Full order object:", order);
+
         const formattedOrder = {
-            orderId: order.Id,
+            orderId: order.OrderId,
             orderTime: order.OrderTime,
             customer: order.Customer,
             tableId: order.TableId,
@@ -127,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const orderHtml = makeorder(formattedOrder);
         console.log("Generated order HTML:", orderHtml);
 
-        const sectionId = statusMappings[order.Status]?.section || statusMappings.default.section;
+        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
         console.log("Target section ID:", sectionId);
 
         const targetElement = document.getElementById(sectionId);
@@ -140,23 +144,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
-
-
-
-    function updateExistingOrderCard(orderCard, order, statusText, color) {
-        const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `
-        <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-    `).join("") : "";
-
-        orderCard.querySelector('.card-body ul').innerHTML = detailsHtml;
-        orderCard.querySelector('.btn').classList.remove('active');
-        orderCard.querySelector(`.btn[data-status="${statusText.toLowerCase()}"]`).classList.add('active');
-        orderCard.querySelector('.card-header').innerHTML =
-            `Order #${order.orderId} | Table: ${order.tableId} | Date: ${new Date(order.orderTime).toLocaleString('en-US', { hour12: false })} | STATUS: ${statusText}`;
-        orderCard.querySelector('.card-header').style.backgroundColor = color;
-        console.log(`Order ${order.orderId} UI updated to ${statusText}`);
-    }
 
     const notifiedCancellations = {};
 

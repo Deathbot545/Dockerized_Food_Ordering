@@ -91,32 +91,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
         if (Array.isArray(order.orderDetails)) {
-            const orderHtml = makeOrderCard(order);
+            const orderHtml = makeorder(order);
             const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
             document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
         } else {
             console.error("Invalid order details for order:", order);
         }
     }
-
-    function makeOrderCard(orderInfo) {
-        return `
-            <div class="card">
-                <div class="card-header">
-                    Order #${orderInfo.orderId}
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Order Details:</h5>
-                    <ul>
-                        ${Array.isArray(orderInfo.orderDetails) ? orderInfo.orderDetails.map(detail => `
-                            <li>${detail.quantity} x ${detail.itemName}</li>
-                        `).join('') : ''}
-                    </ul>
-                </div>
-            </div>
-        `;
-    }
-
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `
         <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>

@@ -144,10 +144,16 @@
     </div>
 </footer>
 <script>
-
     $(document).ready(function () {
-        
+        let connection;
+
         if (!connection) {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true")
+                .configureLogging(signalR.LogLevel.Information)
+                .withAutomaticReconnect()
+                .build();
+
             // Define the ReceiveWaiterCall method before starting the connection
             connection.on("ReceiveWaiterCall", function (tableId) {
                 console.log("ReceiveWaiterCall method triggered for table ID:", tableId);

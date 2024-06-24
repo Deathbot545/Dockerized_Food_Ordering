@@ -61,70 +61,158 @@ window.statusMappings = {
     default: { text: "Unknown", section: "unknownOrders" }
 };
 
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM content loaded");
 
-    $(document).ready(function () {
-        $(document).on('click', '.btn-group .btn', function () {
-            const $btn = $(this);
-            const orderId = $btn.closest('.order-card').data('order-id');
-            const newStatus = $btn.data('status');
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true`)
+        .configureLogging(signalR.LogLevel.Information)
+        .withAutomaticReconnect()
+        .build();
 
-            if ($btn.hasClass('disabled')) {
-                console.error("Button is disabled for order ID:", orderId);
-                return; // Prevent action if the button is disabled
+    connection.on("ReceiveOrderUpdate", function (order) {
+        console.log("ReceiveOrderUpdate method triggered with order:", order);
+        if (order && order.orderId && typeof order.status !== 'undefined') {
+            if (order.status === 4) { // Assuming 4 means 'Cancelled'
+                handleCancellationAlert(order);
             }
+            updateOrderUI(order);
+        } else {
+            console.error("Order update is missing required properties", order);
+        }
+    });
 
-            console.log("Clicked button:", $btn.text().trim(), "for order ID:", orderId, "to change status to:", newStatus);
+    connection.on("NewOrderPlaced", function (orderInfo) {
+        console.log("NewOrderPlaced method triggered with order info:", orderInfo);
+        addNewOrderToUI(orderInfo);
+    });
 
-            if (newStatus === "cancelled") {
-                updateOrderStatusToCancelled(orderId); // Call the cancellation function if "Cancel" is clicked
-            } else if (newStatus !== undefined) {
-                updateOrderStatus(orderId, newStatus);
-            } else {
-                console.error("Undefined status for order ID:", orderId);
-            }
+    connection.start()
+        .then(function () {
+            console.log("SignalR connection established");
+        })
+        .catch(function (err) {
+            console.error("Error while starting SignalR connection:", err);
         });
 
-    function updateOrderStatus(orderId, newStatus) {
-            // Ensure statusMappings is defined correctly
-            const statusMappings = {
-        "pending": 0,
-    "preparing": 1,
-    "completed": 2,
-    "served": 3,
-    "cancelled": 4
-            };
+    function addNewOrderToUI(orderInfo) {
+        console.log("Adding new order to UI:", orderInfo);
 
-    let statusEnumValue = statusMappings[newStatus.toLowerCase()];
-    console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
+        const order = orderInfo.orderDetails || {};
+        order.orderId = orderInfo.orderId;
+        order.status = 0; // Set status to 0 (Pending) for new orders
 
-    if (statusEnumValue === undefined) {
-        console.error("Invalid status value for update:", newStatus);
-    return;
-            }
+        const orderHtml = makeorder(order);
+        console.log("Generated order HTML:", orderHtml);
 
-    fetch('https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus', {
-        method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-                },
-    body: JSON.stringify({OrderId: orderId, Status: statusEnumValue })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error("Failed to update order status");
-                    }
-                })
-                .then(data => {
-        console.log("Order status updated successfully for order ID:", orderId, "with response:", data);
-    connection.invoke("SendOrderUpdate", {orderId: orderId, status: statusEnumValue })
-                        .catch(err => console.error("Error sending update to hub for order ID:", orderId, "with error:", err));
-                })
-                .catch(err => {
-        console.error("Error updating order status for order ID:", orderId, "with error:", err);
-                });
+        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+        console.log("Target section ID:", sectionId);
+
+        const targetElement = document.getElementById(sectionId);
+        console.log("Target element:", targetElement);
+
+        if (targetElement) {
+            targetElement.insertAdjacentHTML('beforeend', orderHtml);
+        } else {
+            console.error(`Section with ID ${sectionId} not found`);
         }
+    }
+
+
+    const notifiedCancellations = {};
+
+    function handleCancellationAlert(order) {
+        if (!notifiedCancellations[order.orderId]) {
+            const cancellationAlert = `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    Order #${order.orderId} has been cancelled by the customer.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>`;
+            document.getElementById('cancelledOrders').insertAdjacentHTML('afterbegin', cancellationAlert);
+            notifiedCancellations[order.orderId] = true;
+
+            setTimeout(() => {
+                const alert = document.querySelector(`.alert:contains('Order #${order.orderId}')`);
+                if (alert) {
+                    alert.parentNode.removeChild(alert);
+                }
+                delete notifiedCancellations[order.orderId];
+            }, 300000); // 5 minutes
+        }
+    }
+
+    document.addEventListener('click', function (event) {
+        const button = event.target.closest('.btn-group .btn');
+        if (!button) return;
+
+        const orderCard = button.closest('.order-card');
+        const orderId = orderCard.dataset.orderId;
+        const newStatus = button.dataset.status;
+
+        if (button.classList.contains('disabled')) {
+            console.error("Button is disabled for order ID:", orderId);
+            return;
+        }
+
+        console.log("Clicked button:", button.textContent.trim(), "for order ID:", orderId, "to change status to:", newStatus);
+
+        if (newStatus === "cancelled") {
+            updateOrderStatusToCancelled(orderId);
+        } else if (newStatus !== undefined) {
+            updateOrderStatus(orderId, newStatus);
+        } else {
+            console.error("Undefined status for order ID:", orderId);
+        }
+    });
+
+    // Ensure this function is defined
+    function updateOrderStatus(orderId, newStatus) {
+        let statusEnumValue = window.statusMappings[newStatus.toLowerCase()];
+        console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
+
+        if (statusEnumValue === undefined) {
+            console.error("Invalid status value for update:", newStatus);
+            return;
+        }
+
+        fetch('https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ OrderId: orderId, Status: statusEnumValue })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Failed to update order status");
+                }
+            })
+            .then(data => {
+                console.log("Order status updated successfully for order ID:", orderId, "with response:", data);
+                connection.invoke("SendOrderUpdate", { orderId: orderId, status: statusEnumValue })
+                    .catch(err => console.error("Error sending update to hub for order ID:", orderId, "with error:", err));
+            })
+            .catch(err => {
+                console.error("Error updating order status for order ID:", orderId, "with error:", err);
+            });
+    }
+
+    // Example button click handler
+    document.querySelectorAll('.update-status-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.dataset.orderId;
+            const newStatus = this.dataset.status;
+            console.log(`Clicked button: ${newStatus} for order ID: ${orderId} to change status to: ${newStatus.toLowerCase()}`);
+            updateOrderStatus(orderId, newStatus.toLowerCase());
+        });
+    });
+
+
+
 
     function updateOrderStatusToCancelled(orderId) {
         fetch('https://restosolutionssaas.com/api/OrderApi/CancelOrder', {
@@ -149,125 +237,20 @@ window.statusMappings = {
             .catch(err => {
                 console.error("Error cancelling order for order ID:", orderId, "with error:", err);
             });
-        }
-
-    document.addEventListener('click', function (event) {
-            const button = event.target.closest('.btn-group .btn');
-    if (!button) return;
-
-    const orderCard = button.closest('.order-card');
-    const orderId = orderCard.dataset.orderId;
-    const newStatus = button.dataset.status;
-
-    if (button.classList.contains('disabled')) {
-        console.error("Button is disabled for order ID:", orderId);
-    return;
-            }
-
-    console.log("Clicked button:", button.textContent.trim(), "for order ID:", orderId, "to change status to:", newStatus);
-
-    if (newStatus === "cancelled") {
-        updateOrderStatusToCancelled(orderId);
-            } else if (newStatus !== undefined) {
-        updateOrderStatus(orderId, newStatus);
-            } else {
-        console.error("Undefined status for order ID:", orderId);
-            }
-        });
-
-    // SignalR connection setup
-    const connection = new signalR.HubConnectionBuilder()
-    .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true`)
-    .configureLogging(signalR.LogLevel.Information)
-    .withAutomaticReconnect()
-    .build();
-
-    connection.on("ReceiveOrderUpdate", function (order) {
-        console.log("ReceiveOrderUpdate method triggered with order:", order);
-    if (order && order.orderId && typeof order.status !== 'undefined') {
-                if (order.status === 4) { // Assuming 4 means 'Cancelled'
-        handleCancellationAlert(order);
-                }
-    updateOrderUI(order);
-            } else {
-        console.error("Order update is missing required properties", order);
-            }
-        });
-
-    connection.on("NewOrderPlaced", function (orderInfo) {
-        console.log("NewOrderPlaced method triggered with order info:", orderInfo);
-    addNewOrderToUI(orderInfo);
-        });
-
-    connection.start()
-    .then(function () {
-        console.log("SignalR connection established");
-            })
-    .catch(function (err) {
-        console.error("Error while starting SignalR connection:", err);
-            });
-
-    function addNewOrderToUI(orderInfo) {
-        console.log("Adding new order to UI:", orderInfo);
-
-    const order = orderInfo.orderDetails || { };
-    order.orderId = orderInfo.orderId;
-    order.status = 0; // Set status to 0 (Pending) for new orders
-
-    const orderHtml = makeorder(order);
-    console.log("Generated order HTML:", orderHtml);
-
-    const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-    console.log("Target section ID:", sectionId);
-
-    const targetElement = document.getElementById(sectionId);
-    console.log("Target element:", targetElement);
-
-    if (targetElement) {
-        targetElement.insertAdjacentHTML('beforeend', orderHtml);
-            } else {
-        console.error(`Section with ID ${sectionId} not found`);
-            }
-        }
-
-    const notifiedCancellations = { };
-
-    function handleCancellationAlert(order) {
-            if (!notifiedCancellations[order.orderId]) {
-                const cancellationAlert = `
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        Order #${order.orderId} has been cancelled by the customer.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>`;
-    document.getElementById('cancelledOrders').insertAdjacentHTML('afterbegin', cancellationAlert);
-    notifiedCancellations[order.orderId] = true;
-
-                setTimeout(() => {
-                    const alert = document.querySelector(`.alert:contains('Order #${order.orderId}')`);
-    if (alert) {
-        alert.parentNode.removeChild(alert);
-                    }
-    delete notifiedCancellations[order.orderId];
-                }, 300000); // 5 minutes
-            }
-        }
+    }
 
     function updateOrderUI(order) {
-            const cardElement = document.querySelector(`.order-card[data-order-id="${order.orderId}"]`);
-    if (cardElement) {
-                const statusText = mapEnumToStatusText(order.status);
-    const color = getStatusColor(order.status);
-    const formattedDate = new Date(order.orderTime).toLocaleString('en-US', {hour12: false }) || 'Invalid Date';
-    const tableIdentifier = `Table: ${order.tableId || 'Unknown'}`;
+        const cardElement = document.querySelector(`.order-card[data-order-id="${order.orderId}"]`);
+        if (cardElement) {
+            const statusText = mapEnumToStatusText(order.status);
+            const color = getStatusColor(order.status);
+            const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false }) || 'Invalid Date';
+            const tableIdentifier = `Table: ${order.tableId || 'Unknown'}`;
 
-    cardElement.style.backgroundColor = color;
-    cardElement.querySelector('.card-header').textContent = `Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}`;
-            } else {
-                console.error("No order card found for order ID:", order.orderId);
-            }
+            cardElement.style.backgroundColor = color;
+            cardElement.querySelector('.card-header').textContent = `Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}`;
+        } else {
+            console.error("No order card found for order ID:", order.orderId);
         }
-    });
-
-
+    }
+});

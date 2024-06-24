@@ -107,16 +107,14 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="card-body">
                 <h5 class="card-title">Order Details:</h5>
                 <ul>
-                    ${orderInfo.orderDetails.map(detail => `
+                    ${Array.isArray(orderInfo.orderDetails) ? orderInfo.orderDetails.map(detail => `
                         <li>${detail.quantity} x ${detail.itemName}</li>
-                    `).join('')}
+                    `).join('') : ''}
                 </ul>
             </div>
         </div>
     `;
     }
-
-
 
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `

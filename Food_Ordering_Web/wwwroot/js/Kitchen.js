@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const order = orderInfo.orderDetails || {};
         order.orderId = orderInfo.orderId;
-        order.status = orderInfo.status;
+        order.status = 0; // Set status to 0 (Pending) for new orders
 
         const orderHtml = makeorder(order);
         console.log("Generated order HTML:", orderHtml);
@@ -119,6 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error(`Section with ID ${sectionId} not found`);
         }
     }
+
 
     const notifiedCancellations = {};
 

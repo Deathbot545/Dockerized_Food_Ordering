@@ -1,9 +1,7 @@
 window.makeorder = function (order) {
     const statusText = mapEnumToStatusText(order.status);
-    const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false }) || 'Invalid Date';
     const tableIdentifier = `Table: ${order.tableId || 'Unknown'}`;
-
     const cancelButtonHtml = (order.status === 2 || order.status === 3) ? "" :
         `<button type="button" class="btn btn-danger" data-status="cancelled">Cancel</button>`;
 
@@ -15,21 +13,22 @@ window.makeorder = function (order) {
     }
 
     return `
-        <div class="card mb-3 order-card" data-order-id="${order.orderId}" data-table-id="${order.tableId}" style="background-color: ${color};">
-            <div class="card-header">
-                Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}
+        <div class="card mb-3 order-card bg-dark text-light" data-order-id="${order.orderId}" data-table-id="${order.tableId}">
+            <div class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
+                <span>Order #${order.orderId} | ${tableIdentifier} | Date: ${formattedDate} | STATUS: ${statusText}</span>
             </div>
             <div class="card-body">
-                <ul>${detailsHtml}</ul>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-warning" data-status="pending">Pending</button>
-                    <button type="button" class="btn btn-primary" data-status="preparing">Preparing</button>
-                    <button type="button" class="btn btn-success" data-status="ready">Ready</button>
-                    ${cancelButtonHtml}
+                <ul class="mb-3">${detailsHtml}</ul>
+                <div class="btn-group" role="group" aria-label="Order Status">
+                    <button type="button" class="btn btn-warning ${(order.status === 0 ? "active" : "")}" data-status="pending">Pending</button>
+                    <button type="button" class="btn btn-primary ${(order.status === 1 ? "active" : "")}" data-status="preparing">In Progress</button>
+                    <button type="button" class="btn btn-success ${(order.status === 2 ? "active" : "")}" data-status="completed">Completed</button>
+                    <button type="button" class="btn btn-danger ${(order.status === 2 || order.status === 3 ? "active" : "")}" data-status="cancelled">Cancel</button>
                 </div>
             </div>
         </div>`;
 }
+
 
 window.getStatusColor = function (status) {
     console.log("Called getStatusColor from Kitchen Application", status);

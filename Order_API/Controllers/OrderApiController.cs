@@ -72,7 +72,10 @@ namespace Order_API.Controllers
         [HttpPost("UpdateOrderStatus")]
         public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusDto updateOrderDto)
         {
-
+            if (updateOrderDto == null || string.IsNullOrWhiteSpace(updateOrderDto.OrderId))
+            {
+                return BadRequest("Invalid order data");
+            }
 
             await _orderService.UpdateOrderStatusAsync(updateOrderDto.OrderId, updateOrderDto.Status);
 
@@ -82,6 +85,7 @@ namespace Order_API.Controllers
 
             return Ok();
         }
+
 
         [HttpGet("GetOrderDetails/{orderId}")]
         public async Task<IActionResult> GetOrderDetails(string orderId)

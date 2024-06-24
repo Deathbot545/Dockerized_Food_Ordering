@@ -167,9 +167,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Ensure this function is defined
     function updateOrderStatus(orderId, newStatus) {
-        let statusEnumValue = Object.keys(window.statusMappings).find(key => window.statusMappings[key].text.toLowerCase() === newStatus);
+        let statusEnumValue = window.statusMappings[newStatus.toLowerCase()];
         console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
+
         if (statusEnumValue === undefined) {
             console.error("Invalid status value for update:", newStatus);
             return;
@@ -198,6 +200,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Error updating order status for order ID:", orderId, "with error:", err);
             });
     }
+
+    // Example button click handler
+    document.querySelectorAll('.update-status-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.dataset.orderId;
+            const newStatus = this.dataset.status;
+            console.log(`Clicked button: ${newStatus} for order ID: ${orderId} to change status to: ${newStatus.toLowerCase()}`);
+            updateOrderStatus(orderId, newStatus.toLowerCase());
+        });
+    });
+
 
 
 

@@ -56,8 +56,6 @@
 
         return html.ToString();
     }
-
-
 }
 
 @{
@@ -222,9 +220,13 @@
             const statusText = statusMappings[getKeyByValue(statusMappings, order.status)]?.text || statusMappings.default.text;
             const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
 
-            const detailsHtml = (order.orderDetails || []).map(detail => `
-                <li>${detail.menuItem.name} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
-            `).join("");
+            let detailsHtml = "";
+            if (Array.isArray(order.orderDetails)) {
+                detailsHtml = order.orderDetails.map(detail => `
+            <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+        `).join("");
+            }
+
 
             orderCard.find('.card-header').html(
                 `Order #${order.id} | Table: Fetching... | Date: ${formattedDate} | STATUS: ${statusText}`

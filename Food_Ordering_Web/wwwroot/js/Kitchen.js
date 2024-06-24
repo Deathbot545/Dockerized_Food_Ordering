@@ -94,21 +94,20 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
     }
 
-    function updateOrderUI(order) {
-        console.log("Updating UI for order ID:", order.orderId, "with new status:", order.status);
-        let orderStatusText = mapEnumToStatusText(order.status);
-        let color = getStatusColor(order.status);
-        const orderCard = document.querySelector(`.order-card[data-order-id="${order.orderId}"]`);
+    function updateExistingOrderCard(orderCard, order, statusText, color) {
+        const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `
+        <li>${detail.menuItemName} x ${detail.quantity} <br><small>Note: ${detail.note || 'No note'}</small></li>
+    `).join("") : "";
 
-        if (orderCard) {
-            updateExistingOrderCard(orderCard, order, orderStatusText, color);
-        } else {
-            const orderHtml = makeorder(order);
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-            document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
-        }
+        orderCard.querySelector('.card-body ul').innerHTML = detailsHtml;
+        orderCard.querySelector('.btn').classList.remove('active');
+        orderCard.querySelector(`.btn[data-status="${statusText.toLowerCase()}"]`).classList.add('active');
+        orderCard.querySelector('.card-header').innerHTML =
+            `Order #${order.orderId} | Table: ${order.tableId} | Date: ${new Date(order.orderTime).toLocaleString('en-US', { hour12: false })} | STATUS: ${statusText}`;
+        orderCard.querySelector('.card-header').style.backgroundColor = color;
+        console.log(`Order ${order.orderId} UI updated to ${statusText}`);
     }
-    
+
     
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = order.orderDetails.map(detail => `

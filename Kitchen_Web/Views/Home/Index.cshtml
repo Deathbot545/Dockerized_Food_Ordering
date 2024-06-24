@@ -240,7 +240,7 @@
         }
 
         function addNewOrderToDOM(order) {
-            const orderHtml = createOrderHtml(order);
+            const orderHtml = makeorder(order);
             const sectionId = statusMappings[getKeyByValue(statusMappings, order.status)]?.section || statusMappings.default.section;
             $('#' + sectionId).append(orderHtml);
         }

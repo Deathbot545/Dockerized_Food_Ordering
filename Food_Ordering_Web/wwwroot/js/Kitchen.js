@@ -99,37 +99,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addNewOrderToUI(order) {
         console.log("Adding new order to UI:", order);
-        const newOrder = {
-            Id: order.orderId,
-            OrderTime: new Date(order.orderTime),
-            Customer: null, // Assuming this is not provided by the hub
-            TableId: order.tableId,
-            TableName: null, // Assuming this is not provided by the hub
-            OutletId: order.outletId,
-            Status: order.status,
-            OrderDetails: Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => ({
-                Id: 0, // Assign a unique id or use detail.orderId if available
-                OrderId: 0, // Assign the order id or use detail.orderId if available
-                MenuItemId: detail.menuItemId,
-                MenuItemName: detail.menuItemName,
-                MenuItem: null, // Assuming this is not provided by the hub
-                Quantity: detail.quantity,
-                Note: detail.note,
-                Size: detail.size,
-                ExtraItems: Array.isArray(detail.extraItems) ? detail.extraItems.map(extraItem => ({
-                    Id: 0, // Assign a unique id or use extraItem.id if available
-                    Name: extraItem.name,
-                    Price: extraItem.price
-                })) : []
-            })) : []
+        const formattedOrder = {
+            orderId: order.Id,
+            orderTime: order.OrderTime,
+            customer: order.Customer,
+            tableId: order.TableId,
+            outletId: order.OutletId,
+            status: order.Status,
+            orderDetails: order.OrderDetails.map(detail => ({
+                id: detail.Id,
+                orderId: detail.OrderId,
+                menuItemName: detail.MenuItemName,
+                menuItemId: detail.MenuItemId,
+                quantity: detail.Quantity,
+                note: detail.Note,
+                size: detail.Size,
+                extraItems: detail.ExtraItems.map(extraItem => ({
+                    id: extraItem.Id,
+                    name: extraItem.Name,
+                    price: extraItem.Price
+                }))
+            }))
         };
 
-        console.log("New order object:", newOrder);
+        console.log("Formatted order object:", formattedOrder);
 
-        const orderHtml = makeorder(newOrder, []);
+        const orderHtml = makeorder(formattedOrder);
         console.log("Generated order HTML:", orderHtml);
 
-        const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
+        const sectionId = statusMappings[order.Status]?.section || statusMappings.default.section;
         console.log("Target section ID:", sectionId);
 
         const targetElement = document.getElementById(sectionId);
@@ -141,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error(`Section with ID ${sectionId} not found`);
         }
     }
+
 
 
 

@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })) : []
         };
 
-        const orderHtml = RenderOrderCard(newOrder, []);
+        const orderHtml = makeorder(newOrder, []);
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
         document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
     }

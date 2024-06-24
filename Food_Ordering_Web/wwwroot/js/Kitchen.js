@@ -1,4 +1,4 @@
-/*window.makeorder = function (order) {
+window.makeorder = function (order) {
     const statusText = mapEnumToStatusText(order.status);
     const color = getStatusColor(order.status);
     const formattedDate = new Date(order.orderTime).toLocaleString('en-US', { hour12: false });
@@ -101,20 +101,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function makeOrderCard(orderInfo) {
         return `
-        <div class="card">
-            <div class="card-header">
-                Order #${orderInfo.orderId}
+            <div class="card">
+                <div class="card-header">
+                    Order #${orderInfo.orderId}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Order Details:</h5>
+                    <ul>
+                        ${Array.isArray(orderInfo.orderDetails) ? orderInfo.orderDetails.map(detail => `
+                            <li>${detail.quantity} x ${detail.itemName}</li>
+                        `).join('') : ''}
+                    </ul>
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Order Details:</h5>
-                <ul>
-                    ${Array.isArray(orderInfo.orderDetails) ? orderInfo.orderDetails.map(detail => `
-                        <li>${detail.quantity} x ${detail.itemName}</li>
-                    `).join('') : ''}
-                </ul>
-            </div>
-        </div>
-    `;
+        `;
     }
 
     function updateExistingOrderCard(orderCard, order, statusText, color) {
@@ -236,4 +236,3 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 });
-*/

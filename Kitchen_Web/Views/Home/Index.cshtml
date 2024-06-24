@@ -257,60 +257,6 @@
             }
         });
 
-        // SignalR connection setup
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`https://restosolutionssaas.com/api/OrderApi/orderStatusHub?isKitchen=true`)
-            .configureLogging(signalR.LogLevel.Information)
-            .withAutomaticReconnect()
-            .build();
-
-        connection.on("ReceiveOrderUpdate", function (order) {
-            console.log("ReceiveOrderUpdate method triggered with order:", order);
-            if (order && order.orderId && typeof order.status !== 'undefined') {
-                if (order.status === 4) { // Assuming 4 means 'Cancelled'
-                    handleCancellationAlert(order);
-                }
-                updateOrderUI(order);
-            } else {
-                console.error("Order update is missing required properties", order);
-            }
-        });
-
-        connection.on("NewOrderPlaced", function (orderInfo) {
-            console.log("NewOrderPlaced method triggered with order info:", orderInfo);
-            addNewOrderToUI(orderInfo);
-        });
-
-        connection.start()
-            .then(function () {
-                console.log("SignalR connection established");
-            })
-            .catch(function (err) {
-                console.error("Error while starting SignalR connection:", err);
-            });
-
-        function addNewOrderToUI(orderInfo) {
-            console.log("Adding new order to UI:", orderInfo);
-
-            const order = orderInfo.orderDetails || {};
-            order.orderId = orderInfo.orderId;
-            order.status = 0; // Set status to 0 (Pending) for new orders
-
-            const orderHtml = makeorder(order);
-            console.log("Generated order HTML:", orderHtml);
-
-            const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
-            console.log("Target section ID:", sectionId);
-
-            const targetElement = document.getElementById(sectionId);
-            console.log("Target element:", targetElement);
-
-            if (targetElement) {
-                targetElement.insertAdjacentHTML('beforeend', orderHtml);
-            } else {
-                console.error(`Section with ID ${sectionId} not found`);
-            }
-        }
 
         const notifiedCancellations = {};
 

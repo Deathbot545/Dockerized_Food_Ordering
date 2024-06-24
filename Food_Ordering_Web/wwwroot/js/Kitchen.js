@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function updateOrderStatus(orderId, newStatus) {
-        let statusEnumValue = Object.keys(statusMappings).find(key => statusMappings[key].text.toLowerCase() === newStatus);
+        let statusEnumValue = Object.keys(window.statusMappings).find(key => window.statusMappings[key].text.toLowerCase() === newStatus);
         console.log("Preparing to send update request for Order ID:", orderId, "with Status:", statusEnumValue);
         if (statusEnumValue === undefined) {
             console.error("Invalid status value for update:", newStatus);

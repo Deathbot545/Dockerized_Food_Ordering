@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
             TableName: null, // Assuming this is not provided by the hub
             OutletId: order.outletId,
             Status: order.status,
-            OrderDetails: order.orderDetails.map(detail => ({
+            OrderDetails: Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => ({
                 Id: 0, // Assign a unique id or use detail.orderId if available
                 OrderId: 0, // Assign the order id or use detail.orderId if available
                 MenuItemId: detail.menuItemId,
@@ -116,18 +116,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 Quantity: detail.quantity,
                 Note: detail.note,
                 Size: detail.size,
-                ExtraItems: detail.extraItems.map(extraItem => ({
+                ExtraItems: Array.isArray(detail.extraItems) ? detail.extraItems.map(extraItem => ({
                     Id: 0, // Assign a unique id or use extraItem.id if available
                     Name: extraItem.name,
                     Price: extraItem.price
-                }))
-            }))
+                })) : []
+            })) : []
         };
 
         const orderHtml = RenderOrderCard(newOrder, []);
         const sectionId = statusMappings[order.status]?.section || statusMappings.default.section;
         document.getElementById(sectionId).insertAdjacentHTML('beforeend', orderHtml);
     }
+
 
     function updateExistingOrderCard(orderCard, order, statusText, color) {
         const detailsHtml = Array.isArray(order.orderDetails) ? order.orderDetails.map(detail => `

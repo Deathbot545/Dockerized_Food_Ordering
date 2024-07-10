@@ -5,12 +5,13 @@
     body {
         font-family: 'Roboto', sans-serif;
         color: #333;
+        background-color: #f8f5f1;
     }
 
     .hero-section {
         background: url('https://media.istockphoto.com/id/1409730005/photo/chef-cooking-at-a-restaurant-and-flaming-the-food.webp?s=2048x2048&w=is&k=20&c=o4tpp-hSHPlyGUxXMapznfAjbTeUueKpIkq2fayIOx4=') no-repeat center center;
         background-size: cover;
-        color: white;
+        color: #2e2d2b;
         padding: 150px 0;
         text-align: center;
         position: relative;
@@ -18,11 +19,14 @@
     }
 
         .hero-section h1 {
+            color: white;
             font-size: 3.5em;
             font-weight: 700;
+            font-family: 'Playfair Display', serif;
         }
 
         .hero-section p {
+            color: white;
             font-size: 1.5em;
             font-weight: 500;
             margin-bottom: 30px;
@@ -32,200 +36,196 @@
             font-size: 1.25em;
             padding: 15px 30px;
             border-radius: 30px;
+            background-color: #000;
+            color: #fff;
         }
 
-    .feature-item .card, .testimonial-item .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: none;
-        border-radius: 10px;
-        background-color: #f8f9fa; /* Light grey background for a modern look */
+            .hero-section .btn:hover {
+                background-color: #444;
+            }
+
+    .features-section {
+        padding: 50px 0;
     }
 
-        .feature-item .card:hover, .testimonial-item .card:hover {
+    .feature-item .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+    }
+
+        .feature-item .card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
 
     .cta-section {
-        background-color: #007bff;
-        color: white;
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        padding: 50px 0;
     }
 
-        .cta-section h2, .cta-section p {
+        .cta-section h2 {
             margin-bottom: 20px;
+            font-family: 'Playfair Display', serif;
         }
 
-    .testimonials-section .card {
-        border: none;
-        border-radius: 10px;
-        background-color: #f8f9fa;
+        .cta-section .btn {
+            background-color: #fff;
+            color: #000;
+        }
+
+            .cta-section .btn:hover {
+                background-color: #ccc;
+            }
+
+    .testimonials-section {
+        padding: 50px 0;
     }
 
-    .testimonials-section .card-body {
-        padding: 30px;
-    }
-
-    .testimonials-section .card-text {
-        font-size: 1.1em;
-        margin-bottom: 20px;
-    }
-
-    .testimonials-section .card-title {
-        font-size: 1.25em;
-        font-weight: 500;
-        color: #007bff;
-    }
+        .testimonials-section .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
 
     .footer {
-        background-color: #212529;
+        background-color: #2e2d2b;
         color: #f8f9fa;
         padding: 20px 0;
         text-align: center;
     }
 </style>
 
-<!-- QR Code Scanner Modal -->
-<div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="qrScannerModalLabel">QR Code Scanner</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img src="https://images.pexels.com/photos/11745510/pexels-photo-11745510.jpeg" alt="QR Code Scanning" class="img-fluid mb-3">
-                <div id="qr-reader" style="width:100%"></div>
-            </div>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1>Profitez d'une nourriture saine et délicieuse.</h1>
+            <p>Welcome to our restaurant</p>
+            <button id="orderButton" class="btn btn-lg">Order Now</button>
+            <button class="btn btn-lg">Reservation</button>
         </div>
     </div>
-</div>
 
-<!-- Hero Section -->
-<div class="hero-section">
-    <div class="container">
-        <h1>Welcome to Restro</h1>
-        <p>Your ultimate online restaurant ordering solution</p>
-        <button id="orderButton" class="btn btn-lg btn-primary" type="button">
-            Scan QR Code <i class="fas fa-qrcode ml-2"></i>
-        </button>
-    </div>
-</div>
-
-<!-- Features Section -->
-<div class="features-section container">
-    <div class="row text-center">
-        <div class="col-md-4 feature-item">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Easy to Use</h5>
-                    <p class="card-text">A user-friendly interface designed for both restaurant owners and customers.</p>
+    <!-- Features Section -->
+    <div class="features-section container">
+        <div class="row text-center">
+            <div class="col-md-4 feature-item">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Easy to Use</h5>
+                        <p class="card-text">A user-friendly interface designed for both restaurant owners and customers.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 feature-item">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Customizable Menus</h5>
-                    <p class="card-text">Easily create and manage your restaurant's menu to suit your needs.</p>
+            <div class="col-md-4 feature-item">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Customizable Menus</h5>
+                        <p class="card-text">Easily create and manage your restaurant's menu to suit your needs.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 feature-item">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Quick Ordering</h5>
-                    <p class="card-text">Customers can place orders quickly and efficiently through QR codes.</p>
+            <div class="col-md-4 feature-item">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Quick Ordering</h5>
+                        <p class="card-text">Customers can place orders quickly and efficiently through QR codes.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Call to Action Section -->
-<div class="cta-section text-center py-5">
-    <div class="container">
-        <h2>Ready to revolutionize your restaurant business?</h2>
-        <p>Join Restro today and streamline your ordering process.</p>
-        <a class="btn btn-lg btn-light" href="#">Register Your Business</a>
-    </div>
-</div>
-
-<!-- Testimonials Section -->
-<div class="testimonials-section container">
-    <div class="row text-center">
-        <div class="col-md-4 testimonial-item">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <p class="card-text">"Restro has completely transformed how we handle orders. It's fast and reliable!"</p>
-                    <h5 class="card-title text-primary">- John Doe, Restaurant Owner</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 testimonial-item">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <p class="card-text">"I love how easy it is to place orders with Restro. Highly recommended!"</p>
-                    <h5 class="card-title text-primary">- Jane Smith, Customer</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 testimonial-item">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <p class="card-text">"The QR code system is a game-changer for our busy restaurant."</p>
-                    <h5 class="card-title text-primary">- Mike Johnson, Restaurant Owner</h5>
-                </div>
-            </div>
+    <!-- Call to Action Section -->
+    <div class="cta-section">
+        <div class="container">
+            <h2>Ready to revolutionize your restaurant business?</h2>
+            <p>Join Restro today and streamline your ordering process.</p>
+            <a class="btn btn-lg" href="#">Register Your Business</a>
         </div>
     </div>
-</div>
 
-<!-- Footer -->
-<div class="footer">
-    <p>&copy; 2024 Restro. All rights reserved.</p>
-</div>
+    <!-- Testimonials Section -->
+    <div class="testimonials-section container">
+        <div class="row text-center">
+            <div class="col-md-4 testimonial-item">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <p class="card-text">"Restro has completely transformed how we handle orders. It's fast and reliable!"</p>
+                        <h5 class="card-title">- John Doe, Restaurant Owner</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 testimonial-item">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <p class="card-text">"I love how easy it is to place orders with Restro. Highly recommended!"</p>
+                        <h5 class="card-title">- Jane Smith, Customer</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 testimonial-item">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <p class="card-text">"The QR code system is a game-changer for our busy restaurant."</p>
+                        <h5 class="card-title">- Mike Johnson, Restaurant Owner</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://kit.fontawesome.com/a076d05399.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script>
-    document.getElementById('orderButton').addEventListener('click', function () {
-        // Show the modal
-        var myModal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
-        myModal.show();
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Restro. All rights reserved.</p>
+    </div>
 
-        var config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
-        var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
-        html5QrcodeScanner.render(onScanSuccess, onScanError);
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script>
+        document.getElementById('orderButton').addEventListener('click', function () {
+            // Show the modal
+            var myModal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
+            myModal.show();
 
-        // Attempt to modify the button styles after a delay to ensure they've been rendered
-        setTimeout(() => {
-            // Select the buttons created by the library
-            let buttons = document.querySelectorAll('#qr-reader button');
-            buttons.forEach(button => {
-                // Add Bootstrap button classes
-                button.classList.remove('button-class'); // Remove the library's default class if necessary
-                button.classList.add('btn', 'btn-primary'); // Add Bootstrap classes
+            var config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
+            var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
+            html5QrcodeScanner.render(onScanSuccess, onScanError);
 
-                // Specific class additions based on button functionality, if possible
-                if (button.textContent.includes('Start')) {
-                    button.classList.add('btn-success'); // Example for a "Start" button
-                } else if (button.textContent.includes('Stop')) {
-                    button.classList.add('btn-danger'); // Example for a "Stop" button
-                }
-            });
-        }, 1000); // Adjust the delay as needed to ensure the buttons are rendered
-    });
+            // Attempt to modify the button styles after a delay to ensure they've been rendered
+            setTimeout(() => {
+                // Select the buttons created by the library
+                let buttons = document.querySelectorAll('#qr-reader button');
+                buttons.forEach(button => {
+                    // Add Bootstrap button classes
+                    button.classList.remove('button-class'); // Remove the library's default class if necessary
+                    button.classList.add('btn', 'btn-primary'); // Add Bootstrap classes
 
-    function onScanSuccess(decodedText, decodedResult) {
-        // Handle the decoded text
-        console.log(`Code matched = ${decodedText}`, decodedResult);
-    }
+                    // Specific class additions based on button functionality, if possible
+                    if (button.textContent.includes('Start')) {
+                        button.classList.add('btn-success'); // Example for a "Start" button
+                    } else if (button.textContent.includes('Stop')) {
+                        button.classList.add('btn-danger'); // Example for a "Stop" button
+                    }
+                });
+            }, 1000); // Adjust the delay as needed to ensure the buttons are rendered
+        });
 
-    function onScanError(errorMessage) {
-        // Handle scan error
-        console.log(`Scan error: ${errorMessage}`);
-    }
-</script>
+        function onScanSuccess(decodedText, decodedResult) {
+            // Handle the decoded text
+            console.log(`Code matched = ${decodedText}`, decodedResult);
+        }
+
+        function onScanError(errorMessage) {
+            // Handle scan error
+            console.log(`Scan error: ${errorMessage}`);
+        }
+    </script>

@@ -34,49 +34,22 @@
             border-radius: 30px;
         }
 
-    .features-section, .cta-section, .testimonials-section {
-        padding: 50px 0;
-    }
-
-    .feature-item .card {
-        border: none;
-        border-radius: 10px;
+    .feature-item .card, .testimonial-item .card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-        .feature-item .card:hover {
+        .feature-item .card:hover, .testimonial-item .card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
-
-    .feature-item .card-body {
-        padding: 30px;
-    }
-
-    .feature-item .card-title {
-        font-size: 1.5em;
-        margin-bottom: 20px;
-        font-weight: 700;
-    }
-
-    .feature-item .card-text {
-        font-size: 1.1em;
-    }
 
     .cta-section {
         background-color: #007bff;
         color: white;
-        text-align: center;
     }
 
-        .cta-section h2 {
-            font-size: 2.5em;
-            font-weight: 700;
-        }
-
-        .cta-section p {
-            font-size: 1.25em;
-            font-weight: 500;
+        .cta-section h2, .cta-section p {
+            margin-bottom: 20px;
         }
 
     .testimonials-section .card {
@@ -134,74 +107,73 @@
         </div>
     </div>
 
-    <!-- Features Section -->
-    <div class="features-section container">
-        <div class="row">
-            <div class="col-md-4 feature-item">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Easy to Use</h5>
-                        <p class="card-text">A user-friendly interface designed for both restaurant owners and customers.</p>
-                    </div>
+<div class="features-section container">
+    <div class="row text-center">
+        <div class="col-md-4 feature-item">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Easy to Use</h5>
+                    <p class="card-text">A user-friendly interface designed for both restaurant owners and customers.</p>
                 </div>
             </div>
-            <div class="col-md-4 feature-item">
-                <div class="card bg-info text-white">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Customizable Menus</h5>
-                        <p class="card-text">Easily create and manage your restaurant's menu to suit your needs.</p>
-                    </div>
+        </div>
+        <div class="col-md-4 feature-item">
+            <div class="card border-0 shadow-sm mb-4 bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Customizable Menus</h5>
+                    <p class="card-text">Easily create and manage your restaurant's menu to suit your needs.</p>
                 </div>
             </div>
-            <div class="col-md-4 feature-item">
-                <div class="card bg-success text-white">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Quick Ordering</h5>
-                        <p class="card-text">Customers can place orders quickly and efficiently through QR codes.</p>
-                    </div>
+        </div>
+        <div class="col-md-4 feature-item">
+            <div class="card border-0 shadow-sm mb-4 bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Ordering</h5>
+                    <p class="card-text">Customers can place orders quickly and efficiently through QR codes.</p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Call to Action Section -->
-    <div class="cta-section">
-        <div class="container">
-            <h2>Ready to revolutionize your restaurant business?</h2>
-            <p>Join Restro today and streamline your ordering process.</p>
-            <a class="btn btn-lg btn-light" aria-current="page" href="#">Register Your Business</a>
-        </div>
+<!-- Call to Action Section -->
+<div class="cta-section text-center py-5">
+    <div class="container">
+        <h2>Ready to revolutionize your restaurant business?</h2>
+        <p>Join Restro today and streamline your ordering process.</p>
+        <a class="btn btn-lg btn-light" href="#">Register Your Business</a>
     </div>
+</div>
 
-    <!-- Testimonials Section -->
-    <div class="testimonials-section container">
-        <div class="row">
-            <div class="col-md-4 testimonial-item">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <p class="card-text">"Restro has completely transformed how we handle orders. It's fast and reliable!"</p>
-                        <h5 class="card-title">- John Doe, Restaurant Owner</h5>
-                    </div>
+<!-- Testimonials Section -->
+<div class="testimonials-section container">
+    <div class="row text-center">
+        <div class="col-md-4 testimonial-item">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <p class="card-text">"Restro has completely transformed how we handle orders. It's fast and reliable!"</p>
+                    <h5 class="card-title text-primary">- John Doe, Restaurant Owner</h5>
                 </div>
             </div>
-            <div class="col-md-4 testimonial-item">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <p class="card-text">"I love how easy it is to place orders with Restro. Highly recommended!"</p>
-                        <h5 class="card-title">- Jane Smith, Customer</h5>
-                    </div>
+        </div>
+        <div class="col-md-4 testimonial-item">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <p class="card-text">"I love how easy it is to place orders with Restro. Highly recommended!"</p>
+                    <h5 class="card-title text-primary">- Jane Smith, Customer</h5>
                 </div>
             </div>
-            <div class="col-md-4 testimonial-item">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <p class="card-text">"The QR code system is a game-changer for our busy restaurant."</p>
-                        <h5 class="card-title">- Mike Johnson, Restaurant Owner</h5>
-                    </div>
+        </div>
+        <div class="col-md-4 testimonial-item">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <p class="card-text">"The QR code system is a game-changer for our busy restaurant."</p>
+                    <h5 class="card-title text-primary">- Mike Johnson, Restaurant Owner</h5>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Footer -->
     <div class="footer">

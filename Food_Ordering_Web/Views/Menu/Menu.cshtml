@@ -3,220 +3,207 @@
 }
 <style>
     .cart-fixed-bottom {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: #343a40;
-        color: white;
-        padding: 10px 20px;
-        text-align: center;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    }
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #343a40;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    /* Navbar styles */
-    .custom-navbar {
-        background-color: #ffffff; /* White background for a clean look */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-        border-radius: 10px; /* Rounded corners */
-        padding: 10px 20px; /* Added padding */
-        position: sticky;
-        top: 60px; /* Adjust this value to add space from the top */
-        z-index: 1000; /* Ensure the navbar is above other content */
-        margin-bottom: 20px;
-    }
-
-    .custom-navbar .navbar-nav .nav-link {
-        font-family: 'Roboto', sans-serif;
-        color: #333333; /* Dark gray color for text */
-        font-weight: 500;
-        transition: color 0.3s ease, background-color 0.3s ease;
-        padding: 10px 15px; /* Increased padding for better spacing */
-        border-radius: 5px; /* Slightly rounded corners for links */
-        margin: 5px; /* Margin for spacing between links */
-    }
-
-    .custom-navbar .navbar-nav .nav-link:hover,
-    .custom-navbar .navbar-nav .nav-link:focus {
-        color: #ffffff; /* White text color on hover */
-        background-color: #ff6347; /* Tomato color background on hover */
-    }
-
-    .custom-navbar .navbar-toggler {
-        border: none; /* Remove border from toggler button */
-        background-color: #ff6347; /* Tomato color for toggler button */
-        color: #ffffff; /* White color for toggler icon */
-    }
-
-    .custom-navbar .navbar-toggler-icon {
-        filter: invert(100%); /* White color for toggler icon */
-    }
-
-    /* Additional styling for a modern look */
-    .custom-navbar .navbar-nav .nav-link {
-        position: relative;
-    }
-
-    .custom-navbar .navbar-nav .nav-link::before {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: -5px;
-        left: 50%;
-        background-color: #ff6347; /* Tomato color for underline */
-        visibility: hidden;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .custom-navbar .navbar-nav .nav-link:hover::before,
-    .custom-navbar .navbar-nav .nav-link:focus::before {
-        visibility: visible;
-        width: 100%;
-        left: 0;
-    }
-
-    /* Call Waiter button in the navbar */
-    .call-waiter-nav-button {
-        background-color: #3498DB;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 1em;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        border-radius: 5px; /* Matching the navbar link style */
-        margin-left: 10px; /* Slight margin to separate from nav links */
-    }
-
-    .call-waiter-nav-button:hover {
-        background-color: #2980B9;
-    }
-
-    /* Card styles */
-    .card {
-        margin-bottom: 30px;
-        transition: all 0.3s ease;
-        border: none;
-    }
-
-    .card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .card-img-top {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-    }
-
-    .card-title {
-        font-size: 1.2em;
-        font-weight: bold;
-    }
-
-    .card-text {
-        color: #666;
-    }
-
-    /* Category Heading */
-    #menu-container > div > h2 {
-        border-bottom: 2px solid #3498DB;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-        font-size: 1.5em;
-        font-family: 'Roboto', sans-serif;
-        color: #2C3E50;
-    }
-
-    .outlet-header {
-        margin: 40px 0; /* Adds a bit of space above and below */
-        position: relative;
-        text-align: center;
-        color: white;
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('your-background-image.jpg');
-        background-size: cover;
-        background-position: center;
-        border-radius: 15px;
-        padding: 60px 20px; /* Increased padding for better spacing */
-    }
-
-    #outlet-name {
-        font-family: 'Roboto', sans-serif;
-        font-size: 3em;
-        font-weight: 700;
-        margin-bottom: 15px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Subtle text shadow for better readability */
-    }
-
-    #outlet-logo {
-        border-radius: 50%; /* Makes the logo circular, remove if not desired */
-        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow to the logo for depth */
-        max-width: 150px;
-        margin-top: 20px;
-        display: block;
-    }
-
-    /* Style for the Call Waiter button */
-    .call-waiter-button {
-        background-color: #3498DB;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 1em;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        border-radius: 5px; /* Rounded corners for the button */
-    }
-
-    .call-waiter-button:hover {
-        background-color: #2980B9;
-    }
-
-    /* Ensure the cart button is always on top */
-    #cart-button {
-        z-index: 1000;
-        background-color: #ff6347; /* Tomato color for the cart button */
-        border-radius: 10px; /* Rounded corners for the cart button */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-        padding: 10px 20px; /* Added padding */
-        color: white; /* White text color */
-    }
-
-    /* Style adjustments for better mobile responsiveness */
-  
         .custom-navbar {
-            border-radius: 0;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 10px 20px;
+            position: sticky;
+            top: 60px;
+            z-index: 1000;
+            margin-bottom: 20px;
         }
 
-    .outlet-header {
-       
-        padding: 10px;
-    }
-
-        .outlet-header img {
-            max-width: 100%; /* Ensure the image scales with the div */
-            height: auto;
+        .custom-navbar .navbar-nav .nav-link {
+            font-family: 'Roboto', sans-serif;
+            color: #333333;
+            font-weight: 500;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 5px;
         }
 
-        .outlet-header h1 {
-            font-size: 1.5em; /* Adjust the font size as needed */
+        .custom-navbar .navbar-nav .nav-link:hover,
+        .custom-navbar .navbar-nav .nav-link:focus {
+            color: #ffffff;
+            background-color: #ff6347;
         }
-    
+
+        .custom-navbar .navbar-toggler {
+            border: none;
+            background-color: #ff6347;
+            color: #ffffff;
+        }
+
+        .custom-navbar .navbar-toggler-icon {
+            filter: invert(100%);
+        }
+
+        .custom-navbar .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background-color: #ff6347;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .custom-navbar .navbar-nav .nav-link:hover::before,
+        .custom-navbar .navbar-nav .nav-link:focus::before {
+            visibility: visible;
+            width: 100%;
+            left: 0;
+        }
+
+        .call-waiter-nav-button {
+            background-color: #3498DB;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+
+        .call-waiter-nav-button:hover {
+            background-color: #2980B9;
+        }
+
+        .card {
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .card-text {
+            color: #666;
+        }
+
+        #menu-container > div > h2 {
+            border-bottom: 2px solid #3498DB;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-family: 'Roboto', sans-serif;
+            color: #2C3E50;
+        }
+
+        .outlet-header {
+            margin: 40px 0;
+            position: relative;
+            text-align: center;
+            color: white;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('your-background-image.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            padding: 60px 20px;
+        }
+
+        #outlet-name {
+            font-family: 'Roboto', sans-serif;
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #outlet-logo {
+            border-radius: 50%;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            max-width: 150px;
+            margin-top: 20px;
+            display: block;
+        }
+
+        .call-waiter-button {
+            background-color: #3498DB;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .call-waiter-button:hover {
+            background-color: #2980B9;
+        }
+
+        #cart-button {
+            z-index: 1000;
+            background-color: #ff6347;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            color: white;
+        }
+
+        @@media (max-width: 768px) {
+            .custom-navbar {
+                border-radius: 0;
+            }
+
+            .outlet-header {
+                padding: 10px;
+            }
+
+            .outlet-header img {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .outlet-header h1 {
+                font-size: 1.5em;
+            }
+        }
 </style>
 
 <div class="outlet-header d-flex flex-column justify-content-center align-items-center">
-    <h1 id="outlet-name" class="mb-3">Outlet Name</h1>
-    <img id="outlet-logo" src="your-logo-url.jpg" alt="Outlet Logo">
+    <h1 id="outlet-name" class="mb-3">Example Outlet</h1>
+    <img id="outlet-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA" alt="Outlet Logo">
 </div>
 
 <nav class="navbar navbar-expand-lg custom-navbar">
@@ -287,7 +274,7 @@
 
                     category.items.forEach(menuItem => {
                         const imageBase64 = menuItem.image;
-                        menuHtml += `<div class="col-md-4">
+                        menuHtml += `<div class="col-md-6">
                                          <div class="card" data-item-id="${menuItem.id}" data-category-id="${menuItem.menuCategoryId}" data-outlet-id="${outletId}" data-table-id="${tableId}">
                                              <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
                                              <div class="card-body">

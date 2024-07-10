@@ -274,7 +274,7 @@
 
                     category.items.forEach(menuItem => {
                         const imageBase64 = menuItem.image;
-                        menuHtml += `<div class="col-md-6">
+                        menuHtml += `<div class="col-md-5">
                                          <div class="card" data-item-id="${menuItem.id}" data-category-id="${menuItem.menuCategoryId}" data-outlet-id="${outletId}" data-table-id="${tableId}">
                                              <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
                                              <div class="card-body">

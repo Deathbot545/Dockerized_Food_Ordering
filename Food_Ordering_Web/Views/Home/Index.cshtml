@@ -10,28 +10,34 @@
         }
 
     .hero-section {
-        background: url('https://media.istockphoto.com/id/643847438/photo/restaurant-chilling-out-classy-lifestyle-reserved-concept.jpg?s=2048x2048&w=is&k=20&c=MJiiXSZzcLoL7O3u_7sqnLcuS9m5PPuOWoj9OICD3b4=') no-repeat center center;
-        background-size: cover;
-        color: white;
-        padding: 100px 0;
-        text-align: center;
-        box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.5);
+        background-color: #ffe6e6; /* Light pink background */
+        padding: 60px 0;
     }
 
-            .hero-section h1 {
-                font-size: 3em;
-                font-weight: 700;
-            }
+        .hero-section h1 {
+            font-size: 48px;
+            color: #e74c3c; /* Red color */
+        }
 
-            .hero-section p {
-                font-size: 1.25em;
-                font-weight: 500;
-            }
+        .hero-section h2 {
+            font-size: 36px;
+            color: #e74c3c; /* Red color */
+        }
 
-            .hero-section .btn {
-                font-size: 1.25em;
-                padding: 15px 30px;
-                border-radius: 30px;
+        .hero-section p {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .hero-section .btn-primary {
+            background-color: #e74c3c; /* Red color */
+            border-color: #e74c3c; /* Red color */
+        }
+
+            .hero-section .btn-primary:hover {
+                background-color: #d62c1a; /* Darker red */
+                border-color: #d62c1a; /* Darker red */
             }
 
         .features-section, .cta-section, .testimonials-section {
@@ -127,15 +133,25 @@
 </div>
 
 <!-- Hero Section -->
+<!-- Hero Section -->
 <div class="hero-section">
-    <div class="container">
-        <h1>Welcome to Restro</h1>
-        <p>Your ultimate online restaurant ordering solution</p>
-        <button id="orderButton" class="btn btn-lg btn-primary" type="button">
-            Scan QR Code <i class="fas fa-qrcode ml-2"></i>
-        </button>
+    <div class="container text-center">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1>Delicious</h1>
+                <h2>Quench the Hunger</h2>
+                <p>Your ultimate online restaurant ordering solution. Enjoy hassle-free orders at your favorite restaurants, cafes, and fast-food places by simply scanning a QR code.</p>
+                <button id="orderButton" class="btn btn-lg btn-primary" type="button">
+                    Scan QR Code <i class="fas fa-qrcode ml-2"></i>
+                </button>
+            </div>
+            <div class="col-md-6">
+                <img src="your-relevant-image-url.jpg" alt="Ordering Illustration" class="img-fluid">
+            </div>
+        </div>
     </div>
 </div>
+
 
 
     <!-- Features Section -->

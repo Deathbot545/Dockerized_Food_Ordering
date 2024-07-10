@@ -36,6 +36,9 @@
 
     .feature-item .card, .testimonial-item .card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 10px;
+        background-color: #f8f9fa; /* Light grey background for a modern look */
     }
 
         .feature-item .card:hover, .testimonial-item .card:hover {
@@ -55,6 +58,7 @@
     .testimonials-section .card {
         border: none;
         border-radius: 10px;
+        background-color: #f8f9fa;
     }
 
     .testimonials-section .card-body {
@@ -80,33 +84,34 @@
     }
 </style>
 
-    <!-- QR Code Scanner Modal -->
-    <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="qrScannerModalLabel">QR Code Scanner</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="https://images.pexels.com/photos/11745510/pexels-photo-11745510.jpeg" alt="QR Code Scanning" class="img-fluid mb-3">
-                    <div id="qr-reader" style="width:100%"></div>
-                </div>
+<!-- QR Code Scanner Modal -->
+<div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrScannerModalLabel">QR Code Scanner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="https://images.pexels.com/photos/11745510/pexels-photo-11745510.jpeg" alt="QR Code Scanning" class="img-fluid mb-3">
+                <div id="qr-reader" style="width:100%"></div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="container">
-            <h1>Welcome to Restro</h1>
-            <p>Your ultimate online restaurant ordering solution</p>
-            <button id="orderButton" class="btn btn-lg btn-primary" type="button">
-                Scan QR Code <i class="fas fa-qrcode ml-2"></i>
-            </button>
-        </div>
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <h1>Welcome to Restro</h1>
+        <p>Your ultimate online restaurant ordering solution</p>
+        <button id="orderButton" class="btn btn-lg btn-primary" type="button">
+            Scan QR Code <i class="fas fa-qrcode ml-2"></i>
+        </button>
     </div>
+</div>
 
+<!-- Features Section -->
 <div class="features-section container">
     <div class="row text-center">
         <div class="col-md-4 feature-item">
@@ -118,7 +123,7 @@
             </div>
         </div>
         <div class="col-md-4 feature-item">
-            <div class="card border-0 shadow-sm mb-4 bg-info text-white">
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Customizable Menus</h5>
                     <p class="card-text">Easily create and manage your restaurant's menu to suit your needs.</p>
@@ -126,7 +131,7 @@
             </div>
         </div>
         <div class="col-md-4 feature-item">
-            <div class="card border-0 shadow-sm mb-4 bg-success text-white">
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Quick Ordering</h5>
                     <p class="card-text">Customers can place orders quickly and efficiently through QR codes.</p>
@@ -175,55 +180,52 @@
     </div>
 </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <p>&copy; 2024 Restro. All rights reserved.</p>
-    </div>
+<!-- Footer -->
+<div class="footer">
+    <p>&copy; 2024 Restro. All rights reserved.</p>
+</div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-   
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    document.getElementById('orderButton').addEventListener('click', function () {
+        // Show the modal
+        var myModal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
+        myModal.show();
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script>
-        document.getElementById('orderButton').addEventListener('click', function () {
-            // Show the modal
-            var myModal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
-            myModal.show();
+        var config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
+        var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
 
-            var config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
-            var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
+        // Attempt to modify the button styles after a delay to ensure they've been rendered
+        setTimeout(() => {
+            // Select the buttons created by the library
+            let buttons = document.querySelectorAll('#qr-reader button');
+            buttons.forEach(button => {
+                // Add Bootstrap button classes
+                button.classList.remove('button-class'); // Remove the library's default class if necessary
+                button.classList.add('btn', 'btn-primary'); // Add Bootstrap classes
 
-            // Attempt to modify the button styles after a delay to ensure they've been rendered
-            setTimeout(() => {
-                // Select the buttons created by the library
-                let buttons = document.querySelectorAll('#qr-reader button');
-                buttons.forEach(button => {
-                    // Add Bootstrap button classes
-                    button.classList.remove('button-class'); // Remove the library's default class if necessary
-                    button.classList.add('btn', 'btn-primary'); // Add Bootstrap classes
+                // Specific class additions based on button functionality, if possible
+                if (button.textContent.includes('Start')) {
+                    button.classList.add('btn-success'); // Example for a "Start" button
+                } else if (button.textContent.includes('Stop')) {
+                    button.classList.add('btn-danger'); // Example for a "Stop" button
+                }
+            });
+        }, 1000); // Adjust the delay as needed to ensure the buttons are rendered
+    });
 
-                    // Specific class additions based on button functionality, if possible
-                    if (button.textContent.includes('Start')) {
-                        button.classList.add('btn-success'); // Example for a "Start" button
-                    } else if (button.textContent.includes('Stop')) {
-                        button.classList.add('btn-danger'); // Example for a "Stop" button
-                    }
-                });
-            }, 1000); // Adjust the delay as needed to ensure the buttons are rendered
-        });
+    function onScanSuccess(decodedText, decodedResult) {
+        // Handle the decoded text
+        console.log(`Code matched = ${decodedText}`, decodedResult);
+    }
 
-        function onScanSuccess(decodedText, decodedResult) {
-            // Handle the decoded text
-            console.log(`Code matched = ${decodedText}`, decodedResult);
-        }
-
-        function onScanError(errorMessage) {
-            // Handle scan error
-            console.log(`Scan error: ${errorMessage}`);
-        }
-    </script>
-
+    function onScanError(errorMessage) {
+        // Handle scan error
+        console.log(`Scan error: ${errorMessage}`);
+    }
+</script>

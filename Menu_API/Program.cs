@@ -41,26 +41,13 @@ builder.Services.AddDbContext<MenuDbContext>(options =>
 // ---------------------------
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = GetAllowedOrigins(builder.Configuration);
     options.AddPolicy("AllowMyOrigins", policy =>
     {
-        if (env.IsDevelopment())
-        {
-            policy.WithOrigins(
-                    "http://localhost:5002", // Food_Ordering_Web
-                    "http://localhost:5003", // Kitchen_Web (if you set it)
-                    "http://localhost:5173"  // optional dev server
-                )
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
-        }
-        else
-        {
-            policy.WithOrigins("https://restosolutionssaas.com")
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
-        }
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -70,16 +57,7 @@ var app = builder.Build();
 // Logging
 // ---------------------------
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-var cs = builder.Configuration.GetConnectionString("MenuDbConnection");
-
-if (env.IsDevelopment())
-{
-    logger.LogInformation("Using MenuDbConnection: {ConnectionString}", cs);
-}
-else
-{
-    logger.LogInformation("MenuDbConnection configured.");
-}
+logger.LogInformation("MenuDbConnection configured.");
 
 // ---------------------------
 // DB migrations
@@ -115,3 +93,20 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static string[] GetAllowedOrigins(IConfiguration configuration)
+{
+    var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+    if (origins is { Length: > 0 })
+    {
+        return origins;
+    }
+
+    var rawOrigins = configuration["Cors:AllowedOrigins"];
+    if (!string.IsNullOrWhiteSpace(rawOrigins))
+    {
+        return rawOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    throw new InvalidOperationException("Cors:AllowedOrigins is missing. Configure it in appsettings or env vars.");
+}

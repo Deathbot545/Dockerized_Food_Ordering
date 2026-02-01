@@ -1,21 +1,26 @@
 {
   "ConnectionStrings": {
-    "OutletDbConnection": "Host=restaurantapi.cz0qqo02m0na.eu-west-1.rds.amazonaws.com;Port=5432;Database=OutletDb;User Id=postgres;Password=NxPostgrsql;"
+    "OutletDbConnection": "Host=your-db-host;Port=5432;Database=OutletDb;Username=postgres;Password=change-me;"
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "https://your-domain.example"
+    ]
   },
   "StripeSettings": {
-    "ApiKey": "sk_test_51NjhBQFU6tKdw4REQ4sdK5t4EUN3aNkvW7Z3v9e41eXjEgfHwcnFztdPvwrRIFeGgwuMpzvkrcn8CSghhoCbJS9S006L3W13JP",
-    "WebhookSecret": "pk_test_51NjhBQFU6tKdw4RE8kO4funmhbcbtQur1zsSD3YNbNBBAYQRZqR1omJtSp4KesSL3eHKPr03uZnuCoWUK233DYvD00wd9n7wfQ"
+    "ApiKey": "change-me",
+    "WebhookSecret": "change-me"
   },
   "EmailSettings": {
     "Host": "smtp.gmail.com",
     "Port": 587,
-    "Email": "sitewebsite73@gmail.com",
-    "Password": "otrzdbifusqsiuoc"
+    "Email": "change-me@example.com",
+    "Password": "change-me"
   },
   "Authentication": {
     "Google": {
-      "ClientId": "247244252156-cqtuh8m6k4s6mcumhkri2grnkf5g5a8d.apps.googleusercontent.com",
-      "ClientSecret": "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"
+      "ClientId": "change-me",
+      "ClientSecret": "change-me"
     }
   },
   "Logging": {

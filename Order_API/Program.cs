@@ -41,26 +41,13 @@ builder.Services.AddSingleton<MongoDBContext>();
 // CORS
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = GetAllowedOrigins(builder.Configuration);
     options.AddPolicy("AllowMyOrigins", policy =>
     {
-        if (env.IsDevelopment())
-        {
-            policy.WithOrigins(
-                    "http://localhost:5002",
-                    "http://localhost:5003",
-                    "http://localhost:5173"
-                )
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        }
-        else
-        {
-            policy.WithOrigins("https://restosolutionssaas.com")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        }
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -70,12 +57,7 @@ var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 var mongoOptions = app.Services.GetRequiredService<IOptions<MongoDBSettings>>().Value;
 
-if (env.IsDevelopment())
-    logger.LogInformation("MongoDBSettings ConnectionString: {ConnectionString}", mongoOptions.ConnectionString);
-else
-    logger.LogInformation("MongoDBSettings configured.");
-
-logger.LogInformation("MongoDBSettings DatabaseName: {DatabaseName}", mongoOptions.DatabaseName);
+logger.LogInformation("MongoDBSettings configured. DatabaseName: {DatabaseName}", mongoOptions.DatabaseName);
 
 // Pipeline
 app.UseSwagger();
@@ -95,3 +77,20 @@ app.MapControllers();
 app.MapHub<OrderStatusHub>("/api/OrderApi/orderStatusHub");
 
 app.Run();
+
+static string[] GetAllowedOrigins(IConfiguration configuration)
+{
+    var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+    if (origins is { Length: > 0 })
+    {
+        return origins;
+    }
+
+    var rawOrigins = configuration["Cors:AllowedOrigins"];
+    if (!string.IsNullOrWhiteSpace(rawOrigins))
+    {
+        return rawOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    throw new InvalidOperationException("Cors:AllowedOrigins is missing. Configure it in appsettings or env vars.");
+}

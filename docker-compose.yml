@@ -3,8 +3,8 @@ services:
     image: postgres:16
     container_name: food-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "5432:5432"
     volumes:
@@ -37,11 +37,11 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:80
-      ConnectionStrings__ApplicationDbConnection: Host=postgres;Port=5432;Database=ApplicationDb;Username=postgres;Password=postgres
-      ApplicationDbConnection: Host=postgres;Port=5432;Database=ApplicationDb;Username=postgres;Password=postgres
-      Jwt__Key: dev-super-secret-key
-      Jwt__Issuer: dev
-      Jwt__Audience: dev
+      ConnectionStrings__ApplicationDbConnection: ${APPLICATION_DB_CONNECTION:-Host=postgres;Port=5432;Database=ApplicationDb;Username=postgres;Password=postgres}
+      Jwt__Key: ${JWT_KEY:-dev-super-secret-key}
+      Jwt__Issuer: ${JWT_ISSUER:-dev}
+      Jwt__Audience: ${JWT_AUDIENCE:-dev}
+      Cors__AllowedOrigins: ${ALLOWED_ORIGINS:-http://localhost:8088,http://localhost:8089}
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,8 +56,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:80
-      ConnectionStrings__OutletDbConnection: Host=postgres;Port=5432;Database=OutletDb;Username=postgres;Password=postgres
-      OutletDbConnection: Host=postgres;Port=5432;Database=OutletDb;Username=postgres;Password=postgres
+      ConnectionStrings__OutletDbConnection: ${OUTLET_DB_CONNECTION:-Host=postgres;Port=5432;Database=OutletDb;Username=postgres;Password=postgres}
+      Cors__AllowedOrigins: ${ALLOWED_ORIGINS:-http://localhost:8088,http://localhost:8089}
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,8 +72,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:80
-      ConnectionStrings__MenuDbConnection: Host=postgres;Port=5432;Database=MenuDb;Username=postgres;Password=postgres
-      MenuDbConnection: Host=postgres;Port=5432;Database=MenuDb;Username=postgres;Password=postgres
+      ConnectionStrings__MenuDbConnection: ${MENU_DB_CONNECTION:-Host=postgres;Port=5432;Database=MenuDb;Username=postgres;Password=postgres}
+      Cors__AllowedOrigins: ${ALLOWED_ORIGINS:-http://localhost:8088,http://localhost:8089}
     depends_on:
       postgres:
         condition: service_healthy
@@ -88,8 +88,9 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:80
-      MongoDBSettings__ConnectionString: mongodb://mongo:27017
-      MongoDBSettings__DatabaseName: FoodOrdering
+      MongoDBSettings__ConnectionString: ${MONGO_CONNECTION_STRING:-mongodb://mongo:27017}
+      MongoDBSettings__DatabaseName: ${MONGO_DATABASE:-FoodOrdering}
+      Cors__AllowedOrigins: ${ALLOWED_ORIGINS:-http://localhost:8088,http://localhost:8089}
     depends_on:
       mongo:
         condition: service_healthy
@@ -104,8 +105,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:80
-      ApiBaseUrl: http://food-ordering-api/
-      RestaurantApiBaseUrl: http://restaurant-api/
+      ApiBaseUrl: ${FOOD_ORDERING_API_BASE_URL:-http://food-ordering-api/}
+      RestaurantApiBaseUrl: ${RESTAURANT_API_BASE_URL:-http://restaurant-api/}
     depends_on:
       - food-ordering-api
       - restaurant-api
@@ -122,10 +123,11 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:80
-      ApiBaseUrl: http://food-ordering-api/
-      Jwt__Key: dev-super-secret-key
-      Jwt__Issuer: dev
-      Jwt__Audience: dev
+      ApiBaseUrl: ${FOOD_ORDERING_API_BASE_URL:-http://food-ordering-api/}
+      Jwt__Key: ${JWT_KEY:-dev-super-secret-key}
+      Jwt__Issuer: ${JWT_ISSUER:-dev}
+      Jwt__Audience: ${JWT_AUDIENCE:-dev}
+      Cors__AllowedOrigins: ${ALLOWED_ORIGINS:-http://localhost:8088,http://localhost:8089}
     depends_on:
       - food-ordering-api
     ports:

@@ -15,18 +15,23 @@
     }
   },
   "ConnectionStrings": {
-    "ApplicationDbConnection": "Host=restroapi.cz0qqo02m0na.eu-west-1.rds.amazonaws.com;Port=5432;Database=ApplicationDb;User ID=postgres;Password=NxPostgrsql;"
+    "ApplicationDbConnection": "Host=your-db-host;Port=5432;Database=ApplicationDb;Username=postgres;Password=change-me;"
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "https://your-domain.example"
+    ]
   },
   "Authentication": {
     "Google": {
-      "ClientId": "247244252156-cqtuh8m6k4s6mcumhkri2grnkf5g5a8d.apps.googleusercontent.com",
-      "ClientSecret": "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"
+      "ClientId": "change-me",
+      "ClientSecret": "change-me"
     }
   },
   "Jwt": {
-    "Key": "YourSecretKeyHere",
-    "Issuer": "YourIssuer",
-    "Audience": "YourAudience"
+    "Key": "change-me",
+    "Issuer": "change-me",
+    "Audience": "change-me"
   },
   "AllowedHosts": "*"
 }

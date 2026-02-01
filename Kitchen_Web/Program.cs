@@ -5,46 +5,72 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
 
-// Lo
-builder.Configuration.AddJsonFile("Kitchen_Web_appsettings.json", optional: true, reloadOnChange: true);
+// Load base + environment config (your custom naming scheme)
+builder.Configuration
+    .AddJsonFile("Kitchen_Web_appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"Kitchen_Web_appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-// Setup 
-builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+// Ports
+builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(80); 
+    if (env.IsDevelopment())
+        serverOptions.ListenLocalhost(5003);
+    else
+        serverOptions.ListenAnyIP(80);
 });
 
-// Setup Data Prote
-var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
-    .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
+// Data Protection
+if (env.IsDevelopment())
+{
+    builder.Services.AddDataProtection()
+        .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
+}
+else
+{
+    var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
+        .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
+}
 
-// Setup HTTP client servic
+// HTTP Client
 builder.Services.AddHttpClient("namedClient", c =>
 {
-    c.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
-    c.Timeout = TimeSpan.FromSeconds(200); // Set the desired timeout 
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+    if (string.IsNullOrWhiteSpace(apiBaseUrl))
+        throw new InvalidOperationException("ApiBaseUrl missing in Kitchen_Web config.");
+
+    c.BaseAddress = new Uri(apiBaseUrl);
+    c.Timeout = TimeSpan.FromSeconds(200);
 })
-.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+.ConfigurePrimaryHttpMessageHandler(() =>
 {
-    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    if (env.IsDevelopment())
+    {
+        return new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+    }
+
+    return new HttpClientHandler();
 });
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 
-// Configure Cookie Policy
+// Cookie Policy
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.MinimumSameSitePolicy = SameSiteMode.Lax;
     options.HttpOnly = HttpOnlyPolicy.Always;
-    options.Secure = CookieSecurePolicy.SameAsRequest; // Important for HTTP
+    options.Secure = env.IsDevelopment() ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
 });
 
-// Configure Authentication
+// Auth (JWT)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -52,6 +78,10 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var jwtKey = builder.Configuration["Jwt:Key"];
+    if (string.IsNullOrWhiteSpace(jwtKey))
+        throw new InvalidOperationException("Jwt:Key missing in Kitchen_Web config.");
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -60,25 +90,38 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
-// Configure CORS
+// CORS (env-aware)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowMyOrigins", builder =>
+    options.AddPolicy("AllowMyOrigins", policy =>
     {
-        builder.WithOrigins("https://restosolutionssaas.com")
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials();
+        if (env.IsDevelopment())
+        {
+            policy.WithOrigins(
+                    "http://localhost:5002",
+                    "http://localhost:5003",
+                    "http://localhost:5173"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+        else
+        {
+            policy.WithOrigins("https://restosolutionssaas.com")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
     });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();
@@ -89,12 +132,16 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles(); // Make sure static files are served after redirect and before routing
+if (!env.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseStaticFiles();
 
 if (!string.IsNullOrEmpty(builder.Configuration["PathBase"]))
 {
-    app.UsePathBase(builder.Configuration["PathBase"]);  // Set PathBase if specified
+    app.UsePathBase(builder.Configuration["PathBase"]);
 }
 
 app.UseRouting();
@@ -102,12 +149,10 @@ app.UseCors("AllowMyOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-    endpoints.MapControllers();  // Ensure attribute routes are also mapped
-});
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllers();
 
 app.Run();

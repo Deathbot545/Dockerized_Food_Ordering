@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CnZdWj4qEwp0rx9sl91HfmwXejAXR4HUUMsrd7XP3awu6/x9LG+tvXhjg2TRMAvCuf3w/FPkjSowmmYR0h+v/Q==",
+  "dgSpecHash": "L5FNAlXO+II=",
   "success": true,
-  "projectFilePath": "D:\\Dockerize\\dockerize\\Kitchen_Web\\Kitchen_Web.csproj",
+  "projectFilePath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\Kitchen_Web.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\awssdk.core\\3.7.100.14\\awssdk.core.3.7.100.14.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\awssdk.securitytoken\\3.7.100.14\\awssdk.securitytoken.3.7.100.14.nupkg.sha512",

@@ -1,4 +1,12 @@
 {
+  "ConnectionStrings": {
+    "ApplicationDbConnection": "Host=localhost;Port=5432;Database=ApplicationDb;User ID=postgres;Password=postgres;"
+  },
+  "Jwt": {
+    "Key": "dev-super-secret-key-change-me",
+    "Issuer": "dev",
+    "Audience": "dev"
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Information",

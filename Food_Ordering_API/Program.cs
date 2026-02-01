@@ -2,35 +2,35 @@ using Food_Ordering_API.Data;
 using Food_Ordering_API.Models;
 using Food_Ordering_API.Services.AccountService;
 using Food_Ordering_API.Services.User;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
 
-builder.Configuration.AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true);
+// Load base + environment config (your custom naming scheme)
+builder.Configuration
+    .AddJsonFile("Food_Ordering_API_appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"Food_Ordering_API_appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+// Hosting / Ports
+builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(80);
-
+    if (env.IsDevelopment())
+        serverOptions.ListenLocalhost(5000);
+    else
+        serverOptions.ListenAnyIP(80);
 });
-ConfigureIdentity(builder);
-ConfigureSwagger(builder);
-ConfigureControllers(builder);
 
-// Add this line to add in-me
+// Services
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+
 builder.Services.AddDistributedMemoryCache();
-
-// Register AccountService
-builder.Services.AddScoped<AccountService, AccountService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -38,7 +38,21 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Add JWT Authentication
+builder.Services.AddScoped<AccountService, AccountService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<ApplicationUserDbContext>()
+.AddDefaultTokenProviders();
+
+// JWT Auth
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -46,6 +60,10 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var jwtKey = builder.Configuration["Jwt:Key"];
+    if (string.IsNullOrWhiteSpace(jwtKey))
+        throw new InvalidOperationException("Jwt:Key is missing. Set it in configuration (custom appsettings files or env vars).");
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -54,45 +72,54 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
+// CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowMyOrigins", builder =>
+    options.AddPolicy("AllowMyOrigins", policy =>
     {
-        builder.WithOrigins(
-                 "https://restosolutionssaas.com:8443", // The first web application origin
-                 "https://restosolutionssaas.com" // The seco web application origin
-               )
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
+        if (env.IsDevelopment())
+        {
+            policy.WithOrigins(
+                    "http://localhost:5002",
+                    "http://localhost:5003",
+                    "http://localhost:5173"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+        else
+        {
+            policy.WithOrigins(
+                    "https://restosolutionssaas.com:8443",
+                    "https://restosolutionssaas.com"
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
     });
 });
 
-builder.Services.AddDbContext<ApplicationUserDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDbConnection")));
-
 var app = builder.Build();
 
-// Log the connection string to verify it's correctly loaded
+// Logging + migrations
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbConnection");
-logger.LogInformation($"Using connection string: {connectionString}");
+var cs = builder.Configuration.GetConnectionString("ApplicationDbConnection");
+logger.LogInformation("ApplicationDbConnection configured.");
 
-// Ensure Database is Created and Migrations
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    var dbContext = services.GetRequiredService<ApplicationUserDbContext>();
-
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationUserDbContext>();
     try
     {
-        logger.LogInformation("Applying migrations to ensure the database and tables are created...");
-        dbContext.Database.Migrate(); // This will ensure DB exists and all migrations are applied.
-        logger.LogInformation("Database check and migration applied successfully.");
+        logger.LogInformation("Applying migrations...");
+        dbContext.Database.Migrate();
+        logger.LogInformation("Migrations applied successfully.");
     }
     catch (Exception ex)
     {
@@ -100,59 +127,24 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Pipeline
+if (env.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-   
 }
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-//app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseCors("AllowMyOrigins");
 
-app.UseAuthentication(); // Important: place after UseRouting and before UseAuthorization
+app.UseSession();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
 
 app.Run();
-
-void ConfigureIdentity(WebApplicationBuilder builder)
-{
-    builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-    {
-        // Configure identity options as needed
-        options.Password.RequireDigit = true;
-        options.Password.RequiredLength = 6;
-        // etc.
-    })
-    .AddEntityFrameworkStores<ApplicationUserDbContext>()
-    .AddDefaultTokenProviders();
-
-    // Continue to configure external authentication providers as before
-    builder.Services.AddAuthentication().AddGoogle(options =>
-    {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-    });
-}
-//hoho
-
-void ConfigureSwagger(WebApplicationBuilder builder)
-{
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
-}
-
-void ConfigureControllers(WebApplicationBuilder builder)
-{
-    builder.Services.AddControllers();
-}

@@ -1,19 +1,27 @@
 # Use the official ASP.NET Core runtime as a base image
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-jammy AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-# Download and install the CA certificate
-RUN apt-get update && apt-get install -y wget ca-certificates
-RUN wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -O /usr/local/share/ca-certificates/global-bundle.pem
-RUN update-ca-certificates
-
 # Use the official .NET SDK to build the application
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy AS build
 WORKDIR /src
+
+# --- NuGet TLS hardening (fix SSL_ERROR_SSL / bad record mac) ---
+ENV DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2SUPPORT=false \
+    NUGET_HTTP_PROTOCOL_VERSION=1.1 \
+    NUGET_CERT_REVOCATION_MODE=offline \
+    NUGET_XMLDOC_MODE=skip
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates \
+ && update-ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ["Order_API/Order_API.csproj", "Order_API/"]
-RUN dotnet restore "Order_API/Order_API.csproj"
+RUN dotnet restore "Order_API/Order_API.csproj" --disable-parallel
+
 COPY . .
 WORKDIR "/src/Order_API"
 RUN dotnet build "Order_API.csproj" -c Release -o /app/build

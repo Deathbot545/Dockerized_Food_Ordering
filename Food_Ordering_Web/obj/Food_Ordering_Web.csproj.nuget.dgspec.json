@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {}
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {}
   },
   "projects": {
-    "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj": {
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj",
+        "projectUniqueName": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj",
         "projectName": "Food_Ordering_API",
-        "projectPath": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj",
+        "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\obj\\",
+        "outputPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,6 +39,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -130,18 +136,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
+        "projectUniqueName": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
         "projectName": "Food_Ordering_Web",
-        "projectPath": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
+        "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\Food_Ordering_Web.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Dockerize\\dockerize\\Food_Ordering_Web\\obj\\",
+        "outputPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -156,20 +162,21 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj": {
-                "projectPath": "D:\\Dockerize\\dockerize\\Food_Ordering_API\\Food_Ordering_API.csproj"
+              "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj": {
+                "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_API\\Food_Ordering_API.csproj"
               },
-              "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj": {
-                "projectPath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj"
+              "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj": {
+                "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj"
               },
-              "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj": {
-                "projectPath": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj"
+              "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Restaurant_API\\Restaurant_API.csproj": {
+                "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Restaurant_API\\Restaurant_API.csproj"
               }
             }
           }
@@ -178,6 +185,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -250,18 +262,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj": {
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj",
+        "projectUniqueName": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj",
         "projectName": "Menu_API",
-        "projectPath": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj",
+        "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Dockerize\\dockerize\\Menu_API\\obj\\",
+        "outputPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -276,6 +288,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -288,6 +301,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -360,18 +378,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj": {
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
+        "projectUniqueName": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj",
         "projectName": "Order_API",
-        "projectPath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
+        "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Dockerize\\dockerize\\Order_API\\obj\\",
+        "outputPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -386,14 +404,15 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj": {
-                "projectPath": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj"
+              "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj": {
+                "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj"
               }
             }
           }
@@ -402,6 +421,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -482,18 +506,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj": {
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Restaurant_API\\Restaurant_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj",
+        "projectUniqueName": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Restaurant_API\\Restaurant_API.csproj",
         "projectName": "Restaurant_API",
-        "projectPath": "D:\\Dockerize\\dockerize\\Restaurant_API\\Restaurant_API.csproj",
+        "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Restaurant_API\\Restaurant_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Dockerize\\dockerize\\Restaurant_API\\obj\\",
+        "outputPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Restaurant_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -508,14 +532,15 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj": {
-                "projectPath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj"
+              "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj": {
+                "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj"
               }
             }
           }
@@ -524,6 +549,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -604,7 +634,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
         }
       }
     }

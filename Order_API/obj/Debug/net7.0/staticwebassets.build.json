@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "Hash": "R+VjREfYxohoizz+IeOyY3fDjzrXqK37XmiTVer48YQ=",
+  "Hash": "nkg+3p3Kh3DLwXjGMgiRphRyul0jzL3qya22np3E69A=",
   "Source": "Order_API",
   "BasePath": "_content/Order_API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [
     {
-      "Identity": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj",
+      "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj",
       "Version": 2,
       "Source": "Menu_API",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",

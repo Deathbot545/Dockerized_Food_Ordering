@@ -1,79 +1,97 @@
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Order_API.Data;
 using Order_API.Hubs;
 using Order_API.Service.Orderser;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
 
-builder.Configuration.AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true);
+// Load base + environment config (your custom naming scheme)
+builder.Configuration
+    .AddJsonFile("Order_API_appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"Order_API_appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-var configuration = builder.Configuration;
-
-var mongoSettings = configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
 
-builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+// Hosting / Ports
+builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(80);
+    if (env.IsDevelopment())
+        serverOptions.ListenLocalhost(5004);
+    else
+        serverOptions.ListenAnyIP(80);
 });
+
+// Services
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IOrderService, OrderService>();
-
 builder.Services.AddSignalR();
-
 builder.Services.AddControllers();
 
-ConfigureSwagger(builder);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowMyOrigins", builder =>
-    {
-        builder.WithOrigins("https://restosolutionssaas.com")
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials();
-    });
-});
-
+// Mongo config + context
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection(nameof(MongoDBSettings)));
 
 builder.Services.AddSingleton<MongoDBContext>();
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMyOrigins", policy =>
+    {
+        if (env.IsDevelopment())
+        {
+            policy.WithOrigins(
+                    "http://localhost:5002",
+                    "http://localhost:5003",
+                    "http://localhost:5173"
+                )
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+        else
+        {
+            policy.WithOrigins("https://restosolutionssaas.com")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+    });
+});
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Log Mongo settings safely
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var mongoOptions = app.Services.GetRequiredService<IOptions<MongoDBSettings>>().Value;
 
+if (env.IsDevelopment())
+    logger.LogInformation("MongoDBSettings ConnectionString: {ConnectionString}", mongoOptions.ConnectionString);
+else
+    logger.LogInformation("MongoDBSettings configured.");
+
+logger.LogInformation("MongoDBSettings DatabaseName: {DatabaseName}", mongoOptions.DatabaseName);
+
+// Pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+if (!env.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseRouting();
-
 app.UseCors("AllowMyOrigins");
 
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.MapHub<OrderStatusHub>("/api/OrderApi/orderStatusHub");
 
-var logger = app.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("MongoDBSettings ConnectionString: {ConnectionString}", mongoSettings.ConnectionString);
-logger.LogInformation("MongoDBSettings DatabaseName: {DatabaseName}", mongoSettings.DatabaseName);
-
 app.Run();
-
-void ConfigureSwagger(WebApplicationBuilder builder)
-{
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
-}
-

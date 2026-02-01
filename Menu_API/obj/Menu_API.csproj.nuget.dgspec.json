@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj": {}
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj": {}
   },
   "projects": {
-    "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj": {
+    "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj",
+        "projectUniqueName": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj",
         "projectName": "Menu_API",
-        "projectPath": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj",
+        "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj",
         "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-        "outputPath": "D:\\Dockerize\\dockerize\\Menu_API\\obj\\",
+        "outputPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,6 +39,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -110,7 +116,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
         }
       }
     }

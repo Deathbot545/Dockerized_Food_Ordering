@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "Hash": "L28gBZOSDgZLg8ZiE2TzeuFQuKgoKyNXzB8QyjogQlE=",
+  "Hash": "SOhsTnHAP+Yxd0OErgwgnCTAmVrkU8kSqLukrCrWvlk=",
   "Source": "Restaurant_API",
   "BasePath": "_content/Restaurant_API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [
     {
-      "Identity": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj",
+      "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj",
       "Version": 2,
       "Source": "Menu_API",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
@@ -18,7 +18,7 @@
       "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
     },
     {
-      "Identity": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
+      "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj",
       "Version": 2,
       "Source": "Order_API",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",

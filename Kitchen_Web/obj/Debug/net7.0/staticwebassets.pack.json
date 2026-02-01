@@ -1,63 +1,63 @@
 {
   "Files": [
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\obj\\Debug\\net7.0\\scopedcss\\projectbundle\\Kitchen_Web.bundle.scp.css",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\obj\\Debug\\net7.0\\scopedcss\\projectbundle\\Kitchen_Web.bundle.scp.css",
       "PackagePath": "staticwebassets\\Kitchen_Web.bundle.scp.css"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\css\\site.css",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\favicon.ico",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.js",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.js",
       "PackagePath": "staticwebassets\\js\\bootstrap.bundle.js"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.js.map",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.js.map",
       "PackagePath": "staticwebassets\\js\\bootstrap.bundle.js.map"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.min.js",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.min.js",
       "PackagePath": "staticwebassets\\js\\bootstrap.bundle.min.js"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.min.js.map",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.bundle.min.js.map",
       "PackagePath": "staticwebassets\\js\\bootstrap.bundle.min.js.map"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.js",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.js",
       "PackagePath": "staticwebassets\\js\\bootstrap.esm.js"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.js.map",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.js.map",
       "PackagePath": "staticwebassets\\js\\bootstrap.esm.js.map"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.min.js",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.min.js",
       "PackagePath": "staticwebassets\\js\\bootstrap.esm.min.js"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.min.js.map",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.esm.min.js.map",
       "PackagePath": "staticwebassets\\js\\bootstrap.esm.min.js.map"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.js",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.js",
       "PackagePath": "staticwebassets\\js\\bootstrap.js"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.js.map",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.js.map",
       "PackagePath": "staticwebassets\\js\\bootstrap.js.map"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.min.js",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.min.js",
       "PackagePath": "staticwebassets\\js\\bootstrap.min.js"
     },
     {
-      "Id": "D:\\Dockerize\\dockerize\\Kitchen_Web\\wwwroot\\js\\bootstrap.min.js.map",
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Kitchen_Web\\wwwroot\\js\\bootstrap.min.js.map",
       "PackagePath": "staticwebassets\\js\\bootstrap.min.js.map"
     },
     {

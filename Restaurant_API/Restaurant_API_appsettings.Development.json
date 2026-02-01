@@ -1,4 +1,7 @@
 {
+  "ConnectionStrings": {
+    "OutletDbConnection": "Host=localhost;Port=5432;Database=OutletDb;User Id=postgres;Password=postgres;"
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Information",

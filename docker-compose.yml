@@ -1,0 +1,136 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: food-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./Infrastructure/init-postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mongo:
+    image: mongo:7
+    container_name: food-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  food-ordering-api:
+    build:
+      context: .
+      dockerfile: Food_Ordering_API/Dockerfile
+    container_name: food-ordering-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__ApplicationDbConnection: Host=postgres;Port=5432;Database=ApplicationDb;Username=postgres;Password=postgres
+      ApplicationDbConnection: Host=postgres;Port=5432;Database=ApplicationDb;Username=postgres;Password=postgres
+      Jwt__Key: dev-super-secret-key
+      Jwt__Issuer: dev
+      Jwt__Audience: dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5100:80"
+
+  restaurant-api:
+    build:
+      context: .
+      dockerfile: Restaurant_API/Dockerfile
+    container_name: restaurant-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__OutletDbConnection: Host=postgres;Port=5432;Database=OutletDb;Username=postgres;Password=postgres
+      OutletDbConnection: Host=postgres;Port=5432;Database=OutletDb;Username=postgres;Password=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5101:80"
+
+  menu-api:
+    build:
+      context: .
+      dockerfile: Menu_API/Dockerfile
+    container_name: menu-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__MenuDbConnection: Host=postgres;Port=5432;Database=MenuDb;Username=postgres;Password=postgres
+      MenuDbConnection: Host=postgres;Port=5432;Database=MenuDb;Username=postgres;Password=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5105:80"
+
+  order-api:
+    build:
+      context: .
+      dockerfile: Order_API/Dockerfile
+    container_name: order-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      MongoDBSettings__ConnectionString: mongodb://mongo:27017
+      MongoDBSettings__DatabaseName: FoodOrdering
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "5104:80"
+
+  food-ordering-web:
+    build:
+      context: .
+      dockerfile: Food_Ordering_Web/Dockerfile
+    container_name: food-ordering-web
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ApiBaseUrl: http://food-ordering-api/
+      RestaurantApiBaseUrl: http://restaurant-api/
+    depends_on:
+      - food-ordering-api
+      - restaurant-api
+      - menu-api
+      - order-api
+    ports:
+      - "8088:80"
+
+  kitchen-web:
+    build:
+      context: .
+      dockerfile: Kitchen_Web/Dockerfile
+    container_name: kitchen-web
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ApiBaseUrl: http://food-ordering-api/
+      Jwt__Key: dev-super-secret-key
+      Jwt__Issuer: dev
+      Jwt__Audience: dev
+    depends_on:
+      - food-ordering-api
+    ports:
+      - "8089:80"
+
+volumes:
+  pgdata:
+  mongodata:

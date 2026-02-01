@@ -3,54 +3,96 @@ using Menu_API.Services.MenuS;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
 
-builder.Configuration.AddJsonFile("Menu_API_appsettings.json", optional: true, reloadOnChange: true);
+// Load base + environment config (your custom naming scheme)
+builder.Configuration
+    .AddJsonFile("Menu_API_appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"Menu_API_appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+// ---------------------------
+// Hosting / Ports
+// ---------------------------
+// Local non-Docker dev: localhost:5005
+// Docker/AWS: port 80
+builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(80); // List
-
+    if (env.IsDevelopment())
+        serverOptions.ListenLocalhost(5005);
+    else
+        serverOptions.ListenAnyIP(80);
 });
+
+// ---------------------------
+// Services
+// ---------------------------
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IMenuService, MenuService>();
-// Add services to the conta
 builder.Services.AddControllers();
 
-ConfigureSwagger(builder);
-ConfigureControllers(builder);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowMyOrigins", builder =>
-    {
-        builder.WithOrigins(
-                 "https://restosolutionssaas.com" // The second web applic
-               )
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials(); // Allows cookies, authorization headers with HTTPS
-    });
-});
 builder.Services.AddDbContext<MenuDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDbConnection")));
 
+// ---------------------------
+// CORS (env-aware)
+// ---------------------------
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMyOrigins", policy =>
+    {
+        if (env.IsDevelopment())
+        {
+            policy.WithOrigins(
+                    "http://localhost:5002", // Food_Ordering_Web
+                    "http://localhost:5003", // Kitchen_Web (if you set it)
+                    "http://localhost:5173"  // optional dev server
+                )
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+        else
+        {
+            policy.WithOrigins("https://restosolutionssaas.com")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        }
+    });
+});
+
 var app = builder.Build();
 
+// ---------------------------
+// Logging
+// ---------------------------
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-var connectionString = builder.Configuration.GetConnectionString("MenuDbConnection");
-logger.LogInformation($"Using connection string: {connectionString}");
+var cs = builder.Configuration.GetConnectionString("MenuDbConnection");
 
-// Ensure Database is Created and Migratio
+if (env.IsDevelopment())
+{
+    logger.LogInformation("Using MenuDbConnection: {ConnectionString}", cs);
+}
+else
+{
+    logger.LogInformation("MenuDbConnection configured.");
+}
+
+// ---------------------------
+// DB migrations
+// ---------------------------
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    var dbContext = services.GetRequiredService<MenuDbContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<MenuDbContext>();
 
     try
     {
-        logger.LogInformation("Applying migrations to ensure the database and tables are created...");
-        dbContext.Database.Migrate(); // This will ensure DB exists and all migrations are applied.
-        logger.LogInformation("Database check and migration applied successfully.");
+        logger.LogInformation("Applying migrations...");
+        dbContext.Database.Migrate();
+        logger.LogInformation("Migrations applied successfully.");
     }
     catch (Exception ex)
     {
@@ -58,37 +100,18 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// ---------------------------
+// Pipeline
+// ---------------------------
+app.UseSwagger();
+app.UseSwaggerUI();
 
-// Ensure Database is Created and Migrations are Applied
-
-//gf
-
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-//app.UseHttpsRedirection();
-app.UseRouting(); // This should be added to ensure UseCors works with routing
-
+app.UseRouting();
 app.UseCors("AllowMyOrigins");
+
+// Keep only if you use [Authorize] attributes; otherwise harmless but unnecessary.
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-
-
-void ConfigureSwagger(WebApplicationBuilder builder)
-{
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
-}
-
-void ConfigureControllers(WebApplicationBuilder builder)
-{
-    builder.Services.AddControllers();
-}

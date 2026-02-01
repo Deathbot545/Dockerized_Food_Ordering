@@ -1,73 +1,109 @@
-using Microsoft.AspNetCore.CookiePolicy;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.DataProtection;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.VisualStudio.Services.Users;
-using Stripe;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Food_Ordering_Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
+
+// OPTIONAL: support your custom naming scheme too (doesn't break anything if files don't exist)
+builder.Configuration
+    .AddJsonFile("Food_Ordering_Web_appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"Food_Ordering_Web_appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
 var configuration = builder.Configuration;
-builder.WebHost.ConfigureKestrel((context, serverOptions) =>
-{
-    serverOptions.ListenAnyIP(80);
-});
-// Data 
-var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
-    .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
 
-// HTTP Client Conf
+// Hosting / Ports
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    if (env.IsDevelopment())
+        serverOptions.ListenLocalhost(5002);
+    else
+        serverOptions.ListenAnyIP(80);
+});
+
+// Data Protection
+if (env.IsDevelopment())
+{
+    builder.Services.AddDataProtection()
+        .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
+}
+else
+{
+    var dataProtectionKeysPath = "/root/.aspnet/DataProtection-Keys";
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath))
+        .SetApplicationName("UniqueApplicationNameAcrossAllInstances");
+}
+
+// HTTP Client
 builder.Services.AddHttpClient("namedClient", c =>
 {
-    c.BaseAddress = new Uri(configuration["ApiBaseUrl"]);
-    c.Timeout = TimeSpan.FromSeconds(200); // Example timeout
+    var apiBaseUrl = configuration["ApiBaseUrl"];
+    if (string.IsNullOrWhiteSpace(apiBaseUrl))
+        throw new InvalidOperationException("ApiBaseUrl is missing. Set it in configuration (appsettings/appsettings.Development or env vars).");
+
+    c.BaseAddress = new Uri(apiBaseUrl);
+    c.Timeout = TimeSpan.FromSeconds(200);
 })
-.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+.ConfigurePrimaryHttpMessageHandler(() =>
 {
-    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    if (env.IsDevelopment())
+    {
+        return new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+    }
+
+    return new HttpClientHandler();
 });
 
-// Authentication Configuration
+// Auth / Cookies (env-aware)
+var isDev = env.IsDevelopment();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-.AddCookie(options => // This is where you set the cookie options for authentication cookies
+.AddCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromHours(1); // Set the expiration time as needed
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.None; // Set your desired expiration
+    options.ExpireTimeSpan = TimeSpan.FromHours(1);
+
+    options.Cookie.SecurePolicy = isDev ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.None;
+
+    options.SlidingExpiration = true;
 })
 .AddGoogle(options =>
 {
-    options.ClientId = configuration["Authentication:Google:ClientId"];
-    options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+    options.ClientId = configuration["Authentication:Google:ClientId"] ?? "";
+    options.ClientSecret = configuration["Authentication:Google:ClientSecret"] ?? "";
 });
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensure it matches your environment (use Always if under HTTPS)
-    options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.Name = ".AspNetCore.Cookies";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Adjust as necessary
+
+    options.Cookie.SecurePolicy = isDev ? CookieSecurePolicy.None : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.None;
+
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     options.SlidingExpiration = true;
 });
 
+// MVC / Razor / JSON
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 
-// Configure JSON Options if necessary
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
@@ -76,7 +112,7 @@ builder.Services.Configure<JsonOptions>(options =>
 
 var app = builder.Build();
 
-// Middleware Configuration
+// Error handling
 if (app.Environment.IsDevelopment() || configuration.GetValue<bool>("ShowDetailedErrors"))
 {
     app.UseDeveloperExceptionPage();
@@ -87,33 +123,36 @@ else
     app.UseHsts();
 }
 
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    HttpOnly = HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.Always
-});
-
+// Reverse proxy support
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-app.UseHttpsRedirection();
+// Cookie Policy (env-aware)
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = isDev ? CookieSecurePolicy.None : CookieSecurePolicy.Always
+});
+
+// Pipeline
+if (!isDev)
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 
-// Add the custom middleware here
 app.UseMiddleware<JwtTokenMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-});
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 

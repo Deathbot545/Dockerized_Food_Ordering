@@ -1,4 +1,11 @@
 {
+  "ApiBaseUrl": "http://localhost:5000/",
+  "Jwt": {
+    "Key": "dev-super-secret-key",
+    "Issuer": "dev",
+    "Audience": "dev"
+  },
+  "ShowDetailedErrors": true,
   "Logging": {
     "LogLevel": {
       "Default": "Information",

@@ -3073,11 +3073,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
+      "projectUniqueName": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj",
       "projectName": "Order_API",
-      "projectPath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
+      "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj",
       "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-      "outputPath": "D:\\Dockerize\\dockerize\\Order_API\\obj\\",
+      "outputPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3092,14 +3092,15 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj": {
-              "projectPath": "D:\\Dockerize\\dockerize\\Menu_API\\Menu_API.csproj"
+            "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj": {
+              "projectPath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Menu_API\\Menu_API.csproj"
             }
           }
         }
@@ -3108,6 +3109,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -3188,8 +3194,20 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Npgsql' 7.0.6 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c",
+      "libraryId": "Npgsql",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    }
+  ]
 }

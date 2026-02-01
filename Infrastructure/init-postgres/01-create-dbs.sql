@@ -1,0 +1,3 @@
+CREATE DATABASE "ApplicationDb";
+CREATE DATABASE "OutletDb";
+CREATE DATABASE "MenuDb";

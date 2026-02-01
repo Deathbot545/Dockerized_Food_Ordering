@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6zpENmq6COjtWdPWdxxbhmLEd2BPNfDY1Fj+da8k/KxcLX1idDkYFfJ2XYKi7nMwpEMkbnlN/mNf7jMiT2Y4Eg==",
+  "dgSpecHash": "uddlrXHFJMI=",
   "success": true,
-  "projectFilePath": "D:\\Dockerize\\dockerize\\Order_API\\Order_API.csproj",
+  "projectFilePath": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Order_API\\Order_API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Asus\\.nuget\\packages\\awssdk.core\\3.7.100.14\\awssdk.core.3.7.100.14.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\awssdk.securitytoken\\3.7.100.14\\awssdk.securitytoken.3.7.100.14.nupkg.sha512",
@@ -73,5 +73,16 @@
     "C:\\Users\\Asus\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\Asus\\.nuget\\packages\\zstdsharp.port\\0.7.3\\zstdsharp.port.0.7.3.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Npgsql' 7.0.6 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c",
+      "libraryId": "Npgsql",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    }
+  ]
 }

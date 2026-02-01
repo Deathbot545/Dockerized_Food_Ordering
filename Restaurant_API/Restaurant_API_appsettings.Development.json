@@ -2,6 +2,15 @@
   "ConnectionStrings": {
     "OutletDbConnection": "Host=localhost;Port=5432;Database=OutletDb;User Id=postgres;Password=postgres;"
   },
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:5002",
+      "http://localhost:5003",
+      "http://localhost:5173",
+      "http://localhost:8088",
+      "http://localhost:8089"
+    ]
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Information",

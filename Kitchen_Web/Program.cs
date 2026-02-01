@@ -97,26 +97,13 @@ builder.Services.AddAuthentication(options =>
 // CORS (env-aware)
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = GetAllowedOrigins(builder.Configuration);
     options.AddPolicy("AllowMyOrigins", policy =>
     {
-        if (env.IsDevelopment())
-        {
-            policy.WithOrigins(
-                    "http://localhost:5002",
-                    "http://localhost:5003",
-                    "http://localhost:5173"
-                )
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
-        }
-        else
-        {
-            policy.WithOrigins("https://restosolutionssaas.com")
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
-        }
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -156,3 +143,20 @@ app.MapControllerRoute(
 app.MapControllers();
 
 app.Run();
+
+static string[] GetAllowedOrigins(IConfiguration configuration)
+{
+    var origins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+    if (origins is { Length: > 0 })
+    {
+        return origins;
+    }
+
+    var rawOrigins = configuration["Cors:AllowedOrigins"];
+    if (!string.IsNullOrWhiteSpace(rawOrigins))
+    {
+        return rawOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    throw new InvalidOperationException("Cors:AllowedOrigins is missing. Configure it in appsettings or env vars.");
+}

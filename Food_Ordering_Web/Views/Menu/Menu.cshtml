@@ -1,415 +1,679 @@
 ﻿@{
     ViewData["Title"] = "Guest Menu";
+    var outletId = (ViewBag.OutletId ?? "").ToString();
+    var tableId = (ViewBag.TableId ?? "").ToString();
+    var demoEnabledRaw = (ViewBag.DemoEnabled ?? false).ToString().ToLower();
 }
 <style>
-    .cart-fixed-bottom {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #343a40;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .custom-navbar {
-            background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 10px 20px;
-            position: sticky;
-            top: 60px;
-            z-index: 1000;
-            margin-bottom: 20px;
-        }
-
-        .custom-navbar .navbar-nav .nav-link {
-            font-family: 'Roboto', sans-serif;
-            color: #333333;
-            font-weight: 500;
-            transition: color 0.3s ease, background-color 0.3s ease;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin: 5px;
-        }
-
-        .custom-navbar .navbar-nav .nav-link:hover,
-        .custom-navbar .navbar-nav .nav-link:focus {
-            color: #ffffff;
-            background-color: #ff6347;
-        }
-
-        .custom-navbar .navbar-toggler {
-            border: none;
-            background-color: #ff6347;
-            color: #ffffff;
-        }
-
-        .custom-navbar .navbar-toggler-icon {
-            filter: invert(100%);
-        }
-
-        .custom-navbar .navbar-nav .nav-link::before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 50%;
-            background-color: #ff6347;
-            visibility: hidden;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .custom-navbar .navbar-nav .nav-link:hover::before,
-        .custom-navbar .navbar-nav .nav-link:focus::before {
-            visibility: visible;
-            width: 100%;
-            left: 0;
-        }
-
-        .call-waiter-nav-button {
-            background-color: #3498DB;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            border-radius: 5px;
-            margin-left: 10px;
-        }
-
-        .call-waiter-nav-button:hover {
-            background-color: #2980B9;
-        }
-
-    .card {
-        margin-bottom: 30px;
-        transition: all 0.3s ease;
-        border: none;
-        border-radius: 15px; /* Added for rounded corners */
-        overflow: hidden; /* Added to ensure child elements follow the card's border radius */
+    /* ---------- Page shell ---------- */
+    .menu-wrap {
+        padding: 14px 14px 90px;
+        max-width: 1180px;
+        margin: 0 auto;
     }
 
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-        }
+    /* ---------- Global readability defaults ---------- */
+    body {
+        color: #0b1220;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
 
-    .card-img-top {
-        width: 100%;
-        height: 200px;
+    h1, h2, h3, h4, h5 {
+        color: #07101f;
+    }
+
+    /* ---------- Hero header ---------- */
+    .hero {
+        border-radius: 18px;
+        overflow: hidden;
+        position: relative;
+        /* more contrast so text always pops */
+        background: linear-gradient(135deg, rgba(2,6,23,0.90), rgba(2,6,23,0.78)), radial-gradient(1000px 500px at 15% 0%, rgba(59,130,246,0.28), transparent 60%), radial-gradient(900px 500px at 95% 35%, rgba(34,197,94,0.22), transparent 55%);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.28);
+        border: 1px solid rgba(255,255,255,0.14);
+        padding: 18px;
+        color: #fff;
+        margin-top: 12px;
+    }
+
+    .hero-row {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .hero-left {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+    }
+
+    #outlet-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 999px;
         object-fit: cover;
-        border-top-left-radius: 15px; /* Adjusted for rounded corners */
-        border-top-right-radius: 15px; /* Adjusted for rounded corners */
+        border: 1px solid rgba(255,255,255,0.22);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.30);
+        background: rgba(255,255,255,0.10);
     }
 
+    #outlet-name {
+        margin: 0;
+        font-weight: 950;
+        letter-spacing: .2px;
+        font-size: clamp(1.2rem, 2.4vw, 1.85rem);
+        color: rgba(255,255,255,0.98);
+        text-shadow: 0 2px 14px rgba(0,0,0,0.55);
+    }
 
-        .card-title {
-            font-size: 1.2em;
-            font-weight: bold;
+    .hero-sub {
+        margin: 4px 0 0;
+        color: rgba(255,255,255,0.88); /* stronger than before */
+        font-weight: 800;
+        font-size: .95rem;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+    }
+
+    .hero-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    /* ---------- Search pill ---------- */
+    .pill {
+        border-radius: 999px;
+        padding: 9px 12px;
+        border: 1px solid rgba(255,255,255,0.20);
+        background: rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.98);
+        font-weight: 900;
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        white-space: nowrap;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    }
+
+        .pill i {
+            color: rgba(255,255,255,0.95);
         }
 
-        .card-text {
-            color: #666;
-        }
-
-        #menu-container > div > h2 {
-            border-bottom: 2px solid #3498DB;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            font-family: 'Roboto', sans-serif;
-            color: #2C3E50;
-        }
-
-        .outlet-header {
-            margin: 40px 0;
-            position: relative;
-            text-align: center;
-            color: white;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('your-background-image.jpg');
-            background-size: cover;
-            background-position: center;
-            border-radius: 15px;
-            padding: 60px 20px;
-        }
-
-        #outlet-name {
-            font-family: 'Roboto', sans-serif;
-            font-size: 3em;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        #outlet-logo {
-            border-radius: 50%;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
-            max-width: 150px;
-            margin-top: 20px;
-            display: block;
-        }
-
-        .call-waiter-button {
-            background-color: #3498DB;
-            color: white;
+        .pill input {
             border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            border-radius: 5px;
+            outline: none;
+            background: transparent;
+            color: rgba(255,255,255,0.98);
+            font-weight: 850;
+            min-width: 220px;
         }
 
-        .call-waiter-button:hover {
-            background-color: #2980B9;
+            .pill input::placeholder {
+                color: rgba(255,255,255,0.78);
+                font-weight: 800;
+            }
+
+    /* ---------- Buttons ---------- */
+    .btn-pill {
+        border-radius: 999px !important;
+        font-weight: 900 !important;
+        padding: 10px 14px !important;
+    }
+
+    .btn-primary-glow {
+        background: linear-gradient(90deg, #22c55e, #16a34a);
+        border: none;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.25);
+    }
+
+    .btn-ghost {
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.18);
+        color: rgba(255,255,255,0.95) !important;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.14);
         }
 
-        #cart-button {
-            z-index: 1000;
-            background-color: #ff6347;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            color: white;
+    /* ---------- Sticky category navbar ---------- */
+    .custom-navbar {
+        margin-top: 14px;
+        position: sticky;
+        top: 70px;
+        z-index: 1000;
+        border-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.10);
+        background: rgba(255,255,255,0.96);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+        padding: 10px 12px;
+        backdrop-filter: blur(10px);
+    }
+
+        .custom-navbar .nav-link {
+            font-weight: 950;
+            color: #0b1220; /* darker */
+            padding: 8px 12px;
+            border-radius: 999px;
+            margin: 4px 6px;
+            transition: background .12s ease, color .12s ease, transform .12s ease;
+            white-space: nowrap;
         }
 
-        @@media (max-width: 768px) {
-            .custom-navbar {
-                border-radius: 0;
+            .custom-navbar .nav-link:hover {
+                background: rgba(34,197,94,0.18);
+                color: #064e3b;
+                transform: translateY(-1px);
             }
 
-            .outlet-header {
-                padding: 10px;
+            .custom-navbar .nav-link.active {
+                background: rgba(59,130,246,0.18);
+                color: #1e40af;
             }
 
-            .outlet-header img {
-                max-width: 100%;
-                height: auto;
-            }
+    /* ---------- Section header ---------- */
+    .section-head {
+        margin-top: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
-            .outlet-header h1 {
-                font-size: 1.5em;
-            }
+        .section-head h2 {
+            margin: 0;
+            font-weight: 950;
+            color: #07101f;
+            font-size: 1.2rem;
         }
+
+        .section-head small {
+            color: #334155; /* darker than before */
+            font-weight: 900;
+        }
+
+    /* ---------- Cards ---------- */
+    .menu-grid {
+        margin-top: 12px;
+    }
+
+    .menu-card {
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 12px 36px rgba(0,0,0,0.10);
+        transition: transform .14s ease, box-shadow .14s ease;
+        height: 100%;
+        cursor: pointer;
+        background: #fff;
+    }
+
+        .menu-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 46px rgba(0,0,0,0.16);
+        }
+
+    .menu-cover {
+        width: 100%;
+        height: 190px;
+        object-fit: cover;
+        display: block;
+        background: #e5e7eb;
+    }
+
+    .menu-body {
+        padding: 12px 12px 14px;
+    }
+
+    .menu-title {
+        margin: 0;
+        font-weight: 950;
+        color: #07101f;
+        font-size: 1.04rem;
+        line-height: 1.2;
+    }
+
+    .menu-desc {
+        margin: 8px 0 0;
+        color: #334155; /* stronger contrast */
+        font-weight: 800;
+        font-size: .94rem;
+        min-height: 36px;
+    }
+
+    .menu-foot {
+        margin-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .price {
+        font-weight: 950;
+        color: #0b1220;
+        font-size: 1.04rem;
+        white-space: nowrap;
+    }
+
+    .mini-chip {
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-weight: 950;
+        font-size: .78rem;
+        background: rgba(59,130,246,0.16);
+        color: #1e40af;
+        border: 1px solid rgba(59,130,246,0.28);
+        white-space: nowrap;
+    }
+
+    /* ---------- Loading + empty ---------- */
+    .loading {
+        border-radius: 16px;
+        padding: 14px;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.10);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+        color: #0b1220;
+        font-weight: 900;
+    }
+
+    .empty-state {
+        margin-top: 12px;
+        border-radius: 16px;
+        padding: 16px;
+        background: #fff;
+        border: 1px dashed rgba(0,0,0,0.22);
+        color: #0b1220;
+        font-weight: 900;
+    }
+
+    /* ---------- Cart bar ---------- */
+    .cart-fixed-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(2,6,23,0.96); /* darker */
+        color: rgba(255,255,255,0.98);
+        padding: 12px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        box-shadow: 0 -12px 30px rgba(0,0,0,0.28);
+        z-index: 1100;
+        backdrop-filter: blur(10px);
+    }
+
+        .cart-fixed-bottom .cart-left {
+            font-weight: 950;
+            letter-spacing: .2px;
+            color: rgba(255,255,255,0.98);
+        }
+
+            .cart-fixed-bottom .cart-left small {
+                display: block;
+                font-weight: 850;
+                opacity: 0.88; /* brighter */
+                color: rgba(255,255,255,0.86);
+            }
+
+    /* make call-waiter button consistent */
+    .call-waiter-button, .call-waiter-nav-button {
+        border-radius: 999px !important;
+        font-weight: 950 !important;
+    }
+
+    @@media (max-width: 768px) {
+        .custom-navbar {
+            top: 64px;
+        }
+
+        .pill input {
+            min-width: 160px;
+        }
+    }
 </style>
 
-<div class="outlet-header d-flex flex-column justify-content-center align-items-center">
-    <h1 id="outlet-name" class="mb-3">Example Outlet</h1>
-    <img id="outlet-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA" alt="Outlet Logo">
+
+<div class="menu-wrap">
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-row">
+            <div class="hero-left">
+                <img id="outlet-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XvJwAAAAASUVORK5CYII=" alt="Outlet Logo" />
+                <div>
+                    <h1 id="outlet-name">Loading outlet...</h1>
+                    <div class="hero-sub">Table #<span id="table-id-text">@tableId</span> · Tap an item to view details</div>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <div class="pill">
+                    <i class="fas fa-search"></i>
+                    <input id="menuSearch" type="text" placeholder="Search menu items..." />
+                </div>
+
+                <button type="button" class="btn btn-ghost btn-pill call-waiter-nav-button">
+                    <i class="fas fa-concierge-bell"></i> Call Waiter
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category navbar -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse d-flex justify-content-between align-items-center" id="navbarNav">
+            <ul class="navbar-nav" id="category-navbar"></ul>
+        </div>
+    </nav>
+
+    <div class="section-head">
+        <h2>Menu</h2>
+        <small id="menuCountText">0 items</small>
+    </div>
+
+    <!-- Container for menu items -->
+    <div id="menu-container" class="mt-2">
+        <div class="loading">Loading menu…</div>
+    </div>
 </div>
 
-<nav class="navbar navbar-expand-lg custom-navbar">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+<!-- Cart -->
+<div id="cart-button" class="cart-fixed-bottom" style="display:none;">
+    <div class="cart-left">
+        <span><span id="cart-items-count">0</span> Items · LKR <span id="cart-total">0.00</span></span>
+        <small>Tap to checkout</small>
+    </div>
+    <button class="btn btn-primary-glow btn-pill call-waiter-button" type="button">
+        <i class="fas fa-concierge-bell"></i> Call Waiter
     </button>
-    <div class="collapse navbar-collapse d-flex justify-content-between align-items-center" id="navbarNav">
-        <ul class="navbar-nav" id="category-navbar">
-            <!-- Categories will be filled here by JavaScript -->
-        </ul>
-        <button class="btn call-waiter-nav-button">Call Waiter</button>
-    </div>
-</nav>
-
-<!-- Container for menu items -->
-<div id="menu-container" class="container">
-    <!-- This will be populated by JavaScript -->
-</div>
-<div id="cart-button" class="cart-fixed-bottom">
-    <div>
-        <span id="cart-items-count">0</span> Items - LKR <span id="cart-total">0.00</span>
-    </div>
-    <button class="btn btn-primary call-waiter-button">Call Waiter</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.7/signalr.min.js"></script>
 <script>
     $(document).ready(function () {
-        let outletId = '@ViewBag.OutletId';
-        let tableId = '@ViewBag.TableId'; // Assuming tableId is available in ViewBag
 
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub")
-            .build();
+        const outletId = '@outletId';
+        const tableId = '@tableId';
+        const demoEnabled = '@demoEnabledRaw' === 'true';
 
-        connection.start().then(function () {
-            console.log("SignalR connection established");
-        }).catch(function (err) {
-            console.error("SignalR connection error:", err);
-        });
+        // Build endpoints based on demo mode
+        const menuEndpoint = demoEnabled
+            ? `/Order/DemoMenuItems?outletId=${encodeURIComponent(outletId)}`
+            : `https://restosolutionssaas.com/api/MenuApi/GetMenuItems/${encodeURIComponent(outletId)}`;
 
-        function fetchAndDisplayMenuItems() {
-            let apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItems/${outletId}`;
-            $.get(apiEndpoint, function (menuItems) {
-                let categoryMap = {};
-                let navbarItems = '';
+        const outletInfoEndpoint = demoEnabled
+            ? `/Order/DemoOutletInfo?outletId=${encodeURIComponent(outletId)}`
+            : `https://restosolutionssaas.com/api/OutletApi/outletInfo/${encodeURIComponent(outletId)}`;
 
-                console.log("Fetched Menu Items:", menuItems); // Log menu items
+        const callWaiterEndpoint = demoEnabled
+            ? `/Order/DemoCallWaiter`
+            : `https://restosolutionssaas.com/api/OrderApi/CallWaiter`;
 
-                menuItems.forEach(menuItem => {
-                    console.log("Menu Item:", menuItem); // Log each menu item
+        // SignalR only when NOT demo (avoid noisy errors in demo)
+        if (!demoEnabled) {
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("https://restosolutionssaas.com/api/OrderApi/orderStatusHub")
+                .build();
 
-                    if (!categoryMap[menuItem.menuCategoryId]) {
-                        categoryMap[menuItem.menuCategoryId] = { name: menuItem.categoryName, items: [] };
-                    }
-                    categoryMap[menuItem.menuCategoryId].items.push(menuItem);
-                });
-
-                let menuHtml = '';
-
-                Object.keys(categoryMap).forEach(categoryId => {
-                    const category = categoryMap[categoryId];
-                    navbarItems += `<li class="nav-item"><a class="nav-link" href="#${categoryId}">${category.name}</a></li>`;
-
-                    menuHtml += `<div id="${categoryId}">
-                                     <h2>${category.name}</h2>
-                                     <div class="row">`;
-
-                    category.items.forEach(menuItem => {
-                        const imageBase64 = menuItem.image;
-                        menuHtml += `<div class="col-md-5">
-                                         <div class="card" data-item-id="${menuItem.id}" data-category-id="${menuItem.menuCategoryId}" data-outlet-id="${outletId}" data-table-id="${tableId}">
-                                             <img src="data:image/png;base64,${imageBase64}" class="card-img-top" alt="${menuItem.name}">
-                                             <div class="card-body">
-                                                 <h5 class="card-title">${menuItem.name} - LKR ${menuItem.price.toFixed(2)}</h5>
-                                                 <p class="card-text">${menuItem.description}</p>
-                                             </div>
-                                         </div>
-                                     </div>`;
-                    });
-
-                    menuHtml += `</div>
-                                 </div>`;
-                });
-
-                $('#category-navbar').html(navbarItems);
-                $('#menu-container').html(menuHtml);
-            })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed:", textStatus, errorThrown);
-                });
+            connection.start()
+                .then(() => console.log("SignalR connected"))
+                .catch(err => console.warn("SignalR connection error:", err));
         }
 
-        function fetchAndDisplayOutletInfo() {
-            let outletInfoEndpoint = `https://restosolutionssaas.com/api/OutletApi/outletInfo/${outletId}`;
-
-            console.log(`Fetching data from endpoint: ${outletInfoEndpoint}`); // Logs the endpoint being hit.
-
-            $.get(outletInfoEndpoint, function (outletInfo) {
-                console.log('Received data:', outletInfo); // Logs the received data.
-
-                // Set the outlet name in the title
-                if (outletInfo && outletInfo.customerFacingName) {
-                    console.log('Setting customerFacingName:', outletInfo.customerFacingName); // Logs the name being set.
-                    $("#outlet-name").text(outletInfo.customerFacingName);
-                } else {
-                    console.error('customerFacingName not found or is undefined in the received data');
-                }
-
-                if (outletInfo && outletInfo.logo) {
-                    const logoBase64 = outletInfo.logo;
-                    console.log('Setting Logo:', logoBase64.substring(0, 100) + '...'); // Logs the first 100 characters of the logo data for brevity.
-
-                    $("#outlet-logo").attr('src', `data:image/png;base64,${logoBase64}`)
-                        .attr('alt', `${outletInfo.customerFacingName} Logo`)
-                        .show();
-                } else {
-                    console.error("Logo data is undefined or empty");
-                }
-            })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed for outlet info:", textStatus, errorThrown);
-                });
+        function escapeHtml(text) {
+            return (text ?? '').toString()
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
         function updateCartButton() {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let currentTime = new Date().getTime();
-            let durationLimit = 24 * 60 * 60 * 1000; // Duration limit in milliseconds (e.g., 24 hours)
+            const currentTime = new Date().getTime();
+            const durationLimit = 24 * 60 * 60 * 1000;
 
-            // Filter out items that are older than the duration limit
-            cart = cart.filter(item => currentTime - item.timestamp < durationLimit);
-
-            // Update the cart in local storage after filtering out old items
+            cart = cart.filter(item => currentTime - (item.timestamp || currentTime) < durationLimit);
             localStorage.setItem('cart', JSON.stringify(cart));
 
-            let itemCount = cart.reduce((count, item) => count + item.qty, 0);
-            let total = cart.reduce((total, item) => total + (item.price * item.qty), 0).toFixed(2);
+            const itemCount = cart.reduce((count, item) => count + (item.qty || 0), 0);
+            const total = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 0)), 0);
 
             $("#cart-items-count").text(itemCount);
-            $("#cart-total").text(total);
+            $("#cart-total").text(total.toFixed(2));
 
-            if (itemCount > 0) {
-                $('#cart-button').show();
-            } else {
-                $('#cart-button').hide();
-            }
+            if (itemCount > 0) $("#cart-button").show();
+            else $("#cart-button").hide();
         }
 
-        // Initially populate the menu items
-        fetchAndDisplayMenuItems();
-        fetchAndDisplayOutletInfo();
-        updateCartButton(); // Call this function to update the cart button on page load
-
-        // Add functionality for the Call Waiter button in the cart button and nav bar
-        $('.call-waiter-button, .call-waiter-nav-button').on('click', function () {
-            console.log("Call Waiter button clicked. Table ID:", tableId); // Log the button click and table ID
-            $.ajax({
-                url: 'https://restosolutionssaas.com/api/OrderApi/CallWaiter',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ tableId: tableId }),
-                success: function () {
-                    console.log("Waiter call sent successfully."); // Log successful response
-                    alert("Waiter has been called!");
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.error("Error calling waiter:", textStatus, errorThrown); // Log error details
+        function buildCategoryMap(menuItems) {
+            const categoryMap = {};
+            menuItems.forEach(mi => {
+                if (!categoryMap[mi.menuCategoryId]) {
+                    categoryMap[mi.menuCategoryId] = { name: mi.categoryName, items: [] };
                 }
+                categoryMap[mi.menuCategoryId].items.push(mi);
             });
+            return categoryMap;
+        }
+
+        function renderMenu(menuItems) {
+            const categoryMap = buildCategoryMap(menuItems);
+
+            let navbarItems = '';
+            let menuHtml = '';
+            let totalItems = 0;
+
+            Object.keys(categoryMap).forEach(categoryId => {
+                const category = categoryMap[categoryId];
+                navbarItems += `<li class="nav-item"><a class="nav-link" href="#cat-${categoryId}">${escapeHtml(category.name)}</a></li>`;
+
+                menuHtml += `
+                        <section id="cat-${categoryId}" class="menu-grid mt-3" data-category="${escapeHtml(category.name)}">
+                            <div class="section-head">
+                                <h2>${escapeHtml(category.name)}</h2>
+                                <small>${category.items.length} items</small>
+                            </div>
+                            <div class="row mt-2">`;
+
+                category.items.forEach(mi => {
+                    totalItems++;
+
+                    // Your API/dummy returns base64 in "image"
+                    const imageBase64 = mi.image || "";
+                    const imgSrc = imageBase64
+                        ? `data:image/png;base64,${imageBase64}`
+                        : `https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1200&q=80`; // fallback
+
+                    const price = (mi.price ?? 0);
+                    const desc = mi.description ?? "";
+
+                    menuHtml += `
+                            <div class="col-12 col-md-6 col-lg-4 mb-3 menu-item-card"
+                                 data-name="${escapeHtml(mi.name)}"
+                                 data-desc="${escapeHtml(desc)}"
+                                 data-category="${escapeHtml(category.name)}">
+                                <div class="card menu-card"
+                                     data-item-id="${mi.id}"
+                                     data-category-id="${mi.menuCategoryId}"
+                                     data-outlet-id="${outletId}"
+                                     data-table-id="${tableId}">
+                                    <img class="menu-cover" src="${imgSrc}" alt="${escapeHtml(mi.name)}" loading="lazy" />
+                                    <div class="menu-body">
+                                        <div class="d-flex justify-content-between align-items-start gap-2">
+                                            <h5 class="menu-title">${escapeHtml(mi.name)}</h5>
+                                            <span class="mini-chip">${escapeHtml(category.name)}</span>
+                                        </div>
+                                        <p class="menu-desc">${escapeHtml(desc)}</p>
+                                        <div class="menu-foot">
+                                            <div class="price">LKR ${Number(price).toFixed(2)}</div>
+                                            <button type="button" class="btn btn-primary-glow btn-pill btn-sm js-add"
+                                                    data-item-id="${mi.id}"
+                                                    data-name="${escapeHtml(mi.name)}"
+                                                    data-price="${price}">
+                                                <i class="fas fa-plus"></i> Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                });
+
+                menuHtml += `
+                            </div>
+                        </section>`;
+            });
+
+            $('#category-navbar').html(navbarItems);
+            $('#menu-container').html(menuHtml);
+            $('#menuCountText').text(`${totalItems} items`);
+
+            // Smooth scroll for category links
+            $('#category-navbar a').on('click', function (e) {
+                e.preventDefault();
+                const target = $(this).attr('href');
+                const offset = $(target).offset()?.top ?? 0;
+                window.scrollTo({ top: offset - 110, behavior: 'smooth' });
+
+                $('#category-navbar a').removeClass('active');
+                $(this).addClass('active');
+            });
+        }
+
+        function fetchAndDisplayMenuItems() {
+            $('#menu-container').html(`<div class="loading">Loading menu…</div>`);
+
+            $.get(menuEndpoint, function (menuItems) {
+                if (!menuItems || menuItems.length === 0) {
+                    $('#menu-container').html(`
+                            <div class="empty-state">
+                                <strong>No menu items found.</strong>
+                                <div class="mt-1">Try again later or select a different outlet.</div>
+                            </div>`);
+                    $('#menuCountText').text('0 items');
+                    return;
+                }
+
+                renderMenu(menuItems);
+                updateCartButton();
+            })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    console.warn("Menu request failed:", textStatus, errorThrown);
+                    $('#menu-container').html(`
+                        <div class="empty-state">
+                            <strong>Couldn’t load the menu.</strong>
+                            <div class="mt-1">If you’re in demo mode, ensure Demo endpoints exist in OrderController.</div>
+                        </div>`);
+                });
+        }
+
+        function fetchAndDisplayOutletInfo() {
+            $.get(outletInfoEndpoint, function (outletInfo) {
+                if (outletInfo?.customerFacingName) {
+                    $("#outlet-name").text(outletInfo.customerFacingName);
+                } else {
+                    $("#outlet-name").text("Outlet");
+                }
+
+                if (outletInfo?.logo) {
+                    $("#outlet-logo").attr('src', `data:image/png;base64,${outletInfo.logo}`).show();
+                }
+            })
+                .fail(function () {
+                    $("#outlet-name").text("Outlet");
+                });
+        }
+
+        // Search filter (name + desc + category)
+        $('#menuSearch').on('input', function () {
+            const q = ($(this).val() || "").toString().toLowerCase().trim();
+            let visible = 0;
+
+            $('.menu-item-card').each(function () {
+                const name = ($(this).data('name') || '').toString().toLowerCase();
+                const desc = ($(this).data('desc') || '').toString().toLowerCase();
+                const cat = ($(this).data('category') || '').toString().toLowerCase();
+
+                const show = !q || name.includes(q) || desc.includes(q) || cat.includes(q);
+                $(this).toggle(show);
+                if (show) visible++;
+            });
+
+            $('#menuCountText').text(`${visible} items`);
         });
 
-        $('#menu-container').on('click', '.card', function () {
+        // Add to cart (simple demo behavior)
+        $('#menu-container').on('click', '.js-add', function (e) {
+            e.stopPropagation();
+
+            const id = parseInt($(this).data('item-id'), 10);
+            const name = ($(this).data('name') || '').toString();
+            const price = parseFloat($(this).data('price'));
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existing = cart.find(x => x.id === id);
+
+            if (existing) {
+                existing.qty = (existing.qty || 1) + 1;
+                existing.timestamp = new Date().getTime();
+            } else {
+                cart.push({
+                    id,
+                    name,
+                    price,
+                    qty: 1,
+                    note: "",
+                    size: "regular",
+                    extraItems: [],
+                    timestamp: new Date().getTime()
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartButton();
+        });
+
+        // Card click -> your existing flow to FoodDetail
+        $('#menu-container').on('click', '.menu-card', function () {
             const itemId = $(this).data('item-id');
             const categoryId = $(this).data('category-id');
             const outletId = $(this).data('outlet-id');
             const tableId = $(this).data('table-id');
             const customerFacingName = $("#outlet-name").text();
-            const menuId = '@ViewBag.MenuId'; // Assuming the menu ID is available in ViewBag
-
-            console.log("Clicked Item ID:", itemId);
-            console.log("Clicked Category ID:", categoryId);
-            console.log("Clicked Outlet ID:", outletId);
-            console.log("Clicked Table ID:", tableId);
 
             $.post('/Order/RedirectToDetail', {
                 itemId: itemId,
-                categoryId: categoryId, // Pass category ID
+                categoryId: categoryId,
                 outletId: outletId,
                 tableId: tableId,
-                customerFacingName: customerFacingName,
-                menuId: menuId // Pass menu ID
+                customerFacingName: customerFacingName
             }).done(function (response) {
                 if (response.success) {
-                    // Store data in local storage
                     localStorage.setItem('foodItemData', JSON.stringify({
                         itemId: response.itemId,
-                        categoryId: response.categoryId, // Save category ID
+                        categoryId: response.categoryId,
                         outletId: response.outletId,
                         tableId: response.tableId,
-                        customerFacingName: response.customerFacingName,
-                        menuId: response.menuId // Save menu ID
+                        customerFacingName: response.customerFacingName
                     }));
+
                     window.location.href = response.redirectUrl;
                 } else {
                     console.error("Failed to redirect");
@@ -417,12 +681,33 @@
             });
         });
 
-        $('#cart-button').click(function () {
+        // Call Waiter (demo-safe)
+        $('.call-waiter-button, .call-waiter-nav-button').on('click', function (e) {
+            e.stopPropagation();
+
+            $.ajax({
+                url: callWaiterEndpoint,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ tableId: tableId }),
+                success: function () {
+                    alert("Waiter has been called!");
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error calling waiter:", textStatus, errorThrown);
+                    alert("Could not call waiter (demo/API).");
+                }
+            });
+        });
+
+        // Cart click -> Checkout
+        $('#cart-button').on('click', function () {
             window.location.href = '/Order/Checkout';
         });
+
+        // Init
+        fetchAndDisplayMenuItems();
+        fetchAndDisplayOutletInfo();
+        updateCartButton();
     });
-
-
 </script>
-
-

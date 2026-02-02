@@ -1,52 +1,544 @@
 ﻿@using Food_Ordering_Web.DTO
 @model List<OutletInfoDTO>
 
+@{
+    ViewData["Title"] = "Discover";
+
+    // Curated DEMO cover images by "brand"/name (stable + looks premium on LinkedIn)
+    var coverByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Scan2Serve Central"] = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=80",
+                ["Central"] = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1600&q=80",
+
+                ["Ella Café & Roastery"] = "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1600&q=80",
+                ["Ella Cafe & Roastery"] = "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1600&q=80",
+
+                ["Galle Seaside Grill"] = "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1600&q=80",
+
+                ["Negombo Pizza Lab"] = "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1600&q=80",
+
+                // ✅ Better, stable Sri Lankan food cover (replaces your previous Kandy one)
+                ["Kandy Spice House"] = "https://images.unsplash.com/photo-1604908177076-7e2b7f6f84c4?auto=format&fit=crop&w=1600&q=80",
+                ["Jaffna Curry Club"] = "https://images.unsplash.com/photo-1604908177076-7e2b7f6f84c4?auto=format&fit=crop&w=1600&q=80"
+            };
+
+    // Type-based fallback covers (ALL VALID URLs)
+    var coverByType = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["pizza"] = "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1600&q=80",
+                ["cafe"] = "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1600&q=80",
+                ["seafood"] = "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1600&q=80",
+                ["burgers"] = "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1600&q=80",
+                ["desserts"] = "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?auto=format&fit=crop&w=1600&q=80",
+                ["srilankan"] = "https://images.unsplash.com/photo-1604908177076-7e2b7f6f84c4?auto=format&fit=crop&w=1600&q=80",
+            };
+
+    // Helper: deterministic "demo rating" by name
+    Func<string, decimal> ratingFor = (name) =>
+    {
+        if (string.IsNullOrWhiteSpace(name)) return 4.4m;
+        var h = Math.Abs(name.GetHashCode());
+        var val = 4.1m + (h % 9) * 0.1m; // 4.1 to 4.9
+        return val > 4.9m ? 4.9m : val;
+    };
+
+    // ✅ Demo OutletId mapping (since OutletInfoDTO has no Id)
+    Func<string, int> demoOutletIdFor = (name) =>
+    {
+        if (string.IsNullOrWhiteSpace(name)) return 999;
+        return name switch
+        {
+            "Scan2Serve Central" => 101,
+            "Kandy Spice House" => 102,
+            "Galle Seaside Grill" => 103,
+            "Negombo Pizza Lab" => 104,
+            "Jaffna Curry Club" => 105,
+            "Ella Café & Roastery" => 106,
+            "Ella Cafe & Roastery" => 106,
+            _ => 999
+        };
+    };
+}
+
 <style>
-    .card-img-top {
-        width: 100%; /* Makes the image take the full width of the card */
-        height: 200px; /* Fixed height for consistency */
-        object-fit: cover; /* Ensures the image covers the area, might crop if aspect ratio is different */
+    .discover-wrap {
+        padding: 18px 14px 30px;
+    }
+
+    .discover-max {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .discover-hero {
+        border-radius: 24px;
+        padding: 22px 18px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: radial-gradient(900px 450px at 10% 0%, rgba(59,130,246,0.18), transparent 60%), radial-gradient(900px 450px at 95% 30%, rgba(34,197,94,0.14), transparent 55%), rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.28);
+        backdrop-filter: blur(12px);
+        overflow: hidden;
+    }
+
+        .discover-hero h1 {
+            margin: 0;
+            font-weight: 900;
+            letter-spacing: .2px;
+            font-size: clamp(1.6rem, 2.6vw, 2.35rem);
+            color: rgba(255,255,255,0.96);
+        }
+
+        .discover-hero p {
+            margin: 8px 0 0;
+            color: rgba(255,255,255,0.75);
+            max-width: 78ch;
+            font-weight: 600;
+        }
+
+    .hero-tools {
+        margin-top: 14px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .searchbar {
+        flex: 1;
+        min-width: 260px;
+        max-width: 520px;
+    }
+
+        .searchbar .input-group-text {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: rgba(255,255,255,0.85);
+            border-radius: 999px 0 0 999px;
+        }
+
+        .searchbar input {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-left: none;
+            color: rgba(255,255,255,0.92);
+            border-radius: 0 999px 999px 0;
+            font-weight: 700;
+        }
+
+    .chip-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .chip-btn {
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-weight: 900;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.90);
+        cursor: pointer;
+        user-select: none;
+        transition: transform .12s ease, background .12s ease;
+        white-space: nowrap;
+    }
+
+        .chip-btn:hover {
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .chip-btn.active {
+            border-color: rgba(34,197,94,0.45);
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.14);
+        }
+
+    .section-head {
+        margin-top: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .section-head h2 {
+            margin: 0;
+            font-weight: 900;
+            color: rgba(255,255,255,0.92);
+            font-size: 1.25rem;
+        }
+
+        .section-head small {
+            color: rgba(255,255,255,0.65);
+            font-weight: 700;
+        }
+
+    .grid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    @@media (max-width: 992px) {
+        .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 650px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .rest-card {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+        overflow: hidden;
+        transition: transform .15s ease, border-color .15s ease, background .15s ease;
+        position: relative;
+        cursor: pointer;
+    }
+
+        .rest-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+        }
+
+    .cover {
+        width: 100%;
+        height: 190px;
+        object-fit: cover;
+        display: block;
+        background: rgba(0,0,0,0.22);
+    }
+
+    .overlay {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+        pointer-events: none;
+    }
+
+    .logo-pill {
+        pointer-events: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(255,255,255,0.14);
+        backdrop-filter: blur(10px);
+    }
+
+        .logo-pill img {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+
+        .logo-pill span {
+            color: rgba(255,255,255,0.92);
+            font-weight: 900;
+            font-size: .9rem;
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+    .top-tags {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+        pointer-events: none;
+    }
+
+    .tag {
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-weight: 900;
+        font-size: .78rem;
+        letter-spacing: .3px;
+        white-space: nowrap;
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(15, 23, 42, 0.55);
+        color: rgba(255,255,255,0.92);
+        backdrop-filter: blur(10px);
+    }
+
+    .badge-open {
+        border-color: rgba(34,197,94,0.35);
+        background: rgba(34,197,94,0.14);
+    }
+
+    .badge-closed {
+        border-color: rgba(239,68,68,0.35);
+        background: rgba(239,68,68,0.14);
+    }
+
+    .badge-type {
+        border-color: rgba(59,130,246,0.35);
+        background: rgba(59,130,246,0.14);
+    }
+
+    .card-bodyx {
+        padding: 12px 12px 14px;
+    }
+
+    .title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 10px;
+    }
+
+    .rest-title {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.95);
+        line-height: 1.2;
+        font-size: 1.05rem;
+    }
+
+    .rest-loc {
+        margin: 6px 0 0;
+        color: rgba(255,255,255,0.70);
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .meta-row {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .meta-chip {
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-weight: 800;
+        font-size: .86rem;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.85);
+        white-space: nowrap;
+    }
+
+    .actions-row {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .btn-pill {
+        border-radius: 999px !important;
+        font-weight: 900 !important;
+        padding: 9px 12px !important;
+    }
+
+    .btn-primary-glow {
+        background: linear-gradient(90deg, #22c55e, #16a34a);
+        border: none;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.22);
+    }
+
+    .btn-ghost {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+    .empty-state {
+        border-radius: 18px;
+        padding: 18px;
+        border: 1px dashed rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.78);
     }
 </style>
 
-<div class="album py-5 bg-body-tertiary">
-    <div class="container">
-        @if (Model.Count == 0)
+<div class="discover-wrap">
+    <div class="discover-max">
+
+        <section class="discover-hero">
+            <h1>Discover great food 🍕☕🍛</h1>
+            <p>Browse by cuisine type, check open hours, and find your next favorite spot.</p>
+
+            <div class="hero-tools">
+                <div class="searchbar">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input id="searchInput" type="text" class="form-control" placeholder="Search restaurants, city, cuisine..." />
+                    </div>
+                </div>
+
+                <div class="chip-row" id="typeChips">
+                    <div class="chip-btn active" data-type="">All</div>
+                    <div class="chip-btn" data-type="pizza">Pizza</div>
+                    <div class="chip-btn" data-type="cafe">Café</div>
+                    <div class="chip-btn" data-type="srilankan">Sri Lankan</div>
+                    <div class="chip-btn" data-type="seafood">Seafood</div>
+                    <div class="chip-btn" data-type="burgers">Burgers</div>
+                    <div class="chip-btn" data-type="desserts">Desserts</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-head">
+            <h2>Recommended for you</h2>
+            <small id="countText">@((Model?.Count ?? 0)) places</small>
+        </div>
+
+        @if (Model == null || Model.Count == 0)
         {
-            <div class="alert alert-info" role="alert">
-                No outlets registered yet.
+            <div class="empty-state mt-3">
+                <strong>No outlets available right now.</strong>
+                <div class="mt-1">Check back soon — new places will appear here once restaurants register.</div>
             </div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <div class="grid mt-3" id="restaurantGrid">
                 @foreach (var outlet in Model)
                 {
-                    <div class="col">
-                        <div class="card shadow-sm">
-                            @if (outlet.RestaurantImage != null)
-                            {
-                                <img class="bd-placeholder-img card-img-top"
-                                     src="data:image/png;base64,@Convert.ToBase64String(outlet.RestaurantImage)"
-                                     alt="Restaurant Image">
-                            }
-                            else
-                            {
-                                <svg class="bd-placeholder-img card-img-top" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <title>Placeholder</title>
-                                    <rect width="100%" height="100%" fill="#55595c"></rect>
-                                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
-                                </svg>
-                            }
-                            <div class="card-body">
-                                <p class="card-text">@outlet.CustomerFacingName</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                                    </div>
-                                    <small class="text-muted">Open Hours: @outlet.OperatingHoursStart - @outlet.OperatingHoursEnd</small>
+                    var name = outlet.CustomerFacingName ?? "Restaurant";
+                    var nameLower = name.ToLowerInvariant();
+
+                    // ✅ DEMO cuisine inference
+                    string type =
+                    nameLower.Contains("pizza") ? "pizza" :
+                    nameLower.Contains("cafe") || nameLower.Contains("coffee") ? "cafe" :
+                    nameLower.Contains("sea") || nameLower.Contains("grill") ? "seafood" :
+                    nameLower.Contains("burger") ? "burgers" :
+                    nameLower.Contains("dessert") || nameLower.Contains("cake") || nameLower.Contains("bakery") ? "desserts" :
+                    "srilankan";
+
+                    string typeLabel =
+                    type == "pizza" ? "Pizza" :
+                    type == "cafe" ? "Café" :
+                    type == "seafood" ? "Seafood" :
+                    type == "burgers" ? "Burgers" :
+                    type == "desserts" ? "Desserts" :
+                    "Sri Lankan";
+
+                    // ✅ DEMO outletId + tableId (this is what makes navigation work!)
+                    var demoOutletId = demoOutletIdFor(name);
+                    var demoTableId = 1;
+
+                    // Cover priority: API bytes -> name URL -> type URL
+                    string coverFromName = coverByName.TryGetValue(name, out var c1) ? c1 : null;
+                    if (coverFromName == null)
+                    {
+                        var key = coverByName.Keys.FirstOrDefault(k => nameLower.Contains(k.ToLowerInvariant()));
+                        if (!string.IsNullOrWhiteSpace(key) && coverByName.ContainsKey(key))
+                            coverFromName = coverByName[key];
+                    }
+
+                    string coverFromType = coverByType.TryGetValue(type, out var c2) ? c2 : coverByType["srilankan"];
+
+                    var coverUrl = (outlet.RestaurantImage != null && outlet.RestaurantImage.Length > 0)
+                    ? $"data:image/png;base64,{Convert.ToBase64String(outlet.RestaurantImage)}"
+                    : (coverFromName ?? coverFromType);
+
+                    var logoUrl = (outlet.Logo != null && outlet.Logo.Length > 0)
+                    ? $"data:image/png;base64,{Convert.ToBase64String(outlet.Logo)}"
+                    : $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(name)}&background=0F172A&color=FFFFFF&size=128&bold=true";
+
+                    var openHoursLabel = $"{outlet.OperatingHoursStart:hh\\:mm} - {outlet.OperatingHoursEnd:hh\\:mm}";
+                    var rating = ratingFor(name);
+
+                    var searchHay = $"{name} {outlet.City} {outlet.Country} {typeLabel} {outlet.Contact}".ToLowerInvariant();
+
+                    <div class="rest-card"
+                         data-outlet-id="@demoOutletId"
+                         data-table-id="@demoTableId"
+                         data-name="@name"
+                         data-type="@type"
+                         data-search="@searchHay"
+                         data-hours="@openHoursLabel"
+                         data-start="@outlet.OperatingHoursStart"
+                         data-end="@outlet.OperatingHoursEnd"
+                         data-contact="@outlet.Contact"
+                         data-city="@outlet.City"
+                         data-country="@outlet.Country">
+
+                        <img class="cover" src="@coverUrl" alt="@name" loading="lazy" />
+
+                        <div class="overlay">
+                            <div class="logo-pill">
+                                <img src="@logoUrl" alt="@name logo" loading="lazy" />
+                                <span>@name</span>
+                            </div>
+
+                            <div class="top-tags">
+                                <span class="tag badge-type"><i class="fas fa-tag"></i> @typeLabel</span>
+                                <span class="tag js-open-badge badge-open" style="display:none;"><i class="fas fa-circle"></i> OPEN NOW</span>
+                                <span class="tag js-closed-badge badge-closed" style="display:none;"><i class="far fa-clock"></i> CLOSED</span>
+                            </div>
+                        </div>
+
+                        <div class="card-bodyx">
+                            <div class="title-row">
+                                <div>
+                                    <h3 class="rest-title">@name</h3>
+                                    <div class="rest-loc">@outlet.City, @outlet.Country</div>
                                 </div>
+
+                                <div class="text-end">
+                                    <div class="meta-chip" title="Demo rating"><i class="fas fa-star me-1"></i>@rating.ToString("0.0")</div>
+                                </div>
+                            </div>
+
+                            <div class="meta-row">
+                                <span class="meta-chip"><i class="far fa-clock me-1"></i>@openHoursLabel</span>
+                                @if (!string.IsNullOrWhiteSpace(outlet.Contact))
+                                {
+                                    <span class="meta-chip"><i class="fas fa-phone me-1"></i>@outlet.Contact</span>
+                                }
+                            </div>
+
+                            <div class="actions-row">
+                                <button type="button" class="btn btn-primary-glow btn-pill btn-sm js-view">
+                                    View Menu
+                                </button>
+
+                                @if (!string.IsNullOrWhiteSpace(outlet.Contact))
+                                {
+                                    <a class="btn btn-ghost btn-pill btn-sm" href="tel:@outlet.Contact">Call</a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-ghost btn-pill btn-sm" type="button" disabled>Call</button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -56,3 +548,103 @@
     </div>
 </div>
 
+<script>
+    function parseTimeSpan(ts) {
+        if (!ts) return null;
+        const parts = ts.split(':').map(x => parseInt(x, 10));
+        return { hh: parts[0] || 0, mm: parts[1] || 0 };
+    }
+
+    function isOpenNow(startTs, endTs) {
+        const start = parseTimeSpan(startTs);
+        const end = parseTimeSpan(endTs);
+        if (!start || !end) return false;
+
+        const now = new Date();
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+        const startMinutes = start.hh * 60 + start.mm;
+        const endMinutes = end.hh * 60 + end.mm;
+
+        if (endMinutes >= startMinutes) {
+            return nowMinutes >= startMinutes && nowMinutes <= endMinutes;
+        }
+        return nowMinutes >= startMinutes || nowMinutes <= endMinutes;
+    }
+
+    function applyOpenClosedBadgesOnly() {
+        document.querySelectorAll(".rest-card").forEach(card => {
+            const open = isOpenNow(card.dataset.start, card.dataset.end);
+            const openBadge = card.querySelector(".js-open-badge");
+            const closedBadge = card.querySelector(".js-closed-badge");
+
+            if (open) {
+                if (openBadge) openBadge.style.display = "inline-flex";
+                if (closedBadge) closedBadge.style.display = "none";
+            } else {
+                if (openBadge) openBadge.style.display = "none";
+                if (closedBadge) closedBadge.style.display = "inline-flex";
+            }
+        });
+    }
+
+    function filterCards() {
+        const q = (document.getElementById("searchInput")?.value || "").toLowerCase().trim();
+        const activeChip = document.querySelector("#typeChips .chip-btn.active");
+        const type = (activeChip?.dataset.type || "").toLowerCase();
+
+        let visible = 0;
+
+        document.querySelectorAll(".rest-card").forEach(card => {
+            const cardType = (card.dataset.type || "").toLowerCase();
+            const hay = (card.dataset.search || "").toLowerCase();
+
+            const matchesText = !q || hay.includes(q);
+            const matchesType = !type || cardType === type;
+
+            const show = matchesText && matchesType;
+            card.style.display = show ? "" : "none";
+            if (show) visible++;
+        });
+
+        const count = document.getElementById("countText");
+        if (count) count.textContent = `${visible} places`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        applyOpenClosedBadgesOnly();
+        filterCards();
+
+        document.getElementById("searchInput")?.addEventListener("input", filterCards);
+
+        document.getElementById("typeChips")?.addEventListener("click", function (e) {
+            const el = e.target.closest(".chip-btn");
+            if (!el) return;
+
+            document.querySelectorAll("#typeChips .chip-btn").forEach(c => c.classList.remove("active"));
+            el.classList.add("active");
+            filterCards();
+        });
+
+        // ✅ SINGLE click handler (no duplicates)
+        document.querySelectorAll(".js-view").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const card = e.target.closest(".rest-card");
+                if (!card) return;
+
+                const outletId = card.dataset.outletId;
+                const tableId = card.dataset.tableId || 1;
+
+                if (!outletId) {
+                    console.error("Missing data-outlet-id on rest-card.");
+                    alert("Demo error: outletId missing on card.");
+                    return;
+                }
+
+                window.location.href = `/Order/Menu?outletId=${encodeURIComponent(outletId)}&tableId=${encodeURIComponent(tableId)}`;
+            });
+        });
+    });
+</script>

@@ -1,257 +1,734 @@
-﻿<style>
-    .compact-card .card-body {
-        padding: 0.5rem; /* Reduces padding inside the card */
+﻿@* ===========================
+   Kitchen Staff Management
+   Modern SaaS UI + Demo fallback
+   =========================== *@
+
+@{
+    ViewData["Title"] = "Kitchen Staff";
+}
+
+<style>
+    :root {
+        --panel: rgba(255,255,255,0.06);
+        --panel2: rgba(255,255,255,0.08);
+        --border: rgba(255,255,255,0.14);
+        --text: rgba(255,255,255,0.96);
+        --muted: rgba(255,255,255,0.72);
+        --muted2: rgba(255,255,255,0.62);
+        --accent: #22c55e;
+        --accent2: #0ea5e9;
+        --danger: #ef4444;
+        --warn: #f59e0b;
     }
 
-    .compact-card h5 {
-        font-size: 1rem; /* Smaller title font size */
+    .k-wrap { width:100%; padding: 18px 14px 28px; }
+    .k-max { max-width: 1480px; margin: 0 auto; }
+
+    .k-hero {
+        border-radius: 22px;
+        padding: 18px 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background:
+            radial-gradient(900px 450px at 10% 0%, rgba(34,197,94,0.16), transparent 55%),
+            radial-gradient(900px 450px at 95% 10%, rgba(14,165,233,0.16), transparent 55%),
+            rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+        backdrop-filter: blur(12px);
     }
 
-    .compact-card p {
-        margin-bottom: 0.25rem; /* Reduces space below paragraphs */
-        font-size: 0.875rem; /* Smaller text */
+    .k-title {
+        font-weight: 900;
+        margin: 0;
+        font-size: clamp(1.35rem, 2.1vw, 2.1rem);
+        color: var(--text);
+        letter-spacing: .2px;
+    }
+    .k-sub { margin: 6px 0 0; color: var(--muted); max-width: 100ch; font-weight: 600; }
+
+    .pill {
+        display:inline-flex;
+        align-items:center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.86);
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    .dot {
+        width:9px;height:9px;border-radius:999px;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(34,197,94,0.14);
     }
 
-    .compact-card .btn {
-        padding: 0.25rem 0.5rem; /* Smaller button padding */
-        font-size: 0.875rem; /* Smaller button text */
+    .btn-pill { border-radius: 999px !important; font-weight: 800 !important; letter-spacing: .2px; padding: 10px 14px !important; }
+    .btn-primary-glow {
+        background: linear-gradient(90deg, var(--accent), #16a34a) !important;
+        border: none !important;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.25);
     }
+    .btn-primary-glow:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .btn-ghost {
+        background: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.14) !important;
+        color: rgba(255,255,255,0.92) !important;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.12) !important; transform: translateY(-1px); }
+    .btn-danger-soft {
+        background: rgba(239,68,68,0.12) !important;
+        border: 1px solid rgba(239,68,68,0.25) !important;
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+    .action-bar {
+        margin-top: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        padding: 12px;
+        display:flex;
+        gap: 10px;
+        align-items:center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-wrap { max-width: 360px; width: 100%; }
+    .search-wrap .input-group-text {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.8);
+        border-radius: 999px 0 0 999px;
+    }
+    .search-wrap .form-control {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.92);
+        border-left: none;
+        border-radius: 0 999px 999px 0;
+    }
+
+    .stats {
+        margin-top: 14px;
+        display:grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+    @@media (max-width: 992px){ .stats{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @@media (max-width: 520px){ .stats{ grid-template-columns: 1fr; } }
+
+    .stat {
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(0,0,0,0.18);
+    }
+    .stat .label { color: rgba(255,255,255,0.70); font-weight: 900; text-transform: uppercase; letter-spacing: .6px; font-size: .74rem; }
+    .stat .val { margin-top: 6px; font-size: 1.35rem; font-weight: 900; color: rgba(255,255,255,0.96); line-height: 1.1; }
+    .stat .hint { margin-top: 6px; color: rgba(255,255,255,0.62); font-weight: 700; font-size: .92rem; }
+
+    .panel {
+        margin-top: 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.30);
+        backdrop-filter: blur(12px);
+        padding: 14px;
+    }
+
+    .panel-head {
+        display:flex;
+        align-items:center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .panel-title { margin:0; font-weight: 900; color: rgba(255,255,255,0.95); font-size: 1.05rem; }
+    .panel-sub { margin: 4px 0 0; color: rgba(255,255,255,0.65); font-weight: 700; font-size: .95rem; }
+
+    .staff-grid {
+        display:grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+    @@media (max-width: 1100px){ .staff-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @@media (max-width: 650px){ .staff-grid{ grid-template-columns: 1fr; } }
+
+    .s-card {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+        transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .s-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.18); }
+
+    .s-top { display:flex; align-items:flex-start; justify-content: space-between; gap: 10px; }
+    .s-name { margin:0; font-weight: 900; color: rgba(255,255,255,0.96); font-size: 1.05rem; }
+    .s-email { margin: 4px 0 0; color: rgba(255,255,255,0.66); font-weight: 700; font-size: .92rem; }
+
+    .badge-soft {
+        border-radius: 999px;
+        padding: 8px 10px;
+        font-weight: 900;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        white-space: nowrap;
+        font-size: .85rem;
+    }
+    .badge-blue { border-color: rgba(14,165,233,0.35); background: rgba(14,165,233,0.14); }
+    .badge-green { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.14); }
+    .badge-warn { border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.14); }
+
+    .kv { margin-top: 10px; display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @@media (max-width: 520px){ .kv{ grid-template-columns: 1fr; } }
+    .kv-item {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.05);
+        padding: 10px;
+    }
+    .kv-label {
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        font-size: .72rem;
+        color: rgba(255,255,255,0.62);
+        margin-bottom: 6px;
+    }
+    .kv-val { color: rgba(255,255,255,0.92); font-weight: 800; line-height: 1.35; word-break: break-word; }
+
+    .s-actions { margin-top: 10px; display:flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+    .form-control, .form-select {
+        background: rgba(255,255,255,0.06) !important;
+        border: 1px solid rgba(255,255,255,0.14) !important;
+        color: rgba(255,255,255,0.92) !important;
+    }
+    .form-control::placeholder { color: rgba(255,255,255,0.45) !important; }
+
+    .hint { color: rgba(255,255,255,0.62); font-weight: 700; font-size: .92rem; line-height: 1.45; }
+
+    /* Modal theme */
+    .modal-content {
+        background:#0f1520 !important;
+        color: var(--text);
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        border-radius: 18px !important;
+    }
+    .modal-header, .modal-footer { border: 0 !important; }
+
+    /* Skeleton */
+    .skeleton {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+        position: relative;
+        overflow: hidden;
+        min-height: 160px;
+    }
+    .skeleton:before {
+        content:"";
+        position:absolute;
+        inset:-80px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+        transform: translateX(-60%);
+        animation: shimmer 1.3s infinite;
+    }
+    @@keyframes shimmer { 100% { transform: translateX(60%);} }
 </style>
-<div class="container mt-5">
-    <div class="mb-3">
-        <select class="form-select" name="outletId">
-            @foreach (var outlet in Model)
-            {
-                <option value="@outlet.Id">@outlet.InternalOutletName</option>
-            }
-        </select>
-    </div>
-    <h2 class="mb-4">Kitchen Staff Management</h2>
 
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addEditMemberModal">
-        Add Member
-    </button>
+<div class="k-wrap">
+    <div class="k-max">
 
-    <div class="container mt-5">
-       
-        <div id="staffMembersList" class="row">
-            <!-- Bootstrap Cards for Staff Members will be loaded here via AJAX -->
-        </div>
-       
-    </div>
-
-
-    <div class="modal fade" id="addEditMemberModal" tabindex="-1" aria-labelledby="addEditMemberModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addEditMemberModalLabel">Add/Edit Member</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <section class="k-hero">
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h1 class="k-title mb-0">Kitchen Staff Management</h1>
+                        <span class="pill"><span class="dot"></span> Assign roles & manage access</span>
+                    </div>
+                    <p class="k-sub">
+                        Add kitchen members, set roles, and manage staff per outlet. This page supports <b>API mode</b> with <b>Demo fallback</b> so the UI always works for showcasing.
+                    </p>
                 </div>
-                <div class="modal-body">
-                    <form id="addEditMemberForm">
-                        <input type="hidden" id="memberId" value="0">
-                        <div class="mb-3">
-                            <label for="memberName" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="memberName" name="name" placeholder="Enter member's name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="memberEmail" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="memberEmail" name="email" placeholder="Enter member's email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="memberRole" class="form-label">Role</label>
-                            <select class="form-select" id="memberRole" name="role" required>
-                                <option value="">Select a role</option>
-                                <option value="Chef">Chef</option>
-                                <option value="Assistant Chef">Assistant Chef</option>
-                                <option value="Kitchen Porter">Kitchen Porter</option>
-                                <option value="Waiter">Waiter</option>
-                                <option value="Manager">Manager</option>
-                            </select>
-                        </div>
-                    </form>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <button type="button" class="btn btn-primary-glow btn-pill" data-bs-toggle="modal" data-bs-target="#addEditMemberModal" id="openAddModalBtn">
+                        <i class="fas fa-user-plus me-1"></i> Add Member
+                    </button>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" form="addEditMemberForm">Save Changes</button>
+            </div>
+
+            <div class="action-bar">
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <label class="pill mb-0" style="gap:8px;">
+                        <i class="fas fa-store"></i>
+                        <span style="font-weight:900;">Outlet</span>
+                    </label>
+
+                    <select class="form-select" name="outletId" style="min-width: 320px;">
+                        @foreach (var outlet in Model)
+                        {
+                            <option value="@outlet.Id">@outlet.InternalOutletName</option>
+                        }
+                    </select>
+
+                    <span class="pill" id="modePill">
+                        <i class="fas fa-plug"></i>
+                        <span id="modeText">Mode: —</span>
+                    </span>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <div class="search-wrap">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input id="staffSearch" type="text" class="form-control" placeholder="Search by name or email..." />
+                        </div>
+                    </div>
+
+                    <select id="roleFilter" class="form-select" style="max-width: 220px;">
+                        <option value="">All Roles</option>
+                        <option value="Chef">Chef</option>
+                        <option value="Assistant Chef">Assistant Chef</option>
+                        <option value="Kitchen Porter">Kitchen Porter</option>
+                        <option value="Waiter">Waiter</option>
+                        <option value="Manager">Manager</option>
+                    </select>
+
+                    <button class="btn btn-ghost btn-pill" type="button" id="refreshBtn">
+                        <i class="fas fa-sync me-1"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="label">Total Staff</div>
+                    <div class="val" id="statTotal">—</div>
+                    <div class="hint">For the selected outlet</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Managers</div>
+                    <div class="val" id="statManagers">—</div>
+                    <div class="hint">Supervision & approvals</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Kitchen Team</div>
+                    <div class="val" id="statKitchen">—</div>
+                    <div class="hint">Chef + Assistant + Porter</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Mode</div>
+                    <div class="val" id="statMode">—</div>
+                    <div class="hint">API or Demo</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <div>
+                    <p class="panel-title">Staff Members</p>
+                    <p class="panel-sub">Edit inline and save instantly. Password is required only when adding a new member.</p>
+                </div>
+                <span class="badge-soft badge-blue" id="badgeCount">— members</span>
+            </div>
+
+            <div id="staffMembersList" class="staff-grid">
+                @* Injected via JS *@
+            </div>
+
+            <div id="emptyState" class="hint mt-3" style="display:none;">
+                No staff members found for this outlet. Add a member to get started.
+            </div>
+        </section>
+
+        <!-- Modal -->
+        <div class="modal fade" id="addEditMemberModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-white fw-bold" id="addEditMemberModalLabel">Add Member</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="addEditMemberForm">
+                            <input type="hidden" id="memberId" name="id" value="0" />
+
+                            <div class="mb-3">
+                                <label for="memberName" class="form-label text-white">Name</label>
+                                <input type="text" class="form-control" id="memberName" name="name" placeholder="e.g., Kasun Perera" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="memberEmail" class="form-label text-white">Email</label>
+                                <input type="email" class="form-control" id="memberEmail" name="email" placeholder="e.g., kasun@restro.lk" required>
+                            </div>
+
+                            <div class="mb-3" id="passwordBlock">
+                                <label for="password" class="form-label text-white">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Required for new staff only">
+                                <div class="hint mt-2">For demo: use a simple password. In production: generate + email invite.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="memberRole" class="form-label text-white">Role</label>
+                                <select class="form-select" id="memberRole" name="role" required>
+                                    <option value="">Select a role</option>
+                                    <option value="Chef">Chef</option>
+                                    <option value="Assistant Chef">Assistant Chef</option>
+                                    <option value="Kitchen Porter">Kitchen Porter</option>
+                                    <option value="Waiter">Waiter</option>
+                                    <option value="Manager">Manager</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-ghost btn-pill" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary-glow btn-pill" form="addEditMemberForm">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
+
 @section Scripts {
-    <script>
-        $(document).ready(function () {
+<script>
+    // =============================
+    // CONFIG
+    // =============================
+    const API_BASE = "https://restosolutionssaas.com";
+    const DEMO_FALLBACK = true; // if API fails, show dummy staff
 
-            // Load staff members when a new outlet is selected
-            $('select[name="outletId"]').change(function () {
-                var outletId = $(this).val();
-                loadStaffMembers(outletId);
-            });
-            // Function to load staff members for a specific outlet
-            function loadStaffMembers(outletId) {
-                console.log("Attempting to load staff for Outlet ID:", outletId);
-                $.ajax({
-                    url: `https://restosolutionssaas.com/api/KitchenApi/GetStaffByOutlet/${outletId}`,
-                    type: 'GET',
-                    success: function (response) {
-                        $('#staffMembersList').empty(); // Clear existing staff members
-                        if (response && response.length > 0) {
-                            response.forEach(function (staffMember) {
-                                var staffMemberHtml = `
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm" data-id="${staffMember.id}"> <!-- Add data-id attribute here -->
+    let CURRENT_MODE = "API";
+    let STAFF_CACHE = [];
+    let CURRENT_OUTLET_ID = null;
 
-                <div class="card-body">
-                    <div class="card-text" data-role="name-display">${staffMember.name}</div>
-                    <input type="text" class="form-control d-none" data-role="name-edit" value="${staffMember.name}">
+    function setMode(mode) {
+        CURRENT_MODE = mode;
+        $("#modeText").text(`Mode: ${mode}`);
+        $("#statMode").text(mode);
+        $("#modePill i").attr("class", mode === "DEMO" ? "fas fa-flask" : "fas fa-plug");
+    }
 
-                    <div class="card-text" data-role="email-display">${staffMember.email}</div>
-                    <input type="email" class="form-control d-none" data-role="email-edit" value="${staffMember.email}">
+    function escapeHtml(s) {
+        return String(s ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
-                    <div class="card-text" data-role="role-display">${staffMember.role}</div>
-                    <select class="form-select d-none" data-role="role-edit">
-                        <option value="Chef" ${staffMember.role === 'Chef' ? 'selected' : ''}>Chef</option>
-                        <option value="Assistant Chef" ${staffMember.role === 'Assistant Chef' ? 'selected' : ''}>Assistant Chef</option>
-                        <option value="Kitchen Porter" ${staffMember.role === 'Kitchen Porter' ? 'selected' : ''}>Kitchen Porter</option>
-                        <option value="Waiter" ${staffMember.role === 'Waiter' ? 'selected' : ''}>Waiter</option>
-                        <option value="Manager" ${staffMember.role === 'Manager' ? 'selected' : ''}>Manager</option>
-                        <!-- Ensure you add all roles here -->
-                    </select>
+    function getDummyStaff(outletId) {
+        // "Realistic" demo staff set
+        return [
+            { id: 501, name: "Kasun Perera", email: "kasun.chef@restro.lk", role: "Chef", outletId },
+            { id: 502, name: "Nimali Fernando", email: "nimali.assistant@restro.lk", role: "Assistant Chef", outletId },
+            { id: 503, name: "Ayesha Silva", email: "ayesha.porter@restro.lk", role: "Kitchen Porter", outletId },
+            { id: 504, name: "Tharindu Jayasuriya", email: "tharindu.waiter@restro.lk", role: "Waiter", outletId },
+            { id: 505, name: "Shanaka Dias", email: "shanaka.manager@restro.lk", role: "Manager", outletId },
+        ];
+    }
+
+    function renderSkeleton() {
+        $("#staffMembersList").html(`
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        `);
+    }
+
+    function updateStats(list) {
+        const total = (list || []).length;
+        const managers = (list || []).filter(x => (x.role || "").toLowerCase() === "manager").length;
+        const kitchen = (list || []).filter(x => ["chef","assistant chef","kitchen porter"].includes((x.role || "").toLowerCase())).length;
+
+        $("#statTotal").text(total);
+        $("#statManagers").text(managers);
+        $("#statKitchen").text(kitchen);
+        $("#badgeCount").text(`${total} members`);
+    }
+
+    function roleBadgeClass(role) {
+        const r = (role || "").toLowerCase();
+        if (r === "manager") return "badge-green";
+        if (r.includes("chef")) return "badge-blue";
+        if (r.includes("porter")) return "badge-warn";
+        return "badge-soft";
+    }
+
+    function cardHtml(member) {
+        const id = member.id;
+        const name = escapeHtml(member.name);
+        const email = escapeHtml(member.email);
+        const role = escapeHtml(member.role);
+
+        return `
+            <div class="s-card" data-id="${id}">
+                <div class="s-top">
+                    <div>
+                        <p class="s-name" data-role="name-display">${name}</p>
+                        <input type="text" class="form-control d-none" data-role="name-edit" value="${name}"/>
+
+                        <p class="s-email" data-role="email-display">${email}</p>
+                        <input type="email" class="form-control d-none" data-role="email-edit" value="${email}"/>
+                    </div>
+                    <span class="badge-soft ${roleBadgeClass(role)}" data-role="role-display">${role}</span>
                 </div>
 
-                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-                    <button class="btn btn-outline-primary btn-sm" data-action="edit">Edit</button>
-                    <button class="btn btn-outline-success btn-sm d-none" data-action="save">Save</button>
-                    <button class="btn btn-outline-danger btn-sm" data-action="delete">Delete</button>
+                <div class="kv">
+                    <div class="kv-item">
+                        <div class="kv-label">Role</div>
+                        <div class="kv-val" data-role="role-display2">${role}</div>
+                        <select class="form-select d-none" data-role="role-edit">
+                            <option value="Chef" ${role === 'Chef' ? 'selected' : ''}>Chef</option>
+                            <option value="Assistant Chef" ${role === 'Assistant Chef' ? 'selected' : ''}>Assistant Chef</option>
+                            <option value="Kitchen Porter" ${role === 'Kitchen Porter' ? 'selected' : ''}>Kitchen Porter</option>
+                            <option value="Waiter" ${role === 'Waiter' ? 'selected' : ''}>Waiter</option>
+                            <option value="Manager" ${role === 'Manager' ? 'selected' : ''}>Manager</option>
+                        </select>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Access</div>
+                        <div class="kv-val">Kitchen Portal</div>
+                        <div class="hint">Role-based permissions (demo)</div>
+                    </div>
                 </div>
 
+                <div class="s-actions">
+                    <button class="btn btn-ghost btn-pill btn-sm" data-action="edit">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </button>
+                    <button class="btn btn-primary-glow btn-pill btn-sm d-none" data-action="save">
+                        <i class="fas fa-check me-1"></i> Save
+                    </button>
+                    <button class="btn btn-ghost btn-pill btn-sm d-none" data-action="cancel">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button class="btn btn-danger-soft btn-pill btn-sm" data-action="delete">
+                        <i class="fas fa-trash me-1"></i> Delete
+                    </button>
+                </div>
             </div>
-        </div>`;
+        `;
+    }
 
-                                $('#staffMembersList').append(staffMemberHtml);
-                            });
-                        } else {
-                            // Show a message in #staffMembersList when no staff members are found
-                            $('#staffMembersList').html('<p class="text-center w-100">No staff members found for this outlet. Please add staff members.</p>');
-                        }
-                    },
-                    error: function (xhr) {
-                        console.error("Error loading staff members:", xhr.statusText);
-                        // Show error message in #staffMembersList
-                        $('#staffMembersList').html('<p class="text-center w-100">Error loading staff members. Please try again later.</p>');
-                    }
-                });
-            }
+    function populateStaff(list) {
+        const q = ($("#staffSearch").val() || "").trim().toLowerCase();
+        const role = ($("#roleFilter").val() || "").trim().toLowerCase();
 
-            // Initial load for default selected outlet
-            var initialOutletId = $('select[name="outletId"]').val();
-            if (initialOutletId) {
-                loadStaffMembers(initialOutletId);
-            }
-
-            // Handle the form submission
-            $('#addEditMemberForm').submit(function (e) {
-                e.preventDefault();
-                var formData = new FormData(this);
-                formData.append('outletId', $('select[name="outletId"]').val()); // Ensure outletId is included
-
-                $.ajax({
-                    type: "POST",
-                    url: "https://restosolutionssaas.com/api/KitchenApi/AddKitchenStaff",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        console.log("Staff member added successfully:", response);
-                        $('#addEditMemberModal').modal('hide');
-                        alert(response.message);
-                        loadStaffMembers($('select[name="outletId"]').val()); // Reload staff members list
-                    },
-                    error: function (xhr, textStatus, errorThrown) {
-                        console.error("Error:", textStatus + ": " + errorThrown);
-                        alert("An error occurred: " + xhr.responseText);
-                    }
-                });
-            });
-
-            $('#staffMembersList').on('click', 'button[data-action="delete"]', function () {
-                // Use .closest() to find the nearest parent with the class .card
-                var card = $(this).closest('.card');
-                // Retrieve the data-id attribute from the card
-                var id = card.data('id');
-
-                if (typeof id !== 'undefined' && id !== null) {
-                    deleteStaffMember(id);
-                } else {
-                    console.error("Staff member ID is undefined or null.");
-                }
-            });
-
-
-            $('#staffMembersList').on('click', 'button[data-action="edit"]', function () {
-                var $card = $(this).closest('.card');
-                $card.find('[data-role$="-display"]').addClass('d-none'); // Hide display elements
-                $card.find('[data-role$="-edit"]').removeClass('d-none'); // Show edit inputs
-
-                $(this).addClass('d-none'); // Hide edit button
-                $card.find('button[data-action="save"]').removeClass('d-none'); // Show save button
-            });
-
-            $('#staffMembersList').on('click', 'button[data-action="save"]', function () {
-                var $card = $(this).closest('.card');
-                var id = $card.data('id'); // Ensure this data attribute is correctly set on the card
-                console.log("Saving staff member with ID: ", id); // Debugging log
-
-                // Ensure the rest of the data is correctly captured
-                var name = $card.find('[data-role="name-edit"]').val();
-                var email = $card.find('[data-role="email-edit"]').val();
-                var role = $card.find('[data-role="role-edit"]').val();
-                console.log("Data to update: ", { id, name, email, role }); // Debugging log
-
-                // AJAX call to update the staff member
-                $.ajax({
-                    url: `https://restosolutionssaas.com/api/KitchenApi/UpdateStaffMember`,
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ id, name, email, role }),
-                    success: function (response) {
-                        console.log("Update success response: ", response);
-                        alert('Staff member updated successfully.');
-                        // Further actions
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Update failed: ", xhr.responseText);
-                        alert('An error occurred while updating the staff member.');
-                    }
-                });
-            });
-
-            function deleteStaffMember(id) {
-                if (confirm('Are you sure you want to delete this staff member?')) {
-                    $.ajax({
-                        url: `https://restosolutionssaas.com/api/KitchenApi/DeleteStaffMember/${id}`,
-                        type: 'DELETE',
-                        success: function (response) {
-                            alert(response.message);
-                            // Reload staff members to reflect the deletion
-                            var selectedOutletId = $('select[name="outletId"]').val();
-                            loadStaffMembers(selectedOutletId);
-                        },
-                        error: function (xhr) {
-                            console.error("Error deleting staff member:", xhr.statusText);
-                            alert("An error occurred: " + xhr.responseText);
-                        }
-                    });
-                }
-            }
-
-
+        const filtered = (list || []).filter(m => {
+            const matchQ = !q || (m.name || "").toLowerCase().includes(q) || (m.email || "").toLowerCase().includes(q);
+            const matchRole = !role || (m.role || "").toLowerCase() === role;
+            return matchQ && matchRole;
         });
-    </script>
+
+        $("#staffMembersList").empty();
+
+        if (filtered.length === 0) {
+            $("#emptyState").show();
+        } else {
+            $("#emptyState").hide();
+            filtered.forEach(m => $("#staffMembersList").append(cardHtml(m)));
+        }
+
+        updateStats(filtered.length === (list||[]).length ? (list||[]) : filtered);
+    }
+
+    function loadStaffMembers(outletId) {
+        CURRENT_OUTLET_ID = outletId;
+        renderSkeleton();
+        setMode("API");
+
+        $.ajax({
+            url: `${API_BASE}/api/KitchenApi/GetStaffByOutlet/${outletId}`,
+            type: "GET",
+            success: function (response) {
+                STAFF_CACHE = (response || []);
+                populateStaff(STAFF_CACHE);
+            },
+            error: function () {
+                if (DEMO_FALLBACK) {
+                    setMode("DEMO");
+                    STAFF_CACHE = getDummyStaff(outletId);
+                    populateStaff(STAFF_CACHE);
+                } else {
+                    $("#staffMembersList").html(`<div class="hint">Error loading staff members. Please try again later.</div>`);
+                }
+            }
+        });
+    }
+
+    function setEditMode($card, enabled) {
+        $card.find('[data-role$="-display"]').toggleClass('d-none', enabled);
+        $card.find('[data-role$="-display2"]').toggleClass('d-none', enabled);
+        $card.find('[data-role$="-edit"]').toggleClass('d-none', !enabled);
+
+        $card.find('button[data-action="edit"]').toggleClass('d-none', enabled);
+        $card.find('button[data-action="save"]').toggleClass('d-none', !enabled);
+        $card.find('button[data-action="cancel"]').toggleClass('d-none', !enabled);
+    }
+
+    function updateStaffMember(id, name, email, role) {
+        if (CURRENT_MODE === "DEMO") {
+            STAFF_CACHE = STAFF_CACHE.map(x => x.id == id ? ({ ...x, name, email, role }) : x);
+            populateStaff(STAFF_CACHE);
+            return;
+        }
+
+        $.ajax({
+            url: `${API_BASE}/api/KitchenApi/UpdateStaffMember`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ id, name, email, role }),
+            success: function () {
+                // Update local cache and refresh UI
+                STAFF_CACHE = STAFF_CACHE.map(x => x.id == id ? ({ ...x, name, email, role }) : x);
+                populateStaff(STAFF_CACHE);
+            },
+            error: function (xhr) {
+                alert("Update failed: " + (xhr.responseText || "Unknown error"));
+            }
+        });
+    }
+
+    function deleteStaffMember(id) {
+        if (!confirm("Delete this staff member?")) return;
+
+        if (CURRENT_MODE === "DEMO") {
+            STAFF_CACHE = STAFF_CACHE.filter(x => x.id != id);
+            populateStaff(STAFF_CACHE);
+            return;
+        }
+
+        $.ajax({
+            url: `${API_BASE}/api/KitchenApi/DeleteStaffMember/${id}`,
+            type: "DELETE",
+            success: function () {
+                STAFF_CACHE = STAFF_CACHE.filter(x => x.id != id);
+                populateStaff(STAFF_CACHE);
+            },
+            error: function (xhr) {
+                alert("Delete failed: " + (xhr.responseText || "Unknown error"));
+            }
+        });
+    }
+
+    function resetAddModal() {
+        $("#addEditMemberModalLabel").text("Add Member");
+        $("#memberId").val("0");
+        $("#memberName").val("");
+        $("#memberEmail").val("");
+        $("#memberRole").val("");
+        $("#password").val("");
+        $("#passwordBlock").show();
+        $("#password").prop("required", true);
+    }
+
+    $(document).ready(function () {
+        const initialOutletId = $('select[name="outletId"]').val();
+        if (initialOutletId) loadStaffMembers(initialOutletId);
+
+        $('select[name="outletId"]').change(function () {
+            loadStaffMembers($(this).val());
+        });
+
+        $("#refreshBtn").on("click", function () {
+            if (CURRENT_OUTLET_ID) loadStaffMembers(CURRENT_OUTLET_ID);
+        });
+
+        $("#staffSearch").on("input", function () {
+            populateStaff(STAFF_CACHE);
+        });
+
+        $("#roleFilter").on("change", function () {
+            populateStaff(STAFF_CACHE);
+        });
+
+        $("#openAddModalBtn").on("click", function(){
+            resetAddModal();
+        });
+
+        // Add member submit
+        $("#addEditMemberForm").submit(function (e) {
+            e.preventDefault();
+
+            const outletId = $('select[name="outletId"]').val();
+            const formData = new FormData(this);
+            formData.append("outletId", outletId);
+
+            // Demo mode: just inject into UI
+            if (CURRENT_MODE === "DEMO") {
+                const newId = Math.floor(1000 + Math.random() * 9000);
+                const name = $("#memberName").val();
+                const email = $("#memberEmail").val();
+                const role = $("#memberRole").val();
+
+                STAFF_CACHE.unshift({ id: newId, name, email, role, outletId });
+                populateStaff(STAFF_CACHE);
+
+                bootstrap.Modal.getOrCreateInstance(document.getElementById("addEditMemberModal")).hide();
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: `${API_BASE}/api/KitchenApi/AddKitchenStaff`,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById("addEditMemberModal")).hide();
+                    loadStaffMembers(outletId);
+                },
+                error: function (xhr) {
+                    alert("Add failed: " + (xhr.responseText || "Unknown error"));
+                }
+            });
+        });
+
+        // Card actions
+        $("#staffMembersList").on("click", "button[data-action='edit']", function () {
+            const $card = $(this).closest(".s-card");
+            setEditMode($card, true);
+        });
+
+        $("#staffMembersList").on("click", "button[data-action='cancel']", function () {
+            // rerender from cache to restore original values
+            populateStaff(STAFF_CACHE);
+        });
+
+        $("#staffMembersList").on("click", "button[data-action='save']", function () {
+            const $card = $(this).closest(".s-card");
+            const id = $card.data("id");
+
+            const name = $card.find('[data-role="name-edit"]').val();
+            const email = $card.find('[data-role="email-edit"]').val();
+            const role = $card.find('[data-role="role-edit"]').val();
+
+            updateStaffMember(id, name, email, role);
+        });
+
+        $("#staffMembersList").on("click", "button[data-action='delete']", function () {
+            const id = $(this).closest(".s-card").data("id");
+            deleteStaffMember(id);
+        });
+    });
+</script>
 }

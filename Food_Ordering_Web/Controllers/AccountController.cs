@@ -382,10 +382,28 @@ namespace Food_Ordering_Web.Controllers
         // -----------------------------
         private IActionResult RedirectToRoleHome(string role)
         {
-            // your roles map to controller names in your app
-            var controller = string.IsNullOrWhiteSpace(role) ? "Home" : role;
+            role = (role ?? "").Trim();
+
+            // Normalize common variants from API
+            var normalized = role.ToLowerInvariant();
+
+            var controller = normalized switch
+            {
+                "customer" => "Customer",
+                "user" => "Customer",
+                "client" => "Customer",
+
+                "restaurant" => "Restaurant",
+                "owner" => "Restaurant",
+
+                "admin" => "Admin",
+
+                _ => "Home"
+            };
+
             return RedirectToAction("Index", controller);
         }
+
 
         private async Task SignInDemoUser(DemoUser user)
         {
@@ -434,52 +452,80 @@ namespace Food_Ordering_Web.Controllers
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
-                if (userIdClaim == null)
+                // ✅ USER ID: support common claim names
+                var userId =
+                    jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid")?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+                if (string.IsNullOrWhiteSpace(userId))
                 {
-                    _logger.LogError("User ID claim missing in JWT.");
-                    return View("Error");
+                    _logger.LogError("User ID claim missing in JWT. Claims: {Claims}",
+                        string.Join(", ", jwtToken.Claims.Select(c => $"{c.Type}={c.Value}")));
+                    ViewBag.ErrorMessage = "Login token missing user id claim.";
+                    return RedirectToAction("Login", "Account");
                 }
 
-                var userNameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
-                var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "IsSubscribed");
+                // ✅ NAME: support common claim names
+                var userName =
+                    jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "name")?.Value
+                    ?? "";
 
-                var isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out var s) && s;
+                // ✅ ROLE: support common role claim names
+                var role =
+                    jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "roles")?.Value
+                    ?? "Customer"; // safe default
+
+                // ✅ SUBSCRIPTION
+                var isSubscribedValue =
+                    jwtToken.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value
+                    ?? jwtToken.Claims.FirstOrDefault(c => c.Type == "isSubscribed")?.Value
+                    ?? "false";
+
+                var isSubscribed = bool.TryParse(isSubscribedValue, out var s) && s;
 
                 var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, userNameClaim?.Value ?? string.Empty),
-                    new Claim(ClaimTypes.Role, roleClaim?.Value ?? string.Empty),
-                    new Claim(ClaimTypes.NameIdentifier, userIdClaim.Value),
-                    new Claim("IsSubscribed", isSubscribed.ToString())
-                };
+{
+    new Claim(ClaimTypes.Name, userName),
+    new Claim(ClaimTypes.Role, role),
+    new Claim(ClaimTypes.NameIdentifier, userId),
+    new Claim("IsSubscribed", isSubscribed.ToString())
+};
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties
-                {
-                    IsPersistent = false,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-                });
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    claimsPrincipal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = false,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                    });
 
-                // Store JWT in cookie (dev-safe settings)
+                // Cookie for JWT
                 var secure = HttpContext.Request.IsHttps;
-                var cookieOptions = new CookieOptions
+                Response.Cookies.Append("jwtCookie", token, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = secure,
                     SameSite = secure ? SameSiteMode.None : SameSiteMode.Lax,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-                };
-                Response.Cookies.Append("jwtCookie", token, cookieOptions);
+                });
 
+                // keep your existing outlet/table redirect
                 if (outletId.HasValue && tableId.HasValue)
                     return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
 
-                var role = roleClaim?.Value ?? "Home";
-                return RedirectToAction("Index", role);
+                // ✅ map role -> controller safely
+                return RedirectToRoleHome(role);
+
             }
             catch (Exception ex)
             {

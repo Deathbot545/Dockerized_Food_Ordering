@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "XWXcmGqeFT8ktqyHAoWw8XqeVD3DM3Jwr3YFieSUmUY=",
+  "Hash": "dO8ACBYt8UMo4y4YlsqJnPXbf8JWp01ViqQAfXbtkeM=",
   "Source": "Food_Ordering_Web",
   "BasePath": "_content/Food_Ordering_Web",
   "Mode": "Default",
@@ -1941,6 +1941,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\Images\\background.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\Images\\ll.jpeg",
+      "SourceId": "Food_Ordering_Web",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\",
+      "BasePath": "_content/Food_Ordering_Web",
+      "RelativePath": "Images/ll.jpeg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\ll.jpeg"
     },
     {
       "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\Images\\logo.jpeg",

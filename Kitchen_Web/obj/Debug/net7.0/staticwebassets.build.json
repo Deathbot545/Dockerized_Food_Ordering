@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "v1MsbZdP0M3Nk09biG3MnhtarbltRrxWJvq2+smsv3k=",
+  "Hash": "yLNC5nMqQHUcD99GsCfS7tdzR90/YintuSJjFyamlhk=",
   "Source": "Kitchen_Web",
   "BasePath": "_content/Kitchen_Web",
   "Mode": "Default",
@@ -802,12 +802,12 @@
       "OriginalItemSpec": "wwwroot\\Images\\background.jpg"
     },
     {
-      "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\Images\\logo.jpeg",
+      "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\Images\\ll.jpeg",
       "SourceId": "Food_Ordering_Web",
       "SourceType": "Project",
       "ContentRoot": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\",
       "BasePath": "_content/Food_Ordering_Web",
-      "RelativePath": "Images/logo.jpeg",
+      "RelativePath": "Images/ll.jpeg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -818,7 +818,26 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\Images\\logo.jpeg"
+      "OriginalItemSpec": "wwwroot\\Images\\ll.jpeg"
+    },
+    {
+      "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\Images\\logo.png",
+      "SourceId": "Food_Ordering_Web",
+      "SourceType": "Project",
+      "ContentRoot": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\",
+      "BasePath": "_content/Food_Ordering_Web",
+      "RelativePath": "Images/logo.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Images\\logo.png"
     },
     {
       "Identity": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\js\\bootstrap.bundle.js",

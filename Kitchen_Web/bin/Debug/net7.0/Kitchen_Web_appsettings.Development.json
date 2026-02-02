@@ -1,4 +1,20 @@
 {
+  "ApiBaseUrl": "http://localhost:5000/",
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:5002",
+      "http://localhost:5003",
+      "http://localhost:5173",
+      "http://localhost:8088",
+      "http://localhost:8089"
+    ]
+  },
+  "Jwt": {
+    "Key": "dev-super-secret-key",
+    "Issuer": "dev",
+    "Audience": "dev"
+  },
+  "ShowDetailedErrors": true,
   "Logging": {
     "LogLevel": {
       "Default": "Information",

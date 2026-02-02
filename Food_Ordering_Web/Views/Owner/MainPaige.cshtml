@@ -1,358 +1,828 @@
-﻿@if (TempData["SubscriptionMessage"] != null)
+﻿@* ===========================
+   Owner Main Page (Outlets)
+   Modern UI / Demo-friendly
+   =========================== *@
+
+@{
+    ViewData["Title"] = "Outlets";
+}
+
+@if (TempData["SubscriptionMessage"] != null)
 {
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div class="alert alert-warning alert-dismissible fade show mx-3 mt-3" role="alert">
         @TempData["SubscriptionMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-    <main class="container">
-        <div class="p-3 p-md-4 mb-3 rounded text-body-emphasis bg-body-secondary">
-            <div class="col-lg-12 px-0">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h1 class="display-4 fst">List of Outlets</h1>
-                    <div>
-                        <button type="button" class="btn btn-primary"><a class="dropdown-item" asp-area="" asp-controller="Restaurant" asp-action="Add">Add</a></button>
-                        <div class="dropdown d-inline">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="actionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Action
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="actionDropdown">
-                                <li><a class="dropdown-item" id="editLink" asp-area="" asp-controller="Restaurant" asp-action="Edit">Edit</a></li>
-                                <li><a class="dropdown-item" id="manageLink" asp-area="" asp-controller="Restaurant" asp-action="Manage">Manage</a></li>
-                                <li><a class="dropdown-item" id="tablesLink" asp-area="" asp-controller="Restaurant" asp-action="Tables">Tables</a></li>
-                                <li><a class="dropdown-item" id="deleteButton">Delete</a></li>
-                                <li><a class="dropdown-item" id="kitchenLink" href="#">Kitchen</a></li> <!-- Kitchen link -->
-                            </ul>
 
+<style>
+    /* --- Page layout: wide but not messy --- */
+    .owner-wrap {
+        width: 100%;
+        padding: 18px 14px 28px;
+    }
+
+    .owner-max {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* --- Header / hero --- */
+    .owner-hero {
+        border-radius: 22px;
+        padding: 22px 20px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: radial-gradient(900px 450px at 8% 0%, rgba(34,197,94,0.16), transparent 55%), radial-gradient(900px 450px at 95% 15%, rgba(14,165,233,0.16), transparent 55%), rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+        backdrop-filter: blur(12px);
+    }
+
+        .owner-hero h1 {
+            font-weight: 900;
+            letter-spacing: .2px;
+            margin: 0;
+            font-size: clamp(1.6rem, 2vw, 2.1rem);
+            color: rgba(255,255,255,0.96);
+        }
+
+        .owner-hero p {
+            margin: 6px 0 0;
+            color: rgba(255,255,255,0.72);
+            max-width: 80ch;
+        }
+
+    /* --- Action bar --- */
+    .action-bar {
+        margin-top: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        backdrop-filter: blur(10px);
+        flex-wrap: wrap;
+    }
+
+    .action-left {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .action-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-pill {
+        border-radius: 999px !important;
+        font-weight: 800;
+        letter-spacing: .2px;
+        padding: 10px 14px !important;
+        transition: transform .15s ease, filter .15s ease, background .15s ease;
+    }
+
+    .btn-primary-glow {
+        background: linear-gradient(90deg, #22c55e, #16a34a);
+        border: none;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.25);
+    }
+
+        .btn-primary-glow:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+    .btn-ghost {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-1px);
+        }
+
+    .btn-danger-soft {
+        background: rgba(239,68,68,0.12);
+        border: 1px solid rgba(239,68,68,0.25);
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+        .btn-danger-soft:hover {
+            background: rgba(239,68,68,0.18);
+        }
+
+    .muted {
+        color: rgba(255,255,255,0.70);
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .selected-pill {
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        font-weight: 800;
+    }
+
+    .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 6px rgba(34,197,94,0.14);
+    }
+
+    /* --- Grid section --- */
+    .grid {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 14px;
+        align-items: start;
+    }
+
+    @@media (max-width: 1200px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* --- Cards list --- */
+    .outlet-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    @@media (max-width: 992px) {
+        .outlet-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .outlet-card {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.25);
+        padding: 14px;
+        transition: transform .15s ease, background .15s ease, border-color .15s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .outlet-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.18);
+        }
+
+        .outlet-card.active {
+            border-color: rgba(34,197,94,0.45);
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.14), 0 18px 60px rgba(0,0,0,0.35);
+        }
+
+    .outlet-title {
+        font-weight: 900;
+        color: rgba(255,255,255,0.95);
+        margin: 0;
+        font-size: 1.08rem;
+    }
+
+    .outlet-sub {
+        margin: 6px 0 0;
+        color: rgba(255,255,255,0.70);
+        font-weight: 700;
+        font-size: .95rem;
+    }
+
+    .outlet-meta {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .chip {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.82);
+        font-weight: 800;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+        .chip i {
+            opacity: .9;
+        }
+
+        }
+
+    /* --- Details panel --- */
+    .details {
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.30);
+        padding: 16px;
+        position: sticky;
+        top: 86px;
+        backdrop-filter: blur(12px);
+    }
+
+    @@media (max-width: 992px) {
+        .details {
+            position: static;
+            top: auto;
+        }
+    }
+
+    .details h4 {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.95);
+        font-size: 1.05rem;
+    }
+
+    .details small {
+        color: rgba(255,255,255,0.68);
+    }
+
+    .details-head {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .details-actionsbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+        .details-actionsbar .btn {
+            white-space: nowrap;
+        }
+
+    a.disabled {
+        pointer-events: none;
+        opacity: .45;
+    }
+
+    .kv {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    @@media (max-width: 992px) {
+        .kv {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .kv-item {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 12px 12px;
+    }
+
+    .kv-label {
+        font-weight: 900;
+        letter-spacing: .4px;
+        font-size: .78rem;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.68);
+        margin-bottom: 6px;
+    }
+
+    .kv-val {
+        font-weight: 800;
+        color: rgba(255,255,255,0.92);
+        line-height: 1.35;
+        word-break: break-word;
+    }
+
+    .img-row {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .img-box {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 10px;
+    }
+
+        .img-box img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+    .desc-box {
+        margin-top: 10px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+    }
+
+        .desc-box p {
+            margin: 0;
+            color: rgba(255,255,255,0.82);
+            line-height: 1.55;
+            font-weight: 700;
+        }
+</style>
+
+<div class="owner-wrap">
+    <div class="owner-max">
+
+        <section class="owner-hero">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div>
+                    <h1>Restaurant Owner Dashboard</h1>
+                    <p>Manage outlets, tables, and kitchen operations from one place. Select an outlet to unlock actions.</p>
+                </div>
+
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="selected-pill" id="selectedPill" style="display:none;">
+                        <span class="dot"></span>
+                        <span id="selectedOutletLabel">Selected: —</span>
+                    </span>
+
+                    <a class="btn btn-primary-glow btn-pill text-decoration-none"
+                       asp-controller="Restaurant" asp-action="Add">
+                        <i class="fas fa-plus me-1"></i> Add Outlet
+                    </a>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <div class="action-left">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="checkbox" id="checkAll">
+                        <label class="form-check-label muted" for="checkAll">Select all</label>
+                    </div>
+
+                    <span class="muted">Tip: click a card or row to select an outlet.</span>
+                </div>
+
+                <div class="action-right">
+                    <div class="input-group" style="max-width: 360px;">
+                        <span class="input-group-text" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.8); border-radius: 999px 0 0 999px;">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input id="outletSearch" type="text" class="form-control" placeholder="Search outlets..."
+                               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.92); border-left: none; border-radius: 0 999px 999px 0;" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid">
+            <!-- LEFT: cards + table -->
+            <div>
+                <div class="outlet-cards" id="outletCards">
+                    @foreach (var outlet in Model)
+                    {
+                        <div class="outlet-card"
+                             data-id="@outlet.Id"
+                             data-internal-outlet-name="@outlet.InternalOutletName"
+                             data-customer-facing-name="@outlet.CustomerFacingName"
+                             data-business-type="@outlet.BusinessType"
+                             data-date-opened="@outlet.DateOpened.ToShortDateString()"
+                             data-employee-count="@outlet.EmployeeCount"
+                             data-operating-hours="@outlet.OperatingHoursStart.ToString(@"hh\:mm") - @outlet.OperatingHoursEnd.ToString(@"hh\:mm")"
+                             data-contact="@outlet.Contact"
+                             data-created="@outlet.CreatedAt.ToShortDateString()"
+                             data-updated="@outlet.UpdatedAt.ToShortDateString()"
+                             data-country-state-city="@outlet.Country, @outlet.State, @outlet.City"
+                             data-street-address="@outlet.StreetAddress"
+                             data-description="@outlet.Description"
+                             data-zip="@outlet.Zip"
+                             data-postal-code="@outlet.PostalCode">
+                            <h3 class="outlet-title">@outlet.CustomerFacingName</h3>
+                            <p class="outlet-sub">@outlet.BusinessType • @outlet.Country, @outlet.City</p>
+
+                            <div class="outlet-meta">
+                                <span class="chip"><i class="far fa-clock"></i>@outlet.OperatingHoursStart.ToString(@"hh\:mm") - @outlet.OperatingHoursEnd.ToString(@"hh\:mm")</span>
+                                <span class="chip"><i class="fas fa-users"></i>@outlet.EmployeeCount staff</span>
+                                <span class="chip"><i class="fas fa-phone"></i>@outlet.Contact</span>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover w-100">
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="checkAll">
-                                        <label class="form-check-label" for="checkAll">Select All</label>
-                                    </div>
-                                </th>
-                                <th scope="col">Customer-Facing Name</th>
-                                <th scope="col">Business Type</th>
-                                <th scope="col">Date Opened</th>
-                                <th scope="col">Employee Count</th>
-                                <th scope="col">Operating Hours</th>
-                                <th scope="col">Contact</th>
-                                <th scope="col">Created At</th>
-                                <th scope="col">Updated At</th>
-                            </tr>
-                    </thead>
-                   
-                        <tbody>
-                            @foreach (var outlet in Model)
-                            {
-                                <tr data-id="@outlet.Id"
-                                data-internal-outlet-name="@outlet.InternalOutletName"
-                                data-country-state-city="@outlet.Country, @outlet.State, @outlet.City"
-                                data-street-address="@outlet.StreetAddress"
-                                data-description="@outlet.Description"
-                                data-zip="@outlet.Zip"
-                                data-postal-code="@outlet.PostalCode">
 
-                                    <th scope="row">
-                                        <div class="form-check">
-                                            <input class="form-check-input checkbox-item" type="checkbox" data-outlet-id="@outlet.Id">
-                                        </div>
-                                    </th>
-                                    <td>@outlet.CustomerFacingName</td>
-                                    <td>@outlet.BusinessType</td>
-                                    <td>@outlet.DateOpened.ToShortDateString()</td>
-                                    <td>@outlet.EmployeeCount</td>
-                                    <td>@outlet.OperatingHoursStart.ToString(@"hh\:mm") - @outlet.OperatingHoursEnd.ToString(@"hh\:mm")</td>
-                                    <td>@outlet.Contact</td>
-                                    <td>@outlet.CreatedAt.ToShortDateString()</td>
-                                    <td>@outlet.UpdatedAt.ToShortDateString()</td>
-                                    <!-- Add any other fields that you'd like to display -->
-                                </tr>
-                            }
-                        </tbody>
-                   
-                    </table>
-                    
-                </div>
+               
             </div>
-        </div>
-        <div id="outletInfo" class="mt-4 p-4 rounded text-bg-light mb-3 ">
-            <h4>Selected Outlet Information:</h4>
-            <div id="outletDetails">
-                <div class="row">
-                    <div class="col-md-5">
-                        <h5>Internal Outlet Name:</h5>
-                        <p id="internalOutletName"></p>
+
+            <!-- RIGHT: details panel -->
+            <aside class="details" id="outletInfo">
+                <div class="details-head">
+                    <div>
+                        <h4 class="mb-1">Outlet Details</h4>
+                        <small id="detailSubtitle">Select an outlet to view details and actions.</small>
                     </div>
-                    <div class="col-md-4">
-                        <h5>Customer-Facing Name:</h5>
-                        <p id="customerFacingName"></p>
-                    </div>
-                    <div class="col-md-3">
-                        <h5>Business Type:</h5>
-                        <p id="businessType"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-5">
-                        <h5>Date Opened:</h5>
-                        <p id="dateOpened"></p>
-                    </div>
-                    <div class="col-md-4">
-                        <h5>Employee Count:</h5>
-                        <p id="employeeCount"></p>
-                    </div>
-                    <div class="col-md-3">
-                        <h5>Contact:</h5>
-                        <p id="contact"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-5">
-                        <h5>Operating Hours:</h5>
-                        <p id="operatingHours"></p>
-                    </div>
-                    <div class="col-md-4">
-                        <h5>Health and Safety Compliance:</h5>
-                        <p id="healthAndSafetyCompliance"></p>
-                    </div>
-                    <div class="col-md-3">
-                        <h5>Country, State, City:</h5>
-                        <p id="countryStateCity"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-5">
-                        <h5>Street Address:</h5>
-                        <p id="streetAddress"></p>
-                    </div>
-                    <div class="col-md-4">
-                        <h5>Zip and Postal Code:</h5>
-                        <p id="zipAndPostalCode"></p>
-                    </div>
-                    <div class="col-md-3">
-                        <h5>Created and Updated At:</h5>
-                        <p id="timestamps"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>Logo:</h5>
-                        <img id="logoImage" src="" alt="Outlet Logo" style="width: 100px; height: auto;">
-                    </div>
-                    <div class="col-md-6">
-                        <h5>Restaurant Image:</h5>
-                        <img id="restaurantImage" src="" alt="Restaurant" style="width: 100px; height: auto;">
+
+                    <div class="details-actionsbar">
+                        <a id="editBtn" class="btn btn-ghost btn-pill disabled" href="#" aria-disabled="true">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </a>
+                        <a id="manageBtn" class="btn btn-ghost btn-pill disabled" href="#" aria-disabled="true">
+                            <i class="fas fa-sliders-h me-1"></i> Manage
+                        </a>
+                        <a id="tablesBtnTop" class="btn btn-ghost btn-pill disabled" href="#" aria-disabled="true">
+                            <i class="fas fa-border-all me-1"></i> Tables
+                        </a>
+                        <a id="kitchenBtn" class="btn btn-ghost btn-pill disabled" href="#" aria-disabled="true">
+                            <i class="fas fa-utensils me-1"></i> Kitchen
+                        </a>
+                        <button id="deleteBtnTop" class="btn btn-danger-soft btn-pill" type="button" disabled>
+                            <i class="fas fa-trash me-1"></i> Delete
+                        </button>
                     </div>
                 </div>
 
-            </div>
-            <div class="row">
-                <div class="col-md-9">
-                    <h5>Description:</h5>
-                    <p id="description"></p>
+                <div class="kv">
+                    <div class="kv-item">
+                        <div class="kv-label">Internal Name</div>
+                        <div class="kv-val" id="internalOutletName">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Customer Name</div>
+                        <div class="kv-val" id="customerFacingName">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Business Type</div>
+                        <div class="kv-val" id="businessType">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Contact</div>
+                        <div class="kv-val" id="contact">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Operating Hours</div>
+                        <div class="kv-val" id="operatingHours">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Staff</div>
+                        <div class="kv-val" id="employeeCount">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Location</div>
+                        <div class="kv-val" id="countryStateCity">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Address</div>
+                        <div class="kv-val" id="streetAddress">—</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Zip / Postal</div>
+                        <div class="kv-val" id="zipAndPostalCode">— / —</div>
+                    </div>
+                    <div class="kv-item">
+                        <div class="kv-label">Timestamps</div>
+                        <div class="kv-val" id="timestamps">Created: — • Updated: —</div>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <a id="viewOutletBtn" class="btn btn-outline-success rounded-pill" href="#">View Outlet</a>
-                </div>
-            </div>
-        </div>
 
-    </main>
+                <div class="img-row">
+                    <div class="img-box">
+                        <div class="kv-label mb-2">Logo</div>
+                        <img id="logoImage" src="/Images/logo.jpeg" alt="Outlet Logo" />
+                    </div>
+                    <div class="img-box">
+                        <div class="kv-label mb-2">Restaurant</div>
+                        <img id="restaurantImage" src="https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1400&q=80" alt="Restaurant Image" />
+                    </div>
+                </div>
+
+                <div class="desc-box">
+                    <div class="kv-label mb-2">Description</div>
+                    <p id="description">—</p>
+                </div>
+            </aside>
+        </section>
+    </div>
+</div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Delete Outlet</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:#0f1520;border:1px solid rgba(255,255,255,0.12);border-radius:18px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white">Delete Outlet</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body text-white-50">
                 Are you sure you want to delete this outlet? All associated information will be deleted.
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-ghost btn-pill" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger-soft btn-pill" id="confirmDelete">Delete</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function () {
-        $('.form-check-input').prop('checked', false);
+    // =============================
+    // CONFIG
+    // =============================
+    const DEMO_MODE = true;                 // true = no backend calls
+    const API_BASE = "https://restosolutionssaas.com";
+    let selectedOutletId = null;
 
-        // Initially disable the "Action" dropdown button
-        $('#actionDropdown').prop('disabled', true);
-     
-        $('.checkbox-item').click(function () {
-            $('#checkAll').prop('checked', false);
+    function setActionLink($a, href) {
+        $a.removeClass("disabled").attr("aria-disabled", "false").attr("href", href);
+    }
+    function disableActionLink($a) {
+        $a.addClass("disabled").attr("aria-disabled", "true").attr("href", "#");
+    }
+    function enableDeleteButton(enabled) {
+        $("#deleteBtnTop").prop("disabled", !enabled);
+    }
 
-            // Uncheck all checkboxes except the one that was clicked
-            $('.checkbox-item').not(this).prop('checked', false);
+    function setSelectedPill(label) {
+        const pill = document.getElementById("selectedPill");
+        const span = document.getElementById("selectedOutletLabel");
+        pill.style.display = label ? "inline-flex" : "none";
+        span.textContent = label ? `Selected: ${label}` : "Selected: —";
+    }
 
-            // Logic to handle the enabled state of the "Action" dropdown based on checkbox state
-            $('#actionDropdown').prop('disabled', !$('.checkbox-item:checked').length);
-            // Enable the "Action" dropdown button when an outlet is selected
-         
-            // Check the clicked one
-            $(this).prop('checked', true);
+    function clearDetails() {
+        $("#internalOutletName").text("—");
+        $("#customerFacingName").text("—");
+        $("#businessType").text("—");
+        $("#employeeCount").text("—");
+        $("#contact").text("—");
+        $("#operatingHours").text("—");
+        $("#timestamps").text("Created: — • Updated: —");
+        $("#countryStateCity").text("—");
+        $("#streetAddress").text("—");
+        $("#description").text("—");
+        $("#zipAndPostalCode").text("— / —");
+        $("#detailSubtitle").text("Select an outlet to view details and actions.");
 
-            const $row = $(this).closest('tr');
-            const outletId = $(this).data('outlet-id');
-            const internalOutletName = $row.data('internal-outlet-name');  // Update this line
-            const customerFacingName = $row.find('td:nth-child(2)').text();
-            const businessType = $row.find('td:nth-child(3)').text();
-            const dateOpened = $row.find('td:nth-child(4)').text();
-            const employeeCount = $row.find('td:nth-child(5)').text();
-            const operatingHours = $row.find('td:nth-child(6)').text();
-            const contact = $row.find('td:nth-child(7)').text();
-            const createdAt = $row.find('td:nth-child(8)').text();
-            const updatedAt = $row.find('td:nth-child(9)').text();
-            // New variables for Country, State, City and Street Address
-            const countryStateCity = $row.data('country-state-city');
-            const streetAddress = $row.data('street-address');
-            const description = $row.data('description');
-            const zip = $row.data('zip');
-            const postalCode = $row.data('postal-code');
-            const countryStateCityParts = $row.data('country-state-city').split(', '); // Make sure this split pattern matches your actual data
-            const country = countryStateCityParts.length > 0 ? countryStateCityParts[0] : '';
-            const state = countryStateCityParts.length > 1 ? countryStateCityParts[1] : '';
-            const city = countryStateCityParts.length > 2 ? countryStateCityParts[2] : '';
+        $("#logoImage").attr("src", "/Images/logo.jpeg");
+        $("#restaurantImage").attr("src", "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1400&q=80");
 
-            // Update the displayed information
-            $("#internalOutletName").text($row.data('internal-outlet-name'));
-            $("#customerFacingName").text(customerFacingName);
-            $("#businessType").text(businessType);
-            $("#dateOpened").text(dateOpened);
-            $("#employeeCount").text(employeeCount);
-            $("#contact").text(contact);
-            $("#operatingHours").text(operatingHours);
-            $("#timestamps").text(`Created: ${createdAt} / Updated: ${updatedAt}`);
-            // Update new fields
-            $("#countryStateCity").text(countryStateCity);
-            $("#streetAddress").text(streetAddress);
-            $("#description").text(description);
-            $("#zipAndPostalCode").text(`${zip} / ${postalCode}`);
-            $("#logoImage").attr('src', logoImage ? `data:image/png;base64,${logoImage}` : '/path/to/default/logo.png'); // Handle null case appropriately
-            $("#restaurantImage").attr('src', restaurantImage ? `data:image/png;base64,${restaurantImage}` : '/path/to/default/restaurant.png');
+        setSelectedPill(null);
+        selectedOutletId = null;
 
-          
-            // Update the "Tables" link to include the selectedOutletId and the additional parameters
-            $('#tablesLink').attr('href', `/Restaurant/Tables?id=${outletId}&customerFacingName=${encodeURIComponent(customerFacingName)}&internalOutletName=${encodeURIComponent(internalOutletName)}`);
-            $('#manageLink').attr('href', `/Restaurant/Manage?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}`);
-            // Construct the URL with outlet information as parameters
-            let editUrl = `/Restaurant/Edit?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}&customerFacingName=${encodeURIComponent(customerFacingName)}&businessType=${encodeURIComponent(businessType)}&country=${encodeURIComponent(country)}&state=${encodeURIComponent(state)}&city=${encodeURIComponent(city)}&streetAddress=${encodeURIComponent(streetAddress)}&description=${encodeURIComponent(description)}&zip=${zip}&postalCode=${postalCode}&dateOpened=${encodeURIComponent(dateOpened)}&employeeCount=${employeeCount}&operatingHoursStart=${encodeURIComponent(operatingHours.split(' - ')[0])}&operatingHoursEnd=${encodeURIComponent(operatingHours.split(' - ')[1])}&contact=${encodeURIComponent(contact)}&createdAt=${encodeURIComponent(createdAt)}&updatedAt=${encodeURIComponent(updatedAt)}`;
-            // Update the "Edit" link to include the selected outlet's information as URL parameters
-            $('#editLink').attr('href', editUrl);
-            fetchAndDisplayOutletImages(outletId);
+        disableActionLink($("#editBtn"));
+        disableActionLink($("#manageBtn"));
+        disableActionLink($("#tablesBtnTop"));
+        disableActionLink($("#kitchenBtn"));
+        enableDeleteButton(false);
+    }
 
-            // Listen for clicks on the "Select All" checkbox
-            $('#checkAll').click(function () {
-                // Check or uncheck all individual checkboxes based on the "Select All" state
-                $('.checkbox-item').prop('checked', this.checked);
+    function highlightSelection(id) {
+        $(".outlet-card").removeClass("active");
+        $(".outlet-row").removeClass("table-active");
 
-                // If "Select All" is checked, disable the "Action" dropdown since it's not specific to one item
-                $('#actionDropdown').prop('disabled', this.checked);
+        $(`.outlet-card[data-id='${id}']`).addClass("active");
+        $(`.outlet-row[data-id='${id}']`).addClass("table-active");
+    }
 
-                // If you want to clear the detailed information when "Select All" is checked, add logic here
-                if (this.checked) {
-                    // Clear displayed information or take any other necessary actions
-                    clearDisplayedInformation();
-                }
-            });
-
-            // Function to clear displayed information (implement as needed)
-            function clearDisplayedInformation() {
-                $("#internalOutletName").text('');
-                $("#customerFacingName").text('');
-                $("#businessType").text('');
-                $("#dateOpened").text('');
-                $("#employeeCount").text('');
-                $("#contact").text('');
-                $("#operatingHours").text('');
-                $("#timestamps").text('');
-                $("#countryStateCity").text('');
-                $("#streetAddress").text('');
-                $("#description").text('');
-                $("#zipAndPostalCode").text('');
-                $("#logoImage").attr('src', '/path/to/default/logo.png');
-                $("#restaurantImage").attr('src', '/path/to/default/restaurant.png');
-                // Any other fields that display selected outlet details
-            }
-            updateKitchenLink(outletId);
-        });
-        function updateKitchenLink(outletId) {
-            if (outletId) {
-                const kitchenUrl = `https://restosolutionssaas.com/kitchen/${outletId}`;
-                $('#kitchenLink').attr('href', kitchenUrl);
-            } else {
-                $('#kitchenLink').attr('href', '#'); // Reset or handle appropriately if no outlet is selected
-            }
-        }
-        function fetchAndDisplayOutletImages(outletId) {
-            $.ajax({
-                url: `https://restosolutionssaas.com/api/OutletApi/GetOutletImages/${outletId}`,
-                method: 'GET',
-                success: function (data) {
-                    const logoImageUrl = data.logoBase64 ? `data:image/png;base64,${data.logoBase64}` : '/path/to/default/logo.png';
-                    const restaurantImageUrl = data.restaurantImageBase64 ? `data:image/png;base64,${data.restaurantImageBase64}` : '/path/to/default/restaurant.png';
-
-                    $('#logoImage').attr('src', logoImageUrl);
-                    $('#restaurantImage').attr('src', restaurantImageUrl);
-                },
-                error: function (error) {
-                    console.error('Error fetching images:', error);
-                    // Optionally set default images in case of an error
-                    $('#logoImage').attr('src', '/path/to/default/logo.png');
-                    $('#restaurantImage').attr('src', '/path/to/default/restaurant.png');
-                }
-            });
-        }
-
-    });
-
-    $("#deleteButton").click(function () {
-        const selectedId = $('.checkbox-item:checked').data('outlet-id');
-        // Store the selectedId in the modal as data-attribute
-        $('#deleteConfirmationModal').data('selected-id', selectedId);
-        // Show the modal
-        $('#deleteConfirmationModal').modal('show');
-    });
-
-    // When the Delete button inside the modal is clicked
-    $("#confirmDelete").click(function () {
-        // Retrieve the selectedId from the modal's data-attribute
-        const selectedId = $('#deleteConfirmationModal').data('selected-id');
-
+    function fetchAndDisplayOutletImages(outletId) {
         $.ajax({
-            url: `https://restosolutionssaas.com/api/OutletApi/delete/${selectedId}`,
-            type: 'DELETE',
-            success: function (response) {
-                console.log(response);  // Debugging line
-                if (response && response.Message) {
-                    alert(response.Message);
-                }
-                location.reload(); // Refresh the page or remove the row from the table
+            url: `${API_BASE}/api/OutletApi/GetOutletImages/${outletId}`,
+            method: 'GET',
+            success: function (data) {
+                const logoImageUrl = data.logoBase64 ? `data:image/png;base64,${data.logoBase64}` : '/Images/logo.jpeg';
+                const restaurantImageUrl = data.restaurantImageBase64 ? `data:image/png;base64,${data.restaurantImageBase64}` : 'https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1400&q=80';
+
+                $('#logoImage').attr('src', logoImageUrl);
+                $('#restaurantImage').attr('src', restaurantImageUrl);
             },
-            error: function (error) {
-                console.log(error);  // Debugging line
-                if (error.responseJSON && error.responseJSON.Message) {
-                    alert(error.responseJSON.Message);
-                } else {
+            error: function () {
+                $('#logoImage').attr('src', '/Images/logo.jpeg');
+                $('#restaurantImage').attr('src', 'https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1400&q=80');
+            }
+        });
+    }
+
+    function fillDetailsFromElement($el) {
+        const outletId = $el.data("id");
+        selectedOutletId = outletId;
+
+        const internalOutletName = $el.data("internal-outlet-name") || "";
+        const customerFacingName = $el.data("customer-facing-name") || "";
+        const businessType = $el.data("business-type") || "";
+        const dateOpened = $el.data("date-opened") || "";
+        const employeeCount = $el.data("employee-count");
+        const operatingHours = $el.data("operating-hours") || "";
+        const contact = $el.data("contact") || "";
+        const createdAt = $el.data("created") || "";
+        const updatedAt = $el.data("updated") || "";
+        const countryStateCity = $el.data("country-state-city") || "";
+        const streetAddress = $el.data("street-address") || "";
+        const description = $el.data("description") || "";
+        const zip = $el.data("zip") || "";
+        const postalCode = $el.data("postal-code") || "";
+
+        $("#internalOutletName").text(internalOutletName || "—");
+        $("#customerFacingName").text(customerFacingName || "—");
+        $("#businessType").text(businessType || "—");
+        $("#employeeCount").text(employeeCount ?? "—");
+        $("#contact").text(contact || "—");
+        $("#operatingHours").text(operatingHours || "—");
+        $("#timestamps").text(`Created: ${createdAt || "—"} • Updated: ${updatedAt || "—"}`);
+        $("#countryStateCity").text(countryStateCity || "—");
+        $("#streetAddress").text(streetAddress || "—");
+        $("#description").text(description || "—");
+        $("#zipAndPostalCode").text(`${zip || "—"} / ${postalCode || "—"}`);
+        $("#detailSubtitle").text("Actions unlocked for this outlet.");
+
+        setSelectedPill(customerFacingName || internalOutletName || outletId);
+        highlightSelection(outletId);
+
+        // Build MVC URLs
+        const manageUrl = `/Restaurant/Manage?id=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}`;
+        const tablesUrl = `/Restaurant/Tables?id=${outletId}&customerFacingName=${encodeURIComponent(customerFacingName)}&internalOutletName=${encodeURIComponent(internalOutletName)}`;
+        const kitchenUrl = `/Kitchen/Index?outletId=${outletId}&internalOutletName=${encodeURIComponent(internalOutletName)}&customerFacingName=${encodeURIComponent(customerFacingName)}`;
+
+        // Edit URL (your long querystring version)
+        const countryStateCityParts = (countryStateCity || "").split(", ");
+        const country = countryStateCityParts[0] || "";
+        const state = countryStateCityParts[1] || "";
+        const city = countryStateCityParts[2] || "";
+
+        const editUrl = `/Restaurant/Edit?id=${outletId}`
+            + `&internalOutletName=${encodeURIComponent(internalOutletName)}`
+            + `&customerFacingName=${encodeURIComponent(customerFacingName)}`
+            + `&businessType=${encodeURIComponent(businessType)}`
+            + `&country=${encodeURIComponent(country)}`
+            + `&state=${encodeURIComponent(state)}`
+            + `&city=${encodeURIComponent(city)}`
+            + `&streetAddress=${encodeURIComponent(streetAddress)}`
+            + `&description=${encodeURIComponent(description)}`
+            + `&zip=${encodeURIComponent(zip)}`
+            + `&postalCode=${encodeURIComponent(postalCode)}`
+            + `&dateOpened=${encodeURIComponent(dateOpened)}`
+            + `&employeeCount=${encodeURIComponent(employeeCount ?? "")}`
+            + `&operatingHoursStart=${encodeURIComponent((operatingHours || "").split(" - ")[0] || "")}`
+            + `&operatingHoursEnd=${encodeURIComponent((operatingHours || "").split(" - ")[1] || "")}`
+            + `&contact=${encodeURIComponent(contact)}`
+            + `&createdAt=${encodeURIComponent(createdAt)}`
+            + `&updatedAt=${encodeURIComponent(updatedAt)}`;
+
+        // Enable toolbar buttons
+        setActionLink($("#editBtn"), editUrl);
+        setActionLink($("#manageBtn"), manageUrl);
+        setActionLink($("#tablesBtnTop"), tablesUrl);
+        setActionLink($("#kitchenBtn"), kitchenUrl);
+        enableDeleteButton(true);
+
+        // Load images (optional)
+        if (!DEMO_MODE) {
+            fetchAndDisplayOutletImages(outletId);
+        }
+    }
+
+    function applySearchFilter(term) {
+        term = (term || "").toLowerCase().trim();
+
+        // Cards
+        $(".outlet-card").each(function () {
+            const name = ($(this).data("customer-facing-name") || "").toLowerCase();
+            const type = ($(this).data("business-type") || "").toLowerCase();
+            const city = ($(this).data("country-state-city") || "").toLowerCase();
+            const match = name.includes(term) || type.includes(term) || city.includes(term);
+            $(this).toggle(match);
+        });
+
+        // Table rows
+        $(".outlet-row").each(function () {
+            const name = ($(this).data("customer-facing-name") || "").toLowerCase();
+            const type = ($(this).data("business-type") || "").toLowerCase();
+            const city = ($(this).data("country-state-city") || "").toLowerCase();
+            const match = name.includes(term) || type.includes(term) || city.includes(term);
+            $(this).toggle(match);
+        });
+    }
+
+    $(document).ready(function () {
+        clearDetails();
+
+        // Search
+        $("#outletSearch").on("input", function () {
+            applySearchFilter($(this).val());
+        });
+
+        // Card click selects
+        $(".outlet-card").on("click", function () {
+            const id = $(this).data("id");
+            $(".checkbox-item").prop("checked", false);
+            $(`.checkbox-item[data-outlet-id='${id}']`).prop("checked", true);
+            $("#checkAll").prop("checked", false);
+            fillDetailsFromElement($(this));
+        });
+
+        // Row click selects (except checkbox)
+        $(".outlet-row").on("click", function (e) {
+            if ($(e.target).is("input[type='checkbox']")) return;
+
+            const id = $(this).data("id");
+            $(".checkbox-item").prop("checked", false);
+            $(`.checkbox-item[data-outlet-id='${id}']`).prop("checked", true);
+            $("#checkAll").prop("checked", false);
+            fillDetailsFromElement($(this));
+        });
+
+        // Checkbox single-select
+        $(".checkbox-item").on("change", function () {
+            $("#checkAll").prop("checked", false);
+
+            const id = $(this).data("outlet-id");
+            $(".checkbox-item").not(this).prop("checked", false);
+
+            if ($(this).is(":checked")) {
+                const $row = $(`.outlet-row[data-id='${id}']`);
+                fillDetailsFromElement($row);
+            } else {
+                clearDetails();
+            }
+        });
+
+        // Select all: bulk mode (disable actions)
+        $("#checkAll").on("change", function () {
+            const checked = $(this).is(":checked");
+            $(".checkbox-item").prop("checked", checked);
+
+            if (checked) {
+                clearDetails();
+                setSelectedPill("Multiple selected");
+                $("#detailSubtitle").text("Bulk selection active (single-outlet actions disabled).");
+            } else {
+                clearDetails();
+            }
+        });
+
+        // Delete toolbar button -> modal
+        $("#deleteBtnTop").on("click", function () {
+            if (!selectedOutletId) return;
+            $('#deleteConfirmationModal').data('selected-id', selectedOutletId);
+            $('#deleteConfirmationModal').modal('show');
+        });
+
+        // Confirm delete
+        $("#confirmDelete").on("click", function () {
+            const id = $('#deleteConfirmationModal').data('selected-id');
+            if (!id) return;
+
+            if (DEMO_MODE) {
+                alert("Demo mode: delete disabled (no backend).");
+                $('#deleteConfirmationModal').modal('hide');
+                return;
+            }
+
+            $.ajax({
+                url: `${API_BASE}/api/OutletApi/delete/${id}`,
+                type: 'DELETE',
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
                     alert("An error occurred while deleting the outlet.");
                 }
-            }
-        });
-        // Close the modal
-        $('#deleteConfirmationModal').modal('hide');
-    });
+            });
 
+            $('#deleteConfirmationModal').modal('hide');
+        });
+    });
 </script>

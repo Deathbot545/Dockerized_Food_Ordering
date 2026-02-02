@@ -1,166 +1,988 @@
-﻿<style>
-    /* Your existing style for the image */
-    .img {
-        max-width: 150px;
-        height: auto;
-        display: block;
+﻿@{
+    ViewData["Title"] = "Tables";
+    var outletId = (int?)ViewBag.OutletId ?? 101;
+    var internalName = (string)ViewBag.InternalOutletName ?? "restro_central_colombo";
+    var customerName = (string)ViewBag.CustomerFacingName ?? "Scan2Serve Central";
+}
+
+<style>
+    :root {
+        --bg: #0b0f14;
+        --panel: rgba(255,255,255,0.06);
+        --panel2: rgba(255,255,255,0.08);
+        --border: rgba(255,255,255,0.14);
+        --text: rgba(255,255,255,0.96);
+        --muted: rgba(255,255,255,0.72);
+        --muted2: rgba(255,255,255,0.62);
+        --accent: #22c55e;
+        --accent2: #0ea5e9;
+        --danger: #ef4444;
+        --warn: #f59e0b;
+    }
+
+    .tbl-wrap {
+        width: 100%;
+        padding: 18px 14px 28px;
+    }
+
+    .tbl-max {
+        max-width: 1480px;
         margin: 0 auto;
     }
 
-    /* Style for the card */
-    .qr-card {
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    .tbl-hero {
+        border-radius: 22px;
+        padding: 18px 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: radial-gradient(900px 450px at 10% 0%, rgba(34,197,94,0.16), transparent 55%), radial-gradient(900px 450px at 95% 10%, rgba(14,165,233,0.16), transparent 55%), rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+        backdrop-filter: blur(12px);
     }
 
-    /* Style for the card header */
-    .qr-card-header {
-        background-color: #f9f9f9;
-        padding: 15px;
-        font-weight: bold;
+    .tbl-title {
+        font-weight: 900;
+        margin: 0;
+        font-size: clamp(1.35rem, 2.1vw, 2.1rem);
+        color: var(--text);
+        letter-spacing: .2px;
     }
 
-    /* Style for the card body */
-    .qr-card-body {
-        padding: 20px;
-        text-align: center;
+    .tbl-sub {
+        margin: 6px 0 0;
+        color: var(--muted);
+        max-width: 95ch;
+        line-height: 1.5;
+        font-weight: 600;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.86);
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(34,197,94,0.14);
+    }
+
+    .btn-pill {
+        border-radius: 999px !important;
+        font-weight: 800 !important;
+        letter-spacing: .2px;
+        padding: 10px 14px !important;
+    }
+
+    .btn-primary-glow {
+        background: linear-gradient(90deg, var(--accent), #16a34a);
+        border: none !important;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.25);
+    }
+
+        .btn-primary-glow:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+    .btn-ghost {
+        background: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.14) !important;
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.12) !important;
+            transform: translateY(-1px);
+        }
+
+    .btn-danger-soft {
+        background: rgba(239,68,68,0.12) !important;
+        border: 1px solid rgba(239,68,68,0.25) !important;
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+    .action-bar {
+        margin-top: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        backdrop-filter: blur(10px);
+        flex-wrap: wrap;
+    }
+
+    .search-wrap {
+        max-width: 360px;
+        width: 100%;
+    }
+
+        .search-wrap .input-group-text {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: rgba(255,255,255,0.8);
+            border-radius: 999px 0 0 999px;
+        }
+
+        .search-wrap .form-control {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: rgba(255,255,255,0.92);
+            border-left: none;
+            border-radius: 0 999px 999px 0;
+        }
+
+    .stats {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    @@media (max-width: 992px) {
+        .stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 520px) {
+        .stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .stat {
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(0,0,0,0.18);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat .label {
+            color: rgba(255,255,255,0.70);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            font-size: .74rem;
+        }
+
+        .stat .val {
+            margin-top: 6px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: rgba(255,255,255,0.96);
+            line-height: 1.1;
+        }
+
+        .stat .hint {
+            margin-top: 6px;
+            color: rgba(255,255,255,0.62);
+            font-weight: 700;
+            font-size: .92rem;
+        }
+
+    .grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 14px;
+        align-items: start;
+    }
+
+    @@media (max-width: 1200px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .card-glass {
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.30);
+        backdrop-filter: blur(12px);
+    }
+
+    .tables-panel {
+        padding: 14px;
+    }
+
+    .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .panel-title {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.95);
+        font-size: 1.05rem;
+    }
+
+    .panel-sub {
+        margin: 4px 0 0;
+        color: rgba(255,255,255,0.65);
+        font-weight: 700;
+        font-size: .95rem;
+    }
+
+    /* Table cards */
+    .table-cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    @@media (max-width: 1100px) {
+        .table-cards {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 650px) {
+        .table-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .tcard {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+        overflow: hidden;
+        position: relative;
+        transition: transform .15s ease, background .15s ease, border-color .15s ease;
+        cursor: pointer;
+    }
+
+        .tcard:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.18);
+        }
+
+        .tcard.active {
+            border-color: rgba(34,197,94,0.45);
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.14);
+        }
+
+    .tcard-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .tname {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.96);
+        font-size: 1.05rem;
+        letter-spacing: .2px;
+    }
+
+    .tsub {
+        margin: 4px 0 0;
+        color: rgba(255,255,255,0.66);
+        font-weight: 700;
+        font-size: .92rem;
+    }
+
+    .badge-soft {
+        border-radius: 999px;
+        padding: 8px 10px;
+        font-weight: 900;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        white-space: nowrap;
+        font-size: .85rem;
+    }
+
+    .badge-green {
+        border-color: rgba(34,197,94,0.35);
+        background: rgba(34,197,94,0.14);
+    }
+
+    .badge-blue {
+        border-color: rgba(14,165,233,0.35);
+        background: rgba(14,165,233,0.14);
+    }
+
+    .badge-warn {
+        border-color: rgba(245,158,11,0.35);
+        background: rgba(245,158,11,0.14);
+    }
+
+    .badge-red {
+        border-color: rgba(239,68,68,0.35);
+        background: rgba(239,68,68,0.14);
+    }
+
+    .qr-frame {
+        margin-top: 10px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.05);
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 170px;
+    }
+
+        .qr-frame img {
+            max-width: 180px;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+
+    .tcard-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .icon-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        font-weight: 900;
+        font-size: .9rem;
+        text-decoration: none;
+    }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .icon-btn.danger {
+            border-color: rgba(239,68,68,0.25);
+            background: rgba(239,68,68,0.12);
+        }
+
+    /* Sidebar */
+    .sidebar {
+        position: sticky;
+        top: 86px;
+        padding: 14px;
+    }
+
+    @@media (max-width: 1200px) {
+        .sidebar {
+            position: static;
+        }
+    }
+
+    .kv {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .kv-item {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+    }
+
+    .kv-label {
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        font-size: .75rem;
+        color: rgba(255,255,255,0.62);
+        margin-bottom: 6px;
+    }
+
+    .kv-val {
+        color: rgba(255,255,255,0.92);
+        font-weight: 800;
+        line-height: 1.35;
+        word-break: break-word;
+    }
+
+    .hint {
+        color: rgba(255,255,255,0.62);
+        font-weight: 700;
+        font-size: .92rem;
+        line-height: 1.45;
+    }
+
+    /* Modal theme */
+    .modal-content {
+        background: #0f1520 !important;
+        color: var(--text);
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        border-radius: 18px !important;
+    }
+
+    .modal-header, .modal-footer {
+        border: 0 !important;
     }
 </style>
 
-<div class="container mt-5">
-    <h1 class="mb-5">Tables for Outlet @ViewBag.InternalOutletName (@ViewBag.CustomerFacingName)</h1>
-    
-    <!-- Action bar -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Available Tables</h2>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTableModal">Add New Table</button>
-    </div>
-    
-    <!-- Table Cards -->
-    <div class="row g-4" id="tableCards">
-      
+<div class="tbl-wrap">
+    <div class="tbl-max">
+
+        <!-- HERO -->
+        <section class="tbl-hero">
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h1 class="tbl-title mb-0">Tables & QR Ordering</h1>
+                        <span class="pill"><span class="dot"></span> @customerName</span>
+                        <span class="pill" title="Internal outlet name">@internalName</span>
+                    </div>
+                    <p class="tbl-sub">
+                        Create tables, manage QR codes, and preview the customer flow. This page supports <b>API mode</b> and <b>Demo mode</b> (dummy data fallback).
+                    </p>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <a class="btn btn-ghost btn-pill text-decoration-none"
+                       href="/Restaurant/Manage?id=@outletId&internalOutletName=@internalName">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Manage
+                    </a>
+
+                    <button class="btn btn-primary-glow btn-pill" data-bs-toggle="modal" data-bs-target="#addTableModal">
+                        <i class="fas fa-plus me-1"></i> Add New Table
+                    </button>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats">
+                <div class="stat">
+                    <div class="label">Total Tables</div>
+                    <div class="val" id="statTotal">—</div>
+                    <div class="hint">All registered tables</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Active Today</div>
+                    <div class="val" id="statActive">—</div>
+                    <div class="hint">Scans / sessions</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Top Table</div>
+                    <div class="val" id="statTop">—</div>
+                    <div class="hint">Most orders</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Mode</div>
+                    <div class="val" id="statMode">—</div>
+                    <div class="hint">API or Demo</div>
+                </div>
+            </div>
+
+            <!-- ACTION BAR -->
+            <div class="action-bar">
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <span class="pill"><i class="fas fa-link"></i> Outlet ID: @outletId</span>
+                    <span class="pill"><i class="fas fa-clock"></i> Updated live</span>
+                </div>
+
+                <div class="search-wrap">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input id="tableSearch" type="text" class="form-control" placeholder="Search tables (e.g., T01, VIP, Patio)..." />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRID -->
+        <section class="grid">
+            <!-- LEFT -->
+            <div class="card-glass tables-panel">
+                <div class="panel-head">
+                    <div>
+                        <p class="panel-title">Available Tables</p>
+                        <p class="panel-sub">Click a card to see quick actions. QR is previewed inside each card.</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap align-items-center">
+                        <span class="badge-soft badge-blue" id="badgeCount">— tables</span>
+                        <button class="btn btn-ghost btn-pill" type="button" id="refreshBtn">
+                            <i class="fas fa-sync me-1"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-cards" id="tableCards">
+                    @* Cards injected by JS *@
+                </div>
+
+                <div class="mt-3 hint">
+                    Tip: For LinkedIn demo, keep the API URL but enable Demo fallback. If the API is down, the UI still looks complete.
+                </div>
+            </div>
+
+            <!-- RIGHT -->
+            <aside class="card-glass sidebar">
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                    <div>
+                        <h5 class="mb-1 text-white fw-bold">Selected Table</h5>
+                        <div class="hint" id="selectedHint">Select a table card to see actions.</div>
+                    </div>
+                    <span class="badge-soft badge-green" id="selectedStatus" style="display:none;">Ready</span>
+                </div>
+
+                <div class="kv">
+                    <div class="kv-item">
+                        <div class="kv-label">Table</div>
+                        <div class="kv-val" id="selectedTableName">—</div>
+                    </div>
+
+                    <div class="kv-item">
+                        <div class="kv-label">Customer Link</div>
+                        <div class="kv-val" id="selectedLink">—</div>
+                        <div class="hint mt-2">
+                            This is where your flow goes: <b>SpecialLogin → Menu</b>.
+                        </div>
+                    </div>
+
+                    <div class="kv-item">
+                        <div class="kv-label">Actions</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a id="btnOpenMenu" class="icon-btn" href="#" style="pointer-events:none; opacity:.55;">
+                                <i class="fas fa-eye"></i> Open Menu
+                            </a>
+                            <button id="btnCopyLink" class="icon-btn" type="button" disabled>
+                                <i class="fas fa-copy"></i> Copy Link
+                            </button>
+                            <button id="btnRemoveQR" class="icon-btn danger" type="button" disabled>
+                                <i class="fas fa-trash"></i> Remove QR
+                            </button>
+                        </div>
+                        <div class="hint mt-2">Remove QR will call your endpoint in API mode. In Demo mode, it just updates UI.</div>
+                    </div>
+                </div>
+
+            </aside>
+        </section>
+
     </div>
 </div>
 
 <!-- Add Table Modal -->
-<div class="modal fade" id="addTableModal" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade" id="addTableModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Table</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title text-white fw-bold">Add New Table</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
-                <input type="text" id="newTableName" class="form-control" placeholder="Enter Table Name or Number">
+                <label class="form-label text-white">Table name / identifier</label>
+                <input type="text" id="newTableName" class="form-control"
+                       placeholder="e.g., T01, VIP-1, Patio-2"
+                       style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#fff;" />
+                <div class="hint mt-2">
+                    Best practice: use consistent format (T01–T20) or zones (VIP-1, Patio-2).
+                </div>
             </div>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveTableBtn">Save</button>
+                <button type="button" class="btn btn-ghost btn-pill" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-glow btn-pill" id="saveTableBtn">Save</button>
             </div>
         </div>
     </div>
 </div>
-<!-- JavaScript to handle new table addition -->
-<script>
-    $(document).ready(function () {
-       
-        fetchTables();
-    });
-    const outletId = @ViewBag.OutletId;
 
+<script>
+    // ================================
+    // CONFIG
+    // ================================
+    // If API fails, demo data will appear automatically.
+    let DEMO_FALLBACK = true;
+
+    const outletId = @outletId;
+
+    // Use your existing API base:
+    const API_BASE = "https://restosolutionssaas.com";
+
+    let CURRENT_MODE = "API";
+    let TABLES_CACHE = [];
+    let selectedTableId = null;
+
+    // ================================
+    // Dummy QR: simple base64 SVG generator
+    // ================================
+    function dummyQrSvgBase64(label) {
+        const safe = (label || "TABLE").replace(/[<>&"]/g, "");
+        const svg =
+            `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
+      <rect width="220" height="220" rx="18" fill="#0f1520"/>
+      <rect x="18" y="18" width="184" height="184" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.14)"/>
+      <g fill="rgba(255,255,255,0.86)">
+        <rect x="44" y="44" width="36" height="36" rx="6"/>
+        <rect x="140" y="44" width="36" height="36" rx="6"/>
+        <rect x="44" y="140" width="36" height="36" rx="6"/>
+        <rect x="96" y="96" width="10" height="10" rx="2"/>
+        <rect x="114" y="96" width="10" height="10" rx="2"/>
+        <rect x="96" y="114" width="10" height="10" rx="2"/>
+        <rect x="114" y="114" width="10" height="10" rx="2"/>
+      </g>
+      <text x="110" y="200" text-anchor="middle" fill="rgba(255,255,255,0.72)" font-family="system-ui,Segoe UI,Arial" font-size="14" font-weight="700">${safe}</text>
+    </svg>`;
+        return btoa(unescape(encodeURIComponent(svg)));
+    }
+
+    function getDummyTables() {
+        // realistic, LinkedIn-friendly demo set
+        return [
+            { id: 201, tableIdentifier: "T01", qrCodeData: dummyQrSvgBase64("T01"), status: "Active", scans: 14, orders: 6 },
+            { id: 202, tableIdentifier: "T02", qrCodeData: dummyQrSvgBase64("T02"), status: "Idle", scans: 8, orders: 3 },
+            { id: 203, tableIdentifier: "T03", qrCodeData: dummyQrSvgBase64("T03"), status: "Active", scans: 19, orders: 8 },
+            { id: 204, tableIdentifier: "VIP-1", qrCodeData: dummyQrSvgBase64("VIP-1"), status: "Active", scans: 11, orders: 5 },
+            { id: 205, tableIdentifier: "Patio-2", qrCodeData: dummyQrSvgBase64("Patio-2"), status: "Offline", scans: 0, orders: 0 },
+            { id: 206, tableIdentifier: "T12", qrCodeData: dummyQrSvgBase64("T12"), status: "Idle", scans: 4, orders: 1 },
+        ];
+    }
+
+    // ================================
+    // API Fetch + Fallback
+    // ================================
     function fetchTables() {
+        setMode("API");
+        $("#tableCards").html(""); // clear
+
         $.ajax({
-            url: `https://restosolutionssaas.com/api/TablesApi/GetTables?id=${outletId}`,
-            type: 'GET',
+            url: `${API_BASE}/api/TablesApi/GetTables?id=${outletId}`,
+            type: "GET",
             success: function (tables) {
-                populateTables(tables);
+                // Normalize: add demo fields if missing
+                TABLES_CACHE = (tables || []).map(t => ({
+                    ...t,
+                    status: t.status || "Idle",
+                    scans: t.scans ?? Math.floor(Math.random() * 20),
+                    orders: t.orders ?? Math.floor(Math.random() * 10)
+                }));
+
+                populateTables(TABLES_CACHE);
+                updateStats(TABLES_CACHE);
             },
-            error: function (error) {
-                console.error('Error fetching tables:', error);
+            error: function () {
+                if (DEMO_FALLBACK) {
+                    setMode("DEMO");
+                    TABLES_CACHE = getDummyTables();
+                    populateTables(TABLES_CACHE);
+                    updateStats(TABLES_CACHE);
+                } else {
+                    console.error("Error fetching tables and fallback disabled.");
+                }
             }
         });
+    }
+
+    function setMode(mode) {
+        CURRENT_MODE = mode;
+        $("#statMode").text(mode);
+    }
+
+    // ================================
+    // Render Cards
+    // ================================
+    function badgeForStatus(status) {
+        const s = (status || "").toLowerCase();
+        if (s === "active") return "badge-green";
+        if (s === "idle") return "badge-blue";
+        if (s === "offline") return "badge-red";
+        return "badge-warn";
     }
 
     function populateTables(tables) {
-        const tableCards = $('#tableCards');
+        const tableCards = $("#tableCards");
         tableCards.empty();
 
-        tables.forEach(function (tableDto) {
-            const tableCard = `
-        <div class="col-md-4">
-            <div class="card qr-card">
-                <div class="card-header text-center qr-card-header">
-                    ${tableDto.tableIdentifier}
-                    <button class="btn btn-danger btn-sm float-end remove-qr-btn" data-id="${tableDto.id}">x</button>
-                </div>
-                <div class="card-body text-center qr-card-body">
-                    <img src="data:image/svg+xml;base64,${tableDto.qrCodeData}" alt="QR Code for ${tableDto.tableIdentifier}" class="img img-fluid mb-3">
-                </div>
-            </div>
-        </div>
-    `;
+        const q = ($("#tableSearch").val() || "").trim().toLowerCase();
+        const filtered = (tables || []).filter(t =>
+            !q || (t.tableIdentifier || "").toLowerCase().includes(q)
+        );
 
+        $("#badgeCount").text(`${filtered.length} tables`);
+        $("#statTotal").text((tables || []).length);
 
-            tableCards.append(tableCard);
+        filtered.forEach(function (t) {
+            const badgeClass = badgeForStatus(t.status);
+            const scans = t.scans ?? 0;
+            const orders = t.orders ?? 0;
+
+            const html = `
+                    <div class="tcard" data-id="${t.id}" data-name="${escapeHtml(t.tableIdentifier)}">
+                        <div class="tcard-top">
+                            <div>
+                                <p class="tname">${escapeHtml(t.tableIdentifier)}</p>
+                                <p class="tsub">Scans today: <b>${scans}</b> • Orders: <b>${orders}</b></p>
+                            </div>
+                            <span class="badge-soft ${badgeClass}">${escapeHtml(t.status || "Idle")}</span>
+                        </div>
+
+                        <div class="qr-frame">
+                            <img src="data:image/svg+xml;base64,${t.qrCodeData}" alt="QR for ${escapeHtml(t.tableIdentifier)}">
+                        </div>
+
+                        <div class="tcard-actions">
+                            <span class="badge-soft">Outlet ${outletId}</span>
+                            <button class="icon-btn danger remove-qr-btn" data-id="${t.id}" type="button">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+            tableCards.append(html);
+        });
+
+        if (filtered.length === 0) {
+            tableCards.append(`
+                    <div class="kv-item" style="grid-column: 1 / -1;">
+                        <div class="kv-label">No results</div>
+                        <div class="kv-val">No tables match your search.</div>
+                    </div>
+                `);
+        }
+    }
+
+    function updateStats(tables) {
+        const total = (tables || []).length;
+        const active = (tables || []).filter(t => (t.status || "").toLowerCase() === "active").length;
+
+        // Top table by orders
+        let top = "—";
+        let topOrders = -1;
+        (tables || []).forEach(t => {
+            const o = t.orders ?? 0;
+            if (o > topOrders) {
+                topOrders = o;
+                top = t.tableIdentifier || "—";
+            }
+        });
+
+        $("#statTotal").text(total);
+        $("#statActive").text(active);
+        $("#statTop").text(top);
+    }
+
+    // ================================
+    // Selection + Sidebar
+    // ================================
+    function selectTableById(id) {
+        selectedTableId = id;
+
+        $(".tcard").removeClass("active");
+        $(`.tcard[data-id='${id}']`).addClass("active");
+
+        const table = (TABLES_CACHE || []).find(t => t.id == id);
+        if (!table) return;
+
+        const tableName = table.tableIdentifier || "—";
+        $("#selectedTableName").text(tableName);
+
+        // Your real link:
+        // /Account/SpecialLogin?outletId={outletId}&tableId={tableId}
+        const link = `/Account/SpecialLogin?outletId=${outletId}&tableId=${id}`;
+        $("#selectedLink").text(link);
+
+        $("#btnOpenMenu").attr("href", link).css({ "pointer-events": "auto", "opacity": "1" });
+        $("#btnCopyLink").prop("disabled", false);
+        $("#btnRemoveQR").prop("disabled", false);
+
+        const badgeClass = badgeForStatus(table.status);
+        $("#selectedStatus").removeClass("badge-green badge-blue badge-red badge-warn").addClass(badgeClass).show()
+            .text(table.status || "Idle");
+
+        $("#selectedHint").text("Quick actions for this table.");
+    }
+
+    // ================================
+    // Add Table (API or Demo)
+    // ================================
+    function addTable(tableIdentifier) {
+        if (!tableIdentifier) return;
+
+        if (CURRENT_MODE === "DEMO") {
+            const newId = Math.floor(1000 + Math.random() * 9000);
+            TABLES_CACHE.unshift({
+                id: newId,
+                tableIdentifier: tableIdentifier,
+                qrCodeData: dummyQrSvgBase64(tableIdentifier),
+                status: "Idle",
+                scans: 0,
+                orders: 0
+            });
+
+            populateTables(TABLES_CACHE);
+            updateStats(TABLES_CACHE);
+            return;
+        }
+
+        $.ajax({
+            url: `${API_BASE}/api/TablesApi/AddTable`,
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ OutletId: parseInt(outletId, 10), TableIdentifier: tableIdentifier }),
+            success: function () {
+                fetchTables();
+            },
+            error: function (jqXHR) {
+                console.log("AddTable error:", jqXHR.responseText);
+                // fallback to demo if API fails while adding
+                if (DEMO_FALLBACK) {
+                    setMode("DEMO");
+                    addTable(tableIdentifier);
+                }
+            }
         });
     }
 
-    // Fetch tables when the page loads
-    
-    $("#saveTableBtn").click(function () {
-        const tableIdentifier = $("#newTableName").val();
-        const outletId = @ViewBag.OutletId;
-        $.ajax({
-            url: 'https://restosolutionssaas.com/api/TablesApi/AddTable',
-            method: 'POST',
-            contentType: "application/json",
-            data: JSON.stringify({
-                OutletId: parseInt(outletId, 10),
-                TableIdentifier: tableIdentifier
-            }),
-            success: function (response) {
-                console.log("Success:", response);
+    // ================================
+    // Remove QR (API or Demo)
+    // ================================
+    function removeQr(tableId) {
+        if (!tableId) return;
 
-                // Hide the modal after a short delay
-                setTimeout(function () {
-                    var myModalEl = document.getElementById('addTableModal');
-                    var modal = bootstrap.Modal.getInstance(myModalEl);  // Get instance
-                    console.log("Is modal null?", modal === null);  // Diagnostic line
-                    modal.hide();
-                }, 100);
+        if (CURRENT_MODE === "DEMO") {
+            // simulate remove by marking Offline + blanking QR
+            TABLES_CACHE = TABLES_CACHE.map(t => {
+                if (t.id == tableId) {
+                    return { ...t, status: "Offline", qrCodeData: dummyQrSvgBase64(`${t.tableIdentifier} (OFF)`) };
+                }
+                return t;
+            });
 
-                // Clear the input for the next use
-                $('#newTableName').val('');
+            populateTables(TABLES_CACHE);
+            updateStats(TABLES_CACHE);
 
-                // Fetch tables again
-                fetchTables();
+            if (selectedTableId == tableId) {
+                selectTableById(tableId);
             }
-            ,
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log('Error:', textStatus, errorThrown);
-                console.log('Response:', jqXHR.responseText);
-            }
-        });
-    });
-    $("#tableCards").on("click", ".remove-qr-btn", function () {
-        const tableId = $(this).attr("data-id");
+            return;
+        }
 
         $.ajax({
-            url: `https://restosolutionssaas.com/api/TablesApi/RemoveQRCode?id=${tableId}`,
-            type: 'DELETE', // Assuming that the method to remove QR code is a DELETE
-            success: function (response) {
-                console.log("QR code removed:", response);
-
-                // Refresh the tables after successfully removing the QR code
+            url: `${API_BASE}/api/TablesApi/RemoveQRCode?id=${tableId}`,
+            type: "DELETE",
+            success: function () {
                 fetchTables();
             },
-            error: function (error) {
-                console.error('Error removing QR code:', error);
+            error: function () {
+                if (DEMO_FALLBACK) {
+                    setMode("DEMO");
+                    removeQr(tableId);
+                } else {
+                    console.error("Error removing QR code");
+                }
             }
         });
+    }
+
+    // ================================
+    // Helpers
+    // ================================
+    function escapeHtml(s) {
+        return String(s ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // ================================
+    // Bindings
+    // ================================
+    $(document).ready(function () {
+        fetchTables();
+
+        $("#refreshBtn").on("click", function () {
+            fetchTables();
+        });
+
+        $("#tableSearch").on("input", function () {
+            populateTables(TABLES_CACHE);
+        });
+
+        // Card click selects
+        $("#tableCards").on("click", ".tcard", function (e) {
+            // prevent remove click from selecting twice
+            if ($(e.target).closest(".remove-qr-btn").length) return;
+
+            const id = $(this).data("id");
+            selectTableById(id);
+        });
+
+        // Remove QR button inside card
+        $("#tableCards").on("click", ".remove-qr-btn", function () {
+            const id = $(this).attr("data-id");
+            removeQr(id);
+        });
+
+        // Modal save
+        $("#saveTableBtn").on("click", function () {
+            const name = ($("#newTableName").val() || "").trim();
+            if (!name) {
+                alert("Please enter a table name (e.g., T01).");
+                return;
+            }
+
+            addTable(name);
+
+            // Close modal properly
+            const myModalEl = document.getElementById("addTableModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+            modal.hide();
+
+            $("#newTableName").val("");
+        });
+
+        // Sidebar copy link
+        $("#btnCopyLink").on("click", function () {
+            const text = $("#selectedLink").text();
+            if (!text || text === "—") return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Link copied!");
+            });
+        });
+
+        $("#btnRemoveQR").on("click", function () {
+            if (!selectedTableId) return;
+            removeQr(selectedTableId);
+        });
     });
-
-
 </script>
-

@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets\\Images\\background.jpg"
     },
     {
+      "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\Images\\ll.jpeg",
+      "PackagePath": "staticwebassets\\Images\\ll.jpeg"
+    },
+    {
       "Id": "C:\\Users\\Asus\\Downloads\\microservice\\Dockerized_Food_Ordering\\Food_Ordering_Web\\wwwroot\\Images\\logo.jpeg",
       "PackagePath": "staticwebassets\\Images\\logo.jpeg"
     },

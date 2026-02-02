@@ -1,381 +1,795 @@
-﻿<div class="container">
-    <div class="row">
-        <!-- Category Form -->
-        <div class="container">
-            <div id="alert-placeholder"></div>
+﻿@{
+    ViewData["Title"] = "Manage Outlet";
 
-            <div class="row">
-                <!-- Add Category Form -->
-                <div class="col-md-6">
-                    <h2>Add Category</h2>
-                    <form id="category-form">
-                        <!-- Ensure that ViewBag.OutletId actually contains a value -->
-                        <input type="hidden" id="outlet_id" value="@ViewBag.OutletId">
-                        <div class="form-group">
-                            <label for="category_name">Category Name</label>
-                            <input type="text" class="form-control" id="category_name" placeholder="Enter Category Name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="category_extras">Extras</label>
-                            <div id="extras-container">
-                                <div class="extra-group">
-                                    <input type="text" class="form-control d-inline extra-name" placeholder="Extra Name" required>
-                                    <input type="number" step="0.01" class="form-control d-inline extra-price" placeholder="Price" required>
-                                    <button type="button" class="btn btn-danger remove-extra">Remove</button>
-                                </div>
-                            </div>
-                            <button type="button" id="add-extra" class="btn btn-secondary mt-2">Add Extra</button>
-                        </div>
+    // From Controller:
+    // ViewBag.OutletId
+    // ViewBag.InternalOutletName
 
-                        <button type="submit" class="btn btn-primary">Add Category</button>
-                    </form>
+    var outletId = (int?)ViewBag.OutletId ?? 101;
+    var internalName = (string)ViewBag.InternalOutletName ?? "restro_central_colombo";
+    var outletDisplayName = "Scan2Serve Central"; // demo
+    var city = "Colombo";
+    var province = "Western Province";
+    var country = "Sri Lanka";
+    var contact = "+94 11 234 5678";
+    var hours = "10:30 - 23:00";
+    var address = "No. 12, Park Street, Colombo 02";
+}
+
+@* ===========================
+   Manage Page (Demo-friendly)
+   SaaS Dashboard UI
+   =========================== *@
+
+<style>
+    :root {
+        --bg: #0b0f14;
+        --panel: rgba(255,255,255,0.06);
+        --panel2: rgba(255,255,255,0.08);
+        --border: rgba(255,255,255,0.14);
+        --text: rgba(255,255,255,0.96);
+        --muted: rgba(255,255,255,0.72);
+        --muted2: rgba(255,255,255,0.62);
+        --accent: #22c55e;
+        --accent2: #0ea5e9;
+        --danger: #ef4444;
+        --warn: #f59e0b;
+    }
+
+    .mng-wrap {
+        width: 100%;
+        padding: 18px 14px 28px;
+    }
+
+    .mng-max {
+        max-width: 1480px;
+        margin: 0 auto;
+    }
+
+    .mng-hero {
+        border-radius: 22px;
+        padding: 18px 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: radial-gradient(900px 450px at 10% 0%, rgba(34,197,94,0.16), transparent 55%), radial-gradient(900px 450px at 95% 10%, rgba(14,165,233,0.16), transparent 55%), rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+        backdrop-filter: blur(12px);
+    }
+
+    .mng-title {
+        font-weight: 900;
+        margin: 0;
+        font-size: clamp(1.35rem, 2.1vw, 2.1rem);
+        color: var(--text);
+        letter-spacing: .2px;
+    }
+
+    .mng-sub {
+        margin: 6px 0 0;
+        color: var(--muted);
+        max-width: 90ch;
+        line-height: 1.5;
+        font-weight: 600;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.86);
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(34,197,94,0.14);
+    }
+
+    .btn-pill {
+        border-radius: 999px !important;
+        font-weight: 800 !important;
+        letter-spacing: .2px;
+        padding: 10px 14px !important;
+    }
+
+    .btn-primary-glow {
+        background: linear-gradient(90deg, var(--accent), #16a34a);
+        border: none !important;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.25);
+    }
+
+        .btn-primary-glow:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+    .btn-ghost {
+        background: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.14) !important;
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.12) !important;
+            transform: translateY(-1px);
+        }
+
+    .btn-danger-soft {
+        background: rgba(239,68,68,0.12) !important;
+        border: 1px solid rgba(239,68,68,0.25) !important;
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+    .mng-grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 14px;
+        align-items: start;
+    }
+
+    @@media (max-width: 1200px) {
+        .mng-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .card-glass {
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.30);
+        backdrop-filter: blur(12px);
+    }
+
+    .stats {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    @@media (max-width: 992px) {
+        .stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 520px) {
+        .stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .stat {
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(0,0,0,0.18);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat::after {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at 10% 10%, rgba(34,197,94,0.25), transparent 55%), radial-gradient(circle at 90% 20%, rgba(14,165,233,0.20), transparent 60%);
+            filter: blur(30px);
+            pointer-events: none;
+        }
+
+        .stat > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat .label {
+            color: rgba(255,255,255,0.70);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            font-size: .74rem;
+        }
+
+        .stat .val {
+            margin-top: 6px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: rgba(255,255,255,0.96);
+            line-height: 1.1;
+        }
+
+        .stat .hint {
+            margin-top: 6px;
+            color: rgba(255,255,255,0.62);
+            font-weight: 700;
+            font-size: .92rem;
+        }
+
+    /* Tabs */
+    .mng-tabs {
+        padding: 12px;
+    }
+
+    .nav-pills .nav-link {
+        border-radius: 999px !important;
+        font-weight: 900;
+        color: rgba(255,255,255,0.78);
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        margin-right: 8px;
+    }
+
+        .nav-pills .nav-link.active {
+            background: rgba(34,197,94,0.18) !important;
+            border-color: rgba(34,197,94,0.35) !important;
+            color: rgba(255,255,255,0.95) !important;
+        }
+
+    .panel-pad {
+        padding: 14px;
+    }
+
+    /* List rows */
+    .row-item {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.16);
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+        .row-item + .row-item {
+            margin-top: 10px;
+        }
+
+    .row-title {
+        font-weight: 900;
+        color: rgba(255,255,255,0.95);
+        margin: 0;
+    }
+
+    .row-sub {
+        margin: 4px 0 0;
+        color: rgba(255,255,255,0.68);
+        font-weight: 700;
+        font-size: .94rem;
+        line-height: 1.35;
+    }
+
+    .badge-soft {
+        border-radius: 999px;
+        padding: 8px 10px;
+        font-weight: 900;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.88);
+        white-space: nowrap;
+    }
+
+    .badge-green {
+        border-color: rgba(34,197,94,0.35);
+        background: rgba(34,197,94,0.14);
+    }
+
+    .badge-blue {
+        border-color: rgba(14,165,233,0.35);
+        background: rgba(14,165,233,0.14);
+    }
+
+    .badge-warn {
+        border-color: rgba(245,158,11,0.35);
+        background: rgba(245,158,11,0.14);
+    }
+
+    .badge-red {
+        border-color: rgba(239,68,68,0.35);
+        background: rgba(239,68,68,0.14);
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 86px;
+        padding: 14px;
+    }
+
+    @@media (max-width: 1200px) {
+        .sidebar {
+            position: static;
+        }
+    }
+
+    .kv {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .kv-item {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+    }
+
+    .kv-label {
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        font-size: .75rem;
+        color: rgba(255,255,255,0.62);
+        margin-bottom: 6px;
+    }
+
+    .kv-val {
+        color: rgba(255,255,255,0.92);
+        font-weight: 800;
+        line-height: 1.35;
+        word-break: break-word;
+    }
+
+    .qr-box {
+        margin-top: 10px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+        text-align: center;
+    }
+
+    .qr-placeholder {
+        width: 100%;
+        height: 180px;
+        border-radius: 12px;
+        border: 1px dashed rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.65);
+        font-weight: 900;
+    }
+
+    .small-muted {
+        color: rgba(255,255,255,0.62);
+        font-weight: 700;
+        font-size: .92rem;
+        line-height: 1.4;
+    }
+</style>
+
+<div class="mng-wrap">
+    <div class="mng-max">
+
+        <!-- HERO -->
+        <section class="mng-hero">
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <h1 class="mng-title mb-0">Manage Outlet</h1>
+                        <span class="pill">
+                            <span class="dot"></span>
+                            @outletDisplayName • @city
+                        </span>
+                        <span class="pill" title="Internal name">@internalName</span>
+                    </div>
+
+                    <p class="mng-sub">
+                        Control menu, orders, tables, and staff from one place.
+                    </p>
                 </div>
-                <!-- Category Table -->
-                <div class="col-md-6">
-                    <h2>Category Table</h2>
-                    <table class="table table-bordered table-hover">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Category Name</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="category-table-body">
-                            <!-- Sample category rows, replace with actual data from your database -->
-                        </tbody>
-                    </table>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <a class="btn btn-ghost btn-pill text-decoration-none" href="/Home/Index">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                    <button class="btn btn-primary-glow btn-pill" type="button" data-bs-toggle="modal" data-bs-target="#addMenuModal">
+                        <i class="fas fa-plus me-1"></i> Add Menu Item
+                    </button>
+                    <button class="btn btn-ghost btn-pill" type="button" id="previewBtn">
+                        <i class="fas fa-eye me-1"></i> Preview Customer Menu
+                    </button>
                 </div>
             </div>
 
-            <div class="row">
-                <!-- Add Menu Item Form -->
-                <div class="col-md-6">
-                    <h2>Add Menu Item</h2>
-                    <form id="food-form">
-                        <div class="form-group">
-                            <label for="food_name">Food Name</label>
-                            <input type="text" class="form-control" id="food_name" placeholder="Enter Food Name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="food_description">Food Description</label>
-                            <textarea class="form-control" id="food_description" placeholder="Enter Food Description" rows="4" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="food_category">Food Category</label>
-                            <select class="form-control" id="food_category" required>
-                                <option value="">Choose...</option>
-                                <!-- Add more categories as needed -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="food_price">Base Price ($)</label>
-                            <input type="number" step="0.01" class="form-control" id="food_price" placeholder="Enter Food Price" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="is_vegetarian">Vegetarian</label>
-                            <input type="checkbox" id="is_vegetarian">
-                        </div>
-                        <div class="form-group">
-                            <label for="food_sizes">Sizes</label>
-                            <div id="sizes-container">
-                                <div class="size-group">
-                                    <input type="text" class="form-control d-inline size-name" placeholder="Size Name" required>
-                                    <input type="number" step="0.01" class="form-control d-inline size-price" placeholder="Price" required>
-                                    <button type="button" class="btn btn-danger remove-size">Remove</button>
+            <!-- STATS -->
+            <div class="stats">
+                <div class="stat">
+                    <div class="label">Today’s Orders</div>
+                    <div class="val" id="statOrders">42</div>
+                    <div class="hint">+12% vs yesterday</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Revenue</div>
+                    <div class="val" id="statRevenue">LKR 186,400</div>
+                    <div class="hint">Avg ticket: LKR 4,438</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Avg Prep Time</div>
+                    <div class="val" id="statPrep">14m</div>
+                    <div class="hint">Kitchen running smooth</div>
+                </div>
+                <div class="stat">
+                    <div class="label">Tables Active</div>
+                    <div class="val" id="statTables">9</div>
+                    <div class="hint">Peak hour: 7–9PM</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN GRID -->
+        <section class="mng-grid">
+
+            <!-- LEFT: Tabs + Content -->
+            <div class="card-glass mng-tabs">
+                <ul class="nav nav-pills flex-wrap gap-2" id="manageTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-menu" data-bs-toggle="pill" data-bs-target="#panel-menu" type="button" role="tab">
+                            <i class="fas fa-book-open me-1"></i> Menu
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-orders" data-bs-toggle="pill" data-bs-target="#panel-orders" type="button" role="tab">
+                            <i class="fas fa-bolt me-1"></i> Live Orders
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-tables" data-bs-toggle="pill" data-bs-target="#panel-tables" type="button" role="tab">
+                            <i class="fas fa-border-all me-1"></i> Tables
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-staff" data-bs-toggle="pill" data-bs-target="#panel-staff" type="button" role="tab">
+                            <i class="fas fa-users me-1"></i> Staff
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-settings" data-bs-toggle="pill" data-bs-target="#panel-settings" type="button" role="tab">
+                            <i class="fas fa-sliders-h me-1"></i> Settings
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3">
+
+                    <!-- MENU -->
+                    <div class="tab-pane fade show active" id="panel-menu" role="tabpanel">
+                        <div class="panel-pad">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                <div>
+                                    <h5 class="mb-1 text-white fw-bold">Menu Items</h5>
+                                    <div class="small-muted">Demo items. Add/edit actions are UI-only for LinkedIn showcase.</div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <span class="badge-soft badge-blue">Categories: 6</span>
+                                    <span class="badge-soft badge-green">Items: 18</span>
                                 </div>
                             </div>
-                            <button type="button" id="add-size" class="btn btn-secondary mt-2">Add Size</button>
-                        </div>
-                        <div class="form-group">
-                            <label for="food_image">Food Image</label>
-                            <input type="file" class="form-control-file" id="food_image" accept="image/*">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add Food</button>
-                    </form>
-                </div>
-                <!-- Menu Item Table -->
-                <div class="col-md-6">
-                    <h2>Menu Item Table</h2>
-                    <table class="table table-bordered table-hover">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Food Name</th>
-                                <th>Food Description</th>
-                                <th>Category</th>
-                                <th>Price ($)</th>
-                                <th>Image</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
 
-                        <tbody id="menu-item-table-body">
-                            <!-- Make sure this id matches what's used in the JavaScript -->
-                            <!-- Rows will be filled by JavaScript -->
-                        </tbody>
-                    </table>
+                            @{
+                                var menu = new[]
+                                {
+                            new { Name="Grilled Chicken Rice Bowl", Cat="Bowls", Price=1850, Status="Available", Tag="Best seller" },
+                            new { Name="Seafood Kottu (Large)", Cat="Kottu", Price=2400, Status="Available", Tag="Chef pick" },
+                            new { Name="Classic Burger + Fries", Cat="Burgers", Price=2100, Status="Available", Tag="Fast mover" },
+                            new { Name="Creamy Mushroom Pasta", Cat="Pasta", Price=1950, Status="Paused", Tag="Low stock" },
+                            new { Name="Iced Latte", Cat="Beverages", Price=980, Status="Available", Tag="Top rated" },
+                            new { Name="Chocolate Lava Cake", Cat="Desserts", Price=1250, Status="Available", Tag="High margin" }
+                            };
+                            }
+
+                            @foreach (var item in menu)
+                            {
+                                var badgeClass = item.Status == "Available" ? "badge-green" : "badge-warn";
+                                <div class="row-item">
+                                    <div>
+                                        <p class="row-title mb-0">@item.Name</p>
+                                        <p class="row-sub mb-0">@item.Cat • LKR @item.Price • <span class="text-white-50">@item.Tag</span></p>
+                                    </div>
+                                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                                        <span class="badge-soft @badgeClass">@item.Status</span>
+                                        <button class="btn btn-ghost btn-pill" type="button" disabled title="Demo mode">
+                                            <i class="fas fa-pen me-1"></i> Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- LIVE ORDERS -->
+                    <div class="tab-pane fade" id="panel-orders" role="tabpanel">
+                        <div class="panel-pad">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                <div>
+                                    <h5 class="mb-1 text-white fw-bold">Live Orders</h5>
+                                    <div class="small-muted">Shows what the kitchen sees: status + priority.</div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <span class="badge-soft badge-blue">Incoming: 7</span>
+                                    <span class="badge-soft badge-warn">In Prep: 4</span>
+                                    <span class="badge-soft badge-green">Ready: 2</span>
+                                </div>
+                            </div>
+
+                            @{
+                                var orders = new[]
+                                {
+                            new { Id="ORD-1042", Table="T07", Items="2x Burger, 1x Iced Latte", Status="Incoming", Badge="badge-blue", Time="Just now" },
+                            new { Id="ORD-1041", Table="T03", Items="1x Seafood Kottu, 1x Coke", Status="In Prep", Badge="badge-warn", Time="3m ago" },
+                            new { Id="ORD-1039", Table="T12", Items="2x Pasta, 1x Lava Cake", Status="In Prep", Badge="badge-warn", Time="7m ago" },
+                            new { Id="ORD-1037", Table="T01", Items="1x Rice Bowl", Status="Ready", Badge="badge-green", Time="11m ago" }
+                            };
+                            }
+
+                            @foreach (var o in orders)
+                            {
+                                <div class="row-item">
+                                    <div>
+                                        <p class="row-title mb-0">@o.Id <span class="text-white-50">• @o.Table</span></p>
+                                        <p class="row-sub mb-0">@o.Items</p>
+                                    </div>
+                                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                                        <span class="badge-soft @o.Badge">@o.Status</span>
+                                        <span class="badge-soft">@o.Time</span>
+                                        <button class="btn btn-ghost btn-pill" type="button" disabled title="Demo mode">
+                                            <i class="fas fa-check me-1"></i> Advance
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- TABLES -->
+                    <div class="tab-pane fade" id="panel-tables" role="tabpanel">
+                        <div class="panel-pad">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                <div>
+                                    <h5 class="mb-1 text-white fw-bold">Tables</h5>
+                                    <div class="small-muted">QR ordering status at-a-glance.</div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <span class="badge-soft badge-green">Active: 9</span>
+                                    <span class="badge-soft">Total: 18</span>
+                                </div>
+                            </div>
+
+                            @{
+                                var tables = new[]
+                                {
+                            new { Name="T01", Status="Active", Badge="badge-green", Note="Order ready" },
+                            new { Name="T03", Status="Active", Badge="badge-green", Note="In prep" },
+                            new { Name="T07", Status="Active", Badge="badge-green", Note="New order" },
+                            new { Name="T12", Status="Active", Badge="badge-green", Note="Awaiting payment" },
+                            new { Name="T15", Status="Idle", Badge="badge-blue", Note="Available" },
+                            new { Name="T18", Status="Offline", Badge="badge-red", Note="QR disabled" }
+                            };
+                            }
+
+                            <div class="row g-2">
+                                @foreach (var t in tables)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="row-item">
+                                            <div>
+                                                <p class="row-title mb-0">@t.Name</p>
+                                                <p class="row-sub mb-0">@t.Note</p>
+                                            </div>
+                                            <span class="badge-soft @t.Badge">@t.Status</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STAFF -->
+                    <div class="tab-pane fade" id="panel-staff" role="tabpanel">
+                        <div class="panel-pad">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                <div>
+                                    <h5 class="mb-1 text-white fw-bold">Staff</h5>
+                                    <div class="small-muted">Roles + access model (demo).</div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <span class="badge-soft">Staff: 28</span>
+                                    <span class="badge-soft badge-blue">Managers: 2</span>
+                                </div>
+                            </div>
+
+                            @{
+                                var staff = new[]
+                                {
+                            new { Name="Kasun Perera", Role="Manager", Shift="10:00 - 19:00", Badge="badge-blue" },
+                            new { Name="Amaya Fernando", Role="Manager", Shift="15:00 - 23:00", Badge="badge-blue" },
+                            new { Name="Nimal Silva", Role="Kitchen", Shift="11:00 - 20:00", Badge="badge-green" },
+                            new { Name="Rashmi Jayasinghe", Role="Cashier", Shift="12:00 - 21:00", Badge="badge-warn" }
+                            };
+                            }
+
+                            @foreach (var s in staff)
+                            {
+                                <div class="row-item">
+                                    <div>
+                                        <p class="row-title mb-0">@s.Name</p>
+                                        <p class="row-sub mb-0">@s.Role • @s.Shift</p>
+                                    </div>
+                                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                                        <span class="badge-soft @s.Badge">@s.Role</span>
+                                        <button class="btn btn-ghost btn-pill" type="button" disabled title="Demo mode">
+                                            <i class="fas fa-user-cog me-1"></i> Permissions
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- SETTINGS -->
+                    <div class="tab-pane fade" id="panel-settings" role="tabpanel">
+                        <div class="panel-pad">
+                            <h5 class="mb-1 text-white fw-bold">Outlet Settings</h5>
+                            <div class="small-muted mb-3">These are UI-only for demo. Later you can bind to your API.</div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="kv-item">
+                                        <div class="kv-label">Ordering</div>
+                                        <div class="d-flex align-items-center justify-content-between gap-2">
+                                            <div class="kv-val">QR Ordering</div>
+                                            <span class="badge-soft badge-green">Enabled</span>
+                                        </div>
+                                        <div class="small-muted mt-2">Customers scan QR → menu → pay.</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="kv-item">
+                                        <div class="kv-label">Kitchen Display</div>
+                                        <div class="d-flex align-items-center justify-content-between gap-2">
+                                            <div class="kv-val">Live Tickets</div>
+                                            <span class="badge-soft badge-blue">Demo</span>
+                                        </div>
+                                        <div class="small-muted mt-2">Order tickets routed by station.</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="kv-item">
+                                        <div class="kv-label">Danger zone</div>
+                                        <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+                                            <div class="kv-val">Delete outlet data (disabled in demo)</div>
+                                            <button class="btn btn-danger-soft btn-pill" type="button" disabled>
+                                                <i class="fas fa-trash me-1"></i> Delete Outlet
+                                            </button>
+                                        </div>
+                                        <div class="small-muted mt-2">In real mode this would call your delete endpoint.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
+            </div>
+
+            <!-- RIGHT: Sidebar -->
+            <aside class="card-glass sidebar">
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                    <div>
+                        <h5 class="mb-1 text-white fw-bold">Outlet Profile</h5>
+                        <div class="small-muted">Quick reference & actions.</div>
+                    </div>
+                    <span class="badge-soft">@country</span>
+                </div>
+
+                <div class="kv">
+                    <div class="kv-item">
+                        <div class="kv-label">Location</div>
+                        <div class="kv-val">@city, @province</div>
+                        <div class="small-muted mt-1">@address</div>
+                    </div>
+
+                    <div class="kv-item">
+                        <div class="kv-label">Contact</div>
+                        <div class="kv-val">@contact</div>
+                        <div class="small-muted mt-1">Owner hotline (demo)</div>
+                    </div>
+
+                    <div class="kv-item">
+                        <div class="kv-label">Operating Hours</div>
+                        <div class="kv-val">@hours</div>
+                        <div class="small-muted mt-1">Local time</div>
+                    </div>
+                </div>
+
+                <div class="qr-box">
+                    <div class="kv-label mb-2">Table QR (demo)</div>
+                    <div class="qr-placeholder">
+                        QR Preview • Outlet @outletId
+                    </div>
+                    <div class="small-muted mt-2">
+                        Later: generate QR per table → link to `/Account/SpecialLogin?outletId=...&tableId=...`
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3 justify-content-center">
+                        <button class="btn btn-ghost btn-pill" type="button" disabled title="Demo mode">
+                            <i class="fas fa-download me-1"></i> Download QR
+                        </button>
+                        <button class="btn btn-ghost btn-pill" type="button" disabled title="Demo mode">
+                            <i class="fas fa-tv me-1"></i> Kitchen Display
+                        </button>
+                    </div>
+                </div>
+
+            </aside>
+
+        </section>
+    </div>
+</div>
+
+<!-- Add Menu Item Modal -->
+<div class="modal fade" id="addMenuModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:#0f1520;border:1px solid rgba(255,255,255,0.12);border-radius:18px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white fw-bold">Add Menu Item (Demo)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body text-white-50">
+                This is a UI-only demo modal for LinkedIn. You can wire it to your API later.
+                <div class="mt-3">
+                    <label class="form-label text-white">Item name</label>
+                    <input class="form-control" placeholder="e.g., Chicken Rice Bowl" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#fff;" />
+                </div>
+                <div class="row g-2 mt-1">
+                    <div class="col-md-6">
+                        <label class="form-label text-white">Category</label>
+                        <select class="form-select" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#fff;">
+                            <option>Bowls</option>
+                            <option>Kottu</option>
+                            <option>Burgers</option>
+                            <option>Pasta</option>
+                            <option>Beverages</option>
+                            <option>Desserts</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-white">Price (LKR)</label>
+                        <input class="form-control" placeholder="1850" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#fff;" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-ghost btn-pill" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary-glow btn-pill" disabled title="Demo mode">
+                    Save (Demo)
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function () {
-        function fetchAndPopulateCategories() {
-            let outletId = parseInt($('#outlet_id').val(), 10);
-            let apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetAllCategories/${outletId}`;
-
-            $.get(apiEndpoint, function (categories) {
-                console.log("Fetched categories:", categories);
-                let tableBody = '';
-                let dropdownOptions = '<option value="">Choose...</option>';
-
-                categories.forEach(categoryDto => {
-                    tableBody += `<tr><td>${categoryDto.categoryName}</td><td><button class="btn btn-danger btn-sm delete-category" data-id="${categoryDto.id}"><i class="fas fa-times"></i></button></td></tr>`;
-                    dropdownOptions += `<option value="${categoryDto.id}" data-name="${categoryDto.categoryName}">${categoryDto.categoryName}</option>`;
-                });
-
-                $('#category-table-body').html(tableBody);
-                $('#food_category').html(dropdownOptions);
-            })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed:", textStatus, errorThrown);
-                });
-        }
-
-        function fetchAndPopulateMenuItems() {
-            let outletId = parseInt($('#outlet_id').val(), 10);
-            let apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/GetMenuItems/${outletId}`;
-
-            $.get(apiEndpoint, function (menuItems) {
-                console.log("Fetched menu items:", menuItems);
-                let tableBody = '';
-
-                menuItems.forEach(menuItemDto => {
-                    const imageBase64 = menuItemDto.image;
-                    tableBody += `<tr data-item-id="${menuItemDto.id}">
-                            <td>${menuItemDto.name}</td>
-                            <td>${menuItemDto.description}</td>
-                            <td>${menuItemDto.categoryName}</td>
-                            <td>${menuItemDto.price.toFixed(2)}</td>
-                            <td><img src="data:image/png;base64,${imageBase64}" width="100"/></td>
-                            <td><button class="btn btn-danger delete-button">Delete</button></td>
-                        </tr>`;
-                });
-
-                $('#menu-item-table-body').html(tableBody);
-            })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed:", textStatus, errorThrown);
-                });
-        }
-
-        fetchAndPopulateCategories();
-        fetchAndPopulateMenuItems();
-
-        $('#category-form').submit(function (e) {
-            e.preventDefault();
-
-            let outletId = parseInt($('#outlet_id').val(), 10);
-            let categoryName = $('#category_name').val();
-            let internalOutletName = '@ViewBag.InternalOutletName';
-            let extraItems = [];
-
-            $('#extras-container .extra-group').each(function () {
-                const extraName = $(this).find('.extra-name').val();
-                const extraPrice = parseFloat($(this).find('.extra-price').val());
-                extraItems.push({ name: extraName, price: extraPrice });
-            });
-
-            $.ajax({
-                url: '/api/MenuApi/AddCategory',
-                method: 'POST',
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify({
-                    outletId: outletId,
-                    categoryName: categoryName,
-                    internalOutletName: internalOutletName,
-                    extraItems: extraItems
-                }),
-                success: function (response) {
-                    console.log("Category added:", response);
-                    fetchAndPopulateCategories();  // Reload categories
-                },
-                error: function (error) {
-                    console.log("Error adding category:", error);
-                }
-            });
-        });
-
-
-        $(document).on('click', '.delete-category', function () {
-            const categoryId = $(this).attr('data-id');
-            const categoryName = $(this).closest('tr').find('td:first').text(); // Get the name of the category
-
-            let categoryHasMenuItems = false;
-
-            $('#menu-item-table-body tr').each(function () {
-                const menuItemCategoryName = $(this).find('td:nth-child(3)').text(); // Assuming category name is in the third column
-                if (menuItemCategoryName === categoryName) {
-                    categoryHasMenuItems = true;
-                    return false; // Break the loop
-                }
-            });
-
-            if (categoryHasMenuItems) {
-                showBootstrapAlert('This category has menu items. Please delete them first before deleting the category.');
-                return;
-            }
-
-            $.ajax({
-                url: `https://restosolutionssaas.com/api/MenuApi/DeleteCategory/${categoryId}`,
-                method: 'DELETE',
-                success: function (response) {
-                    console.log("Category deleted:", response);
-                    fetchAndPopulateCategories();  // Reload categories
-                },
-                error: function (error) {
-                    console.log("Error deleting category:", error);
-                }
-            });
-        });
-
-        $('#food-form').submit(function (e) {
-            e.preventDefault();
-
-            let foodName = $('#food_name').val();
-            let foodDescription = $('#food_description').val();
-            let foodCategoryId = $('#food_category').val();
-            let foodCategoryName = $('#food_category option:selected').text();
-            let foodPrice = parseFloat($('#food_price').val());
-            let isVegetarian = $('#is_vegetarian').is(':checked');
-            let foodImage = $('#food_image')[0].files[0];
-            let sizes = [];
-
-            $('#sizes-container .size-group').each(function () {
-                const sizeName = $(this).find('.size-name').val();
-                const sizePrice = parseFloat($(this).find('.size-price').val());
-                sizes.push({ size: sizeName, price: sizePrice });
-            });
-
-            if (!foodImage) {
-                console.log("No image file selected.");
-                return;
-            }
-
-            getBase64(foodImage, (base64Image) => {
-                console.log("Sending data:", {
-                    name: foodName,
-                    description: foodDescription,
-                    menuCategoryId: foodCategoryId,
-                    categoryName: foodCategoryName,
-                    price: foodPrice,
-                    isVegetarian: isVegetarian,
-                    image: base64Image.split(',')[1],
-                    sizes: sizes
-                });
-
-                $.ajax({
-                    url: 'https://restosolutionssaas.com/api/MenuApi/AddMenuItem',
-                    method: 'POST',
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify({
-                        name: foodName,
-                        description: foodDescription,
-                        menuCategoryId: foodCategoryId,
-                        categoryName: foodCategoryName,
-                        price: foodPrice,
-                        isVegetarian: isVegetarian,
-                        image: base64Image.split(',')[1],
-                        sizes: sizes
-                    }),
-                    success: function (response) {
-                        console.log("Menu item added:", response);
-                        fetchAndPopulateCategories();
-                        fetchAndPopulateMenuItems();
-                    },
-                    error: function (error) {
-                        console.log("Error adding menu item:", error);
-                    }
-                });
-            });
-        });
-
-        function getBase64(file, callback) {
-            let reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function () {
-                callback(reader.result);
-            };
-            reader.onerror = function (error) {
-                console.log('Error: ', error);
-            };
-        }
-
-
-        $(document).on('click', '.delete-button', function () {
-            const row = $(this).closest('tr');
-            const itemId = row.data('item-id');
-            const apiEndpoint = `https://restosolutionssaas.com/api/MenuApi/DeleteMenuItem/${itemId}`;
-
-            $.ajax({
-                url: apiEndpoint,
-                type: 'DELETE',
-                success: function (result) {
-                    console.log("Item deleted:", result);
-                    row.remove();
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.log("Request failed:", textStatus, errorThrown);
-                }
-            });
-        });
-
-
-        $(document).on('click', '.remove-size', function () {
-            $(this).closest('.size-group').remove();
-        });
-
-        $('#add-size').click(function () {
-            const sizeGroup = `<div class="size-group mt-2">
-                    <input type="text" class="form-control d-inline size-name" placeholder="Size Name" required>
-                    <input type="number" step="0.01" class="form-control d-inline size-price" placeholder="Price" required>
-                    <button type="button" class="btn btn-danger remove-size">Remove</button>
-                </div>`;
-            $('#sizes-container').append(sizeGroup);
-        });
+    // Demo button actions (no backend)
+    document.getElementById("previewBtn")?.addEventListener("click", function () {
+        alert("Demo: This would open the customer-facing menu preview for this outlet.");
     });
-    $(document).on('click', '.remove-extra', function () {
-        $(this).closest('.extra-group').remove();
-    });
-
-    $('#add-extra').click(function () {
-        const extraGroup = `<div class="extra-group mt-2">
-            <input type="text" class="form-control d-inline extra-name" placeholder="Extra Name" required>
-            <input type="number" step="0.01" class="form-control d-inline extra-price" placeholder="Price" required>
-            <button type="button" class="btn btn-danger remove-extra">Remove</button>
-        </div>`;
-        $('#extras-container').append(extraGroup);
-    });
-
-
-    function getBase64(file, callback) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function () {
-            callback(reader.result);
-        };
-        reader.onerror = function (error) {
-            console.log('Error: ', error);
-        };
-    }
-
-    function showBootstrapAlert(message) {
-        const alertHtml = `
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>Attention!</strong> ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-        $('#alert-placeholder').html(alertHtml);
-    }
 </script>

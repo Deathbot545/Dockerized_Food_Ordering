@@ -1,137 +1,1051 @@
-﻿@model Restaurant_API.ViewModels.OutletViewModel;
-@using Order_API.DTO;
-@using Order_API.Models;
-@functions {
-    public static DateTime ConvertToCorrectTimeZone(DateTime dateTimeWithOffset)
-    {
-        TimeZoneInfo istTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
-        DateTime dateTimeInIST = TimeZoneInfo.ConvertTime(dateTimeWithOffset, istTimeZone);
-        return dateTimeInIST;
-    }
+﻿@{
+    ViewData["Title"] = "Kitchen Dashboard";
+
+    // These come from KitchenController.Index(...)
+    var outletId = (int?)(ViewBag.OutletId) ?? 0;
+    var internalName = (string)(ViewBag.InternalOutletName ?? "demo_outlet");
+    var customerName = (string)(ViewBag.CustomerFacingName ?? "Demo Outlet");
+    var demoMode = (bool?)(ViewBag.DemoMode) ?? true;
 }
-<h2>@Model.OutletInfo.InternalOutletName</h2>
 
-<!-- Order Panel -->
-    <div class="row mt-4">
-        <div class="col-lg-9">
+<style>
+    /* ============================
+           Kitchen Dashboard - SaaS UI
+           Scoped styles (won't break other pages)
+           ============================ */
 
-            <!-- Filters -->
-            <div class="d-flex justify-content-between mb-3 align-items-center">
+    .kitchen-wrap {
+        width: 100%;
+        padding: 18px 14px 28px;
+    }
+
+    .kitchen-max {
+        max-width: 1480px;
+        margin: 0 auto;
+    }
+
+    .kitchen-hero {
+        border-radius: 22px;
+        padding: 18px 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: radial-gradient(900px 450px at 8% 0%, rgba(34,197,94,0.16), transparent 55%), radial-gradient(900px 450px at 95% 15%, rgba(14,165,233,0.16), transparent 55%), rgba(255,255,255,0.06);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+        backdrop-filter: blur(12px);
+    }
+
+        .kitchen-hero h1 {
+            margin: 0;
+            font-weight: 900;
+            letter-spacing: .2px;
+            color: rgba(255,255,255,0.96);
+            font-size: clamp(1.35rem, 1.7vw, 1.85rem);
+            line-height: 1.1;
+        }
+
+        .kitchen-hero p {
+            margin: 6px 0 0;
+            color: rgba(255,255,255,0.72);
+            max-width: 90ch;
+        }
+
+    .kitchen-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.9);
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .kitchen-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 6px rgba(34,197,94,0.14);
+    }
+
+        .kitchen-dot.blue {
+            background: #0ea5e9;
+            box-shadow: 0 0 0 6px rgba(14,165,233,0.14);
+        }
+
+        .kitchen-dot.red {
+            background: #ef4444;
+            box-shadow: 0 0 0 6px rgba(239,68,68,0.14);
+        }
+
+    .kitchen-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+    }
+
+        .kitchen-actions .left,
+        .kitchen-actions .right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+    .k-btn {
+        border-radius: 999px !important;
+        font-weight: 800;
+        letter-spacing: .2px;
+        padding: 10px 14px !important;
+    }
+
+    .k-btn-primary {
+        background: linear-gradient(90deg, #22c55e, #16a34a);
+        border: none;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.22);
+    }
+
+        .k-btn-primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+    .k-btn-ghost {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+        .k-btn-ghost:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-1px);
+        }
+
+    .k-btn-danger {
+        background: rgba(239,68,68,0.12);
+        border: 1px solid rgba(239,68,68,0.25);
+        color: rgba(255,255,255,0.92) !important;
+    }
+
+        .k-btn-danger:hover {
+            background: rgba(239,68,68,0.18);
+        }
+
+    .k-muted {
+        color: rgba(255,255,255,0.70);
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .kpi-grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    @@media (max-width: 1200px) {
+        .kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 520px) {
+        .kpi-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .kpi-card {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.25);
+        padding: 14px;
+        backdrop-filter: blur(12px);
+        overflow: hidden;
+        position: relative;
+    }
+
+        .kpi-card::after {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at 20% 15%, rgba(34,197,94,0.16), transparent 62%), radial-gradient(circle at 80% 30%, rgba(14,165,233,0.14), transparent 62%);
+            filter: blur(22px);
+            pointer-events: none;
+        }
+
+        .kpi-card .kpi-top {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+    .kpi-title {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-weight: 900;
+        letter-spacing: .35px;
+        text-transform: uppercase;
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.72);
+    }
+
+    .kpi-value {
+        position: relative;
+        z-index: 1;
+        margin-top: 10px;
+        font-weight: 900;
+        font-size: 1.6rem;
+        color: rgba(255,255,255,0.96);
+    }
+
+    .kpi-sub {
+        position: relative;
+        z-index: 1;
+        margin-top: 6px;
+        color: rgba(255,255,255,0.70);
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .kitchen-layout {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 12px;
+        align-items: start;
+    }
+
+    @@media (max-width: 1200px) {
+        .kitchen-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .board {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        overflow: hidden;
+        box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+        backdrop-filter: blur(12px);
+    }
+
+    .board-head {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .board-title {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.92);
+        font-size: 1.05rem;
+    }
+
+    .board-columns {
+        padding: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    @@media (max-width: 992px) {
+        .board-columns {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .col-card {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+        min-height: 220px;
+    }
+
+    .col-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .col-name {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.92);
+        font-size: 0.98rem;
+    }
+
+    .col-count {
+        font-weight: 900;
+        color: rgba(255,255,255,0.80);
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+    }
+
+    .order {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        padding: 12px;
+        box-shadow: 0 12px 34px rgba(0,0,0,0.24);
+        transition: transform .15s ease, background .15s ease, border-color .15s ease;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+
+        .order:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.18);
+        }
+
+    .order-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .order-id {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.95);
+        font-size: 1.02rem;
+        line-height: 1.2;
+    }
+
+    .order-meta {
+        margin-top: 6px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        padding: 7px 10px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.82);
+        font-weight: 800;
+        font-size: 0.86rem;
+        white-space: nowrap;
+    }
+
+        .pill .mini-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 0 5px rgba(34,197,94,0.14);
+        }
+
+        .pill.warn .mini-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 0 5px rgba(245,158,11,0.14);
+        }
+
+        .pill.blue .mini-dot {
+            background: #0ea5e9;
+            box-shadow: 0 0 0 5px rgba(14,165,233,0.14);
+        }
+
+        .pill.red .mini-dot {
+            background: #ef4444;
+            box-shadow: 0 0 0 5px rgba(239,68,68,0.14);
+        }
+
+    .items {
+        margin-top: 10px;
+        padding-left: 18px;
+        color: rgba(255,255,255,0.85);
+        font-weight: 700;
+        line-height: 1.45;
+    }
+
+    .note {
+        margin-top: 10px;
+        border-radius: 14px;
+        border: 1px dashed rgba(255,255,255,0.14);
+        background: rgba(0,0,0,0.18);
+        padding: 10px;
+        color: rgba(255,255,255,0.75);
+        font-weight: 700;
+        font-size: 0.92rem;
+    }
+
+    .order-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .order-actions .btn {
+            border-radius: 999px !important;
+            font-weight: 800;
+            padding: 8px 12px !important;
+        }
+
+    /* Right panel */
+    .side {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.22);
+        backdrop-filter: blur(12px);
+        overflow: hidden;
+    }
+
+    .side-head {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .side-title {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255,255,255,0.92);
+        font-size: 1.02rem;
+    }
+
+    .notif-list {
+        padding: 10px 12px 12px;
+        display: grid;
+        gap: 10px;
+    }
+
+    .notif {
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 12px;
+        color: rgba(255,255,255,0.86);
+        font-weight: 700;
+    }
+
+        .notif small {
+            display: block;
+            margin-top: 6px;
+            color: rgba(255,255,255,0.65);
+            font-weight: 700;
+        }
+
+    .toast-container {
+        position: fixed;
+        top: 84px;
+        right: 16px;
+        z-index: 99999;
+    }
+</style>
+
+<div class="kitchen-wrap">
+    <div class="kitchen-max">
+
+        <section class="kitchen-hero">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                 <div>
-                    <label class="mr-2">Sort By:</label>
-                    <select class="form-control d-inline-block w-auto">
-                        <option>Sort By Time</option>
-                        <!-- Other options -->
-                    </select>
+                    <h1>Kitchen Dashboard — @customerName</h1>
+                    <p>
+                        Outlet: <span class="fw-bold text-white">@internalName</span> •
+                        OutletId: <span class="fw-bold text-white">@outletId</span>
+                        <span class="ms-2 k-muted">• Live prep board with quick status updates</span>
+                    </p>
                 </div>
-                <!-- You can add a search bar or other filters here -->
-            </div>
 
-        @foreach (var order in Model.Orders ?? Enumerable.Empty<OrderDTO>())
-        {
-            string tableIdentifier = Model.Tables.FirstOrDefault(t => t.Id == order.TableId)?.TableIdentifier;
-
-            <div class="card mb-3 order-card bg-light" data-order-id="@order.Id">
-                <div class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
-                    <span>
-                        Order #@order.Id | Table: @tableIdentifier (@order.TableId) |
-                        <span style="font-weight: lighter;">Date: @ConvertToCorrectTimeZone(order.OrderTime).ToString("yyyy-MM-dd")</span>
-                        <span style="font-weight: bold; font-size: larger;">Time: @ConvertToCorrectTimeZone(order.OrderTime).ToString("HH:mm:ss")</span>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="kitchen-badge">
+                        <span class="kitchen-dot @(demoMode ? "blue" : "")"></span>
+                        <span>@(demoMode ? "DEMO MODE (Dummy Orders)" : "LIVE MODE")</span>
                     </span>
-                    <span>STATUS: @order.Status.ToString().ToUpper()</span>
-                </div>
-                <div class="card-body">
-                    <ul class="mb-3">
-                        @foreach (var detail in order.OrderDetails ?? Enumerable.Empty<OrderDetailDTO>())
-                        {
-                            <li>@detail.MenuItem?.Name <text>x</text>@detail.Quantity</li>
-                        }
 
-                    </ul>
-                    <div class="btn-group" role="group" aria-label="Order Status">
-                        <button type="button" class="btn btn-warning @(order.Status == OrderStatus.Pending ? "active" : "")" data-status="pending">Pending</button>
-                        <button type="button" class="btn btn-primary @(order.Status == OrderStatus.Preparing ? "active" : "")" data-status="in-progress">In Progress</button>
-                        <button type="button" class="btn btn-success @(order.Status == OrderStatus.Ready ? "active" : "")" data-status="completed">Completed</button>
+                    <button class="btn k-btn k-btn-ghost" type="button" id="refreshBtn">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
+
+                    <a class="btn k-btn k-btn-primary text-decoration-none" href="/Restaurant/Index">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+            </div>
+
+            <div class="kitchen-actions">
+                <div class="left">
+                    <div class="input-group" style="max-width: 420px;">
+                        <span class="input-group-text"
+                              style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.8); border-radius: 999px 0 0 999px;">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input id="searchBox" type="text" class="form-control"
+                               placeholder="Search by order #, table, item..."
+                               style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.92); border-left: none; border-radius: 0 999px 999px 0;" />
                     </div>
-                    <!-- Optionally, add an Alert Button and Timer here -->
+
+                    <span class="k-muted" id="lastUpdatedText">Last updated: —</span>
+                </div>
+
+                <div class="right">
+                    <select id="sortSelect" class="form-select"
+                            style="width:auto; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.92); border-radius: 999px;">
+                        <option value="newest">Newest first</option>
+                        <option value="oldest">Oldest first</option>
+                        <option value="priority">Priority</option>
+                    </select>
+
+                    <button class="btn k-btn k-btn-ghost" type="button" id="clearNotifsBtn">
+                        <i class="fas fa-bell-slash me-1"></i> Clear notifications
+                    </button>
                 </div>
             </div>
-        }
+        </section>
 
-        </div>
-
-        <!-- Notification Panel -->
-        <div class="col-lg-3">
-            <div class="sticky-top">
-                <h5 class="bg-secondary text-white p-2 rounded-top">Notifications</h5>
-                <ul class="list-group">
-                    <li class="list-group-item list-group-item-danger">Table #3 requires urgent attention!</li>
-                    <li class="list-group-item list-group-item-danger">Order #12347 from Table #6 has been cancelled!</li>
-                    <li class="list-group-item list-group-item-success">Order #12345 from Table #5 is completed!</li>
-                    <li class="list-group-item list-group-item-success">Order #12346 from Table #2 is completed!</li>
-                    <!-- Other notifications -->
-                </ul>
+        <!-- KPIs -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <p class="kpi-title">Pending</p>
+                    <span class="kitchen-dot red"></span>
+                </div>
+                <div class="kpi-value" id="kpiPending">0</div>
+                <div class="kpi-sub">Needs action / start cooking</div>
             </div>
-        </div>
 
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <p class="kpi-title">In Progress</p>
+                    <span class="kitchen-dot blue"></span>
+                </div>
+                <div class="kpi-value" id="kpiProgress">0</div>
+                <div class="kpi-sub">Currently being prepared</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <p class="kpi-title">Ready</p>
+                    <span class="kitchen-dot"></span>
+                </div>
+                <div class="kpi-value" id="kpiReady">0</div>
+                <div class="kpi-sub">Ready to serve / pickup</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-top">
+                    <p class="kpi-title">Avg prep time</p>
+                    <span class="kitchen-dot blue"></span>
+                </div>
+                <div class="kpi-value" id="kpiAvg">—</div>
+                <div class="kpi-sub">Based on completed transitions</div>
+            </div>
+        </section>
+
+        <section class="kitchen-layout">
+
+            <!-- Board -->
+            <div class="board">
+                <div class="board-head">
+                    <p class="board-title mb-0">Order Board</p>
+                    <span class="k-muted" id="boardSummary">0 orders</span>
+                </div>
+
+                <div class="board-columns">
+                    <div class="col-card">
+                        <div class="col-head">
+                            <p class="col-name mb-0"><span class="kitchen-dot red me-2" style="display:inline-block;vertical-align:middle;"></span>Pending</p>
+                            <span class="col-count" id="countPending">0</span>
+                        </div>
+                        <div id="colPending"></div>
+                    </div>
+
+                    <div class="col-card">
+                        <div class="col-head">
+                            <p class="col-name mb-0"><span class="kitchen-dot blue me-2" style="display:inline-block;vertical-align:middle;"></span>In Progress</p>
+                            <span class="col-count" id="countProgress">0</span>
+                        </div>
+                        <div id="colProgress"></div>
+                    </div>
+
+                    <div class="col-card">
+                        <div class="col-head">
+                            <p class="col-name mb-0"><span class="kitchen-dot me-2" style="display:inline-block;vertical-align:middle;"></span>Ready</p>
+                            <span class="col-count" id="countReady">0</span>
+                        </div>
+                        <div id="colReady"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <aside class="side">
+                <div class="side-head">
+                    <p class="side-title mb-0">Notifications</p>
+                    <span class="k-muted" id="notifCount">0</span>
+                </div>
+                <div class="notif-list" id="notifList">
+                    <!-- Filled by JS -->
+                </div>
+            </aside>
+
+        </section>
     </div>
+</div>
 
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-dark text-white">
-        <div class="container">
-            <span class="text-muted">Quick Actions:</span>
-            <!-- Quick action buttons, e.g., mark all orders as completed, print all pending orders, etc. -->
-        </div>
-    </footer>
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-    $(document).ready(function () {
-        // Hook up click events for the order status buttons
-        $('.btn-group .btn').click(function () {
-            const $btn = $(this);
-            const $card = $btn.closest('.order-card');
-            const orderId = parseInt($card.data('order-id'));
-            const newStatus = $btn.data('status');
+    // =============================
+    // Kitchen Dashboard Demo / Live
+    // =============================
+    const DEMO_MODE = @demoMode.ToString().ToLower();
+    const OUTLET_ID = @outletId;
+    const API_BASE = "https://restosolutionssaas.com"; // used only when DEMO_MODE=false
 
-            updateOrderStatus(orderId, newStatus);
-        });
-    });
+    // Status: "pending" | "progress" | "ready"
+    let orders = [];
+    let notifications = [];
+    let prepTransitions = []; // store durations to compute avg prep time
 
-    function updateOrderStatus(orderId, newStatus) {
-        // Convert string status to your OrderStatus enum
-        let statusEnumValue;
-        switch (newStatus) {
-            case 'pending':
-                statusEnumValue = 0; // Assuming 0 corresponds to 'Pending' in your enum
-                break;
-            case 'in-progress':
-                statusEnumValue = 1; // Adjust these values based on your enum definition
-                break;
-            case 'completed':
-                statusEnumValue = 2;
-                break;
+    // ---- Dummy data (realistic) ----
+    function buildDemoOrders() {
+        const now = new Date();
+        return [
+            {
+                id: 12451,
+                table: "T-04",
+                createdAt: new Date(now.getTime() - 1000 * 60 * 18), // 18 min ago
+                status: "pending",
+                priority: "high",
+                note: "No peanuts. Extra spicy if possible.",
+                items: [
+                    { name: "Chicken Kottu", qty: 1 },
+                    { name: "Lime Juice", qty: 2 }
+                ]
+            },
+            {
+                id: 12452,
+                table: "T-12",
+                createdAt: new Date(now.getTime() - 1000 * 60 * 11),
+                status: "pending",
+                priority: "normal",
+                note: "Make fries well-done.",
+                items: [
+                    { name: "BBQ Chicken Pizza (Medium)", qty: 1 },
+                    { name: "French Fries", qty: 1 }
+                ]
+            },
+            {
+                id: 12453,
+                table: "T-02",
+                createdAt: new Date(now.getTime() - 1000 * 60 * 24),
+                status: "progress",
+                priority: "high",
+                note: "Allergy: lactose (no cheese).",
+                items: [
+                    { name: "Seafood Fried Rice", qty: 1 },
+                    { name: "Coconut Sambol", qty: 1 }
+                ],
+                startedAt: new Date(now.getTime() - 1000 * 60 * 12) // started 12 min ago
+            },
+            {
+                id: 12454,
+                table: "T-07",
+                createdAt: new Date(now.getTime() - 1000 * 60 * 31),
+                status: "progress",
+                priority: "normal",
+                note: "",
+                items: [
+                    { name: "Devilled Chicken", qty: 1 },
+                    { name: "Fried Noodles", qty: 1 }
+                ],
+                startedAt: new Date(now.getTime() - 1000 * 60 * 20)
+            },
+            {
+                id: 12455,
+                table: "T-09",
+                createdAt: new Date(now.getTime() - 1000 * 60 * 45),
+                status: "ready",
+                priority: "normal",
+                note: "Serve drinks first please.",
+                items: [
+                    { name: "Fish & Chips", qty: 2 },
+                    { name: "Iced Coffee", qty: 2 }
+                ],
+                startedAt: new Date(now.getTime() - 1000 * 60 * 33),
+                readyAt: new Date(now.getTime() - 1000 * 60 * 5)
+            }
+        ];
+    }
+
+    function buildDemoNotifs() {
+        return [
+            { type: "danger", text: "Table T-04 requested urgent attention (allergy note).", time: new Date() },
+            { type: "success", text: "Order #12455 marked READY.", time: new Date(new Date().getTime() - 1000 * 60 * 3) }
+        ];
+    }
+
+    // ---- Helpers ----
+    function minutesAgo(date) {
+        const diff = Math.max(0, Date.now() - date.getTime());
+        const mins = Math.floor(diff / 60000);
+        if (mins <= 0) return "just now";
+        if (mins === 1) return "1 min ago";
+        return `${mins} mins ago`;
+    }
+
+    function formatClock(d) {
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function setLastUpdated() {
+        const now = new Date();
+        document.getElementById("lastUpdatedText").textContent = `Last updated: ${formatClock(now)}`;
+    }
+
+    function showToast(title, body, variant = "dark") {
+        const id = `t_${Math.random().toString(16).slice(2)}`;
+        const toastHtml = `
+            <div class="toast align-items-center text-bg-${variant} border-0 show mb-2" role="alert" id="${id}">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <strong>${title}</strong><div style="opacity:.85">${body}</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="document.getElementById('${id}')?.remove()"></button>
+                </div>
+            </div>`;
+        $("#toastContainer").append(toastHtml);
+        setTimeout(() => { document.getElementById(id)?.remove(); }, 3500);
+    }
+
+    function pushNotif(type, text) {
+        notifications.unshift({ type, text, time: new Date() });
+        renderNotifs();
+    }
+
+    function priorityWeight(p) {
+        if (p === "high") return 0;
+        return 1;
+    }
+
+    function sortOrders(list) {
+        const mode = $("#sortSelect").val();
+        const copy = [...list];
+        if (mode === "oldest") copy.sort((a, b) => a.createdAt - b.createdAt);
+        else if (mode === "priority") copy.sort((a, b) => priorityWeight(a.priority) - priorityWeight(b.priority) || (b.createdAt - a.createdAt));
+        else copy.sort((a, b) => b.createdAt - a.createdAt);
+        return copy;
+    }
+
+    function matchesSearch(order, q) {
+        if (!q) return true;
+        q = q.toLowerCase();
+        const items = (order.items || []).map(x => x.name).join(" ").toLowerCase();
+        return (
+            `${order.id}`.includes(q) ||
+            (order.table || "").toLowerCase().includes(q) ||
+            items.includes(q)
+        );
+    }
+
+    // ---- Rendering ----
+    function renderAll() {
+        const q = ($("#searchBox").val() || "").trim();
+
+        const pending = sortOrders(orders.filter(o => o.status === "pending" && matchesSearch(o, q)));
+        const progress = sortOrders(orders.filter(o => o.status === "progress" && matchesSearch(o, q)));
+        const ready = sortOrders(orders.filter(o => o.status === "ready" && matchesSearch(o, q)));
+
+        $("#colPending").empty();
+        $("#colProgress").empty();
+        $("#colReady").empty();
+
+        pending.forEach(o => $("#colPending").append(renderOrderCard(o)));
+        progress.forEach(o => $("#colProgress").append(renderOrderCard(o)));
+        ready.forEach(o => $("#colReady").append(renderOrderCard(o)));
+
+        $("#countPending").text(pending.length);
+        $("#countProgress").text(progress.length);
+        $("#countReady").text(ready.length);
+
+        $("#kpiPending").text(pending.length);
+        $("#kpiProgress").text(progress.length);
+        $("#kpiReady").text(ready.length);
+
+        const total = pending.length + progress.length + ready.length;
+        $("#boardSummary").text(`${total} orders`);
+
+        const avg = computeAvgPrep();
+        $("#kpiAvg").text(avg ? `${avg} min` : "—");
+    }
+
+    function renderOrderCard(o) {
+        const pr = o.priority === "high" ? "red" : "blue";
+        const prLabel = o.priority === "high" ? "High priority" : "Standard";
+
+        const statusPill =
+            o.status === "pending" ? `<span class="pill warn"><span class="mini-dot"></span>Pending</span>` :
+                o.status === "progress" ? `<span class="pill blue"><span class="mini-dot"></span>In progress</span>` :
+                    `<span class="pill"><span class="mini-dot"></span>Ready</span>`;
+
+        const prPill = `<span class="pill ${pr}"><span class="mini-dot"></span>${prLabel}</span>`;
+        const tablePill = `<span class="pill"><span class="mini-dot"></span>Table ${o.table}</span>`;
+        const agePill = `<span class="pill blue"><span class="mini-dot"></span>${minutesAgo(o.createdAt)}</span>`;
+
+        const itemsHtml = (o.items || []).map(x => `<li>${x.name} <span class="text-white-50">×</span>${x.qty}</li>`).join("");
+
+        const noteHtml = o.note ? `<div class="note"><i class="fas fa-sticky-note me-1"></i>${escapeHtml(o.note)}</div>` : "";
+
+        // Actions (single-direction for kitchen flow)
+        let actions = "";
+        if (o.status === "pending") {
+            actions = `
+                    <button class="btn btn-warning" onclick="moveStatus(${o.id}, 'progress')">
+                        <i class="fas fa-fire me-1"></i> Start
+                    </button>
+                    <button class="btn btn-outline-light" onclick="bumpPriority(${o.id})">
+                        <i class="fas fa-bolt me-1"></i> Priority
+                    </button>`;
+        } else if (o.status === "progress") {
+            actions = `
+                    <button class="btn btn-success" onclick="moveStatus(${o.id}, 'ready')">
+                        <i class="fas fa-check me-1"></i> Mark Ready
+                    </button>
+                    <button class="btn btn-outline-light" onclick="moveStatus(${o.id}, 'pending')">
+                        <i class="fas fa-undo me-1"></i> Back
+                    </button>`;
+        } else {
+            actions = `
+                    <button class="btn btn-outline-light" onclick="moveStatus(${o.id}, 'progress')">
+                        <i class="fas fa-undo me-1"></i> Back
+                    </button>
+                    <button class="btn btn-outline-success" onclick="notifyServe(${o.id})">
+                        <i class="fas fa-bell me-1"></i> Notify serve
+                    </button>`;
         }
 
+        return `
+            <div class="order" data-id="${o.id}">
+                <div class="order-top">
+                    <div>
+                        <p class="order-id">Order #${o.id}</p>
+                        <div class="order-meta">
+                            ${tablePill}
+                            ${statusPill}
+                            ${prPill}
+                            ${agePill}
+                        </div>
+                    </div>
+                    <div class="k-muted" style="text-align:right;min-width:90px;">
+                        <div>${formatClock(o.createdAt)}</div>
+                        <small class="text-white-50">created</small>
+                    </div>
+                </div>
+
+                <ul class="items mb-0">${itemsHtml}</ul>
+                ${noteHtml}
+
+                <div class="order-actions">${actions}</div>
+            </div>`;
+    }
+
+    function renderNotifs() {
+        const wrap = $("#notifList");
+        wrap.empty();
+
+        const list = notifications.slice(0, 8);
+        $("#notifCount").text(list.length);
+
+        if (list.length === 0) {
+            wrap.append(`<div class="notif"><strong>All clear</strong><small>No notifications right now.</small></div>`);
+            return;
+        }
+
+        list.forEach(n => {
+            const icon =
+                n.type === "danger" ? "fa-exclamation-triangle" :
+                    n.type === "success" ? "fa-check-circle" :
+                        "fa-info-circle";
+
+            wrap.append(`
+                    <div class="notif">
+                        <div><i class="fas ${icon} me-2"></i>${escapeHtml(n.text)}</div>
+                        <small>${minutesAgo(n.time)}</small>
+                    </div>
+                `);
+        });
+    }
+
+    function computeAvgPrep() {
+        if (prepTransitions.length === 0) return null;
+        const avg = prepTransitions.reduce((a, b) => a + b, 0) / prepTransitions.length;
+        return Math.round(avg);
+    }
+
+    // ---- Actions ----
+    window.moveStatus = function (orderId, nextStatus) {
+        const o = orders.find(x => x.id === orderId);
+        if (!o) return;
+
+        const prev = o.status;
+        if (prev === nextStatus) return;
+
+        // Track timings
+        const now = new Date();
+        if (nextStatus === "progress") {
+            o.startedAt = now;
+        }
+        if (nextStatus === "ready") {
+            o.readyAt = now;
+            if (o.startedAt) {
+                const mins = Math.max(1, Math.round((o.readyAt - o.startedAt) / 60000));
+                prepTransitions.push(mins);
+            }
+        }
+
+        o.status = nextStatus;
+
+        // Notifications
+        if (nextStatus === "progress") {
+            pushNotif("info", `Order #${o.id} started (Table ${o.table}).`);
+            showToast("Started", `Order #${o.id} moved to In Progress`, "dark");
+        } else if (nextStatus === "ready") {
+            pushNotif("success", `Order #${o.id} marked READY (Table ${o.table}).`);
+            showToast("Ready", `Order #${o.id} is ready to serve`, "success");
+        } else if (nextStatus === "pending") {
+            pushNotif("danger", `Order #${o.id} moved back to Pending.`);
+            showToast("Reverted", `Order #${o.id} moved back to Pending`, "dark");
+        }
+
+        // Live mode: call API
+        if (!DEMO_MODE) {
+            postOrderStatus(orderId, nextStatus);
+        }
+
+        renderAll();
+        setLastUpdated();
+    }
+
+    window.bumpPriority = function (orderId) {
+        const o = orders.find(x => x.id === orderId);
+        if (!o) return;
+
+        o.priority = "high";
+        pushNotif("danger", `Order #${o.id} set to HIGH priority.`);
+        showToast("Priority", `Order #${o.id} is now High priority`, "dark");
+        renderAll();
+        setLastUpdated();
+    }
+
+    window.notifyServe = function (orderId) {
+        const o = orders.find(x => x.id === orderId);
+        if (!o) return;
+
+        pushNotif("success", `Server notified: Order #${o.id} ready at Table ${o.table}.`);
+        showToast("Notify", `Server notified for Order #${o.id}`, "success");
+        setLastUpdated();
+    }
+
+    function postOrderStatus(orderId, nextStatus) {
+        // Map to your enum values (adjust if needed)
+        let statusEnumValue = 0;
+        if (nextStatus === "pending") statusEnumValue = 0;
+        else if (nextStatus === "progress") statusEnumValue = 1;
+        else if (nextStatus === "ready") statusEnumValue = 2;
 
         $.ajax({
-            url: 'https://restosolutionssaas.com/api/OrderApi/UpdateOrderStatus',
+            url: `${API_BASE}/api/OrderApi/UpdateOrderStatus`,
             type: 'POST',
-            data: JSON.stringify({
-                OrderId: orderId,
-                Status: statusEnumValue
-            }),
+            data: JSON.stringify({ OrderId: orderId, Status: statusEnumValue }),
             contentType: 'application/json',
-            crossDomain: true,  // Add this line
-            success: function (response) {
-                console.log("Order status updated successfully.");
-                // Update UI if necessary
+            success: function () {
+                // optional: confirm / refresh
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.error("AJAX Error:", textStatus);
-                console.error("Response Text:", jqXHR.responseText);
-                console.error("Error Thrown:", errorThrown);
+            error: function (xhr) {
+                showToast("API Error", "Failed to update order status (keeping UI state).", "dark");
+                console.error(xhr.responseText);
             }
+        });
+    }
 
+    // Basic XSS-safe helper for notes
+    function escapeHtml(str) {
+        return (str || "").replace(/[&<>"']/g, function (m) {
+            return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" })[m];
+        });
+    }
+
+    // ---- Load / Refresh ----
+    function loadData() {
+        if (DEMO_MODE) {
+            orders = buildDemoOrders();
+            notifications = buildDemoNotifs();
+            renderNotifs();
+            renderAll();
+            setLastUpdated();
+            return;
+        }
+
+        // LIVE MODE placeholder:
+        // You can fetch from your real endpoint here and populate "orders".
+        // For now, to avoid breaking:
+        orders = [];
+        notifications = [];
+        renderNotifs();
+        renderAll();
+        setLastUpdated();
+    }
+
+    $(document).ready(function () {
+        loadData();
+
+        $("#refreshBtn").on("click", function () {
+            loadData();
+            showToast("Refreshed", DEMO_MODE ? "Loaded dummy data" : "Loaded live data", "dark");
         });
 
-    }
+        $("#clearNotifsBtn").on("click", function () {
+            notifications = [];
+            renderNotifs();
+            showToast("Cleared", "Notifications cleared", "dark");
+        });
+
+        $("#searchBox").on("input", function () {
+            renderAll();
+        });
+
+        $("#sortSelect").on("change", function () {
+            renderAll();
+        });
+    });
 </script>

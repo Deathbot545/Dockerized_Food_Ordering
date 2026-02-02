@@ -18,13 +18,19 @@ builder.Configuration
 var configuration = builder.Configuration;
 
 // Hosting / Ports
+var runningInContainer =
+    string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"), "true",
+        StringComparison.OrdinalIgnoreCase);
+
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    if (env.IsDevelopment())
+    // Local VS dev: keep your localhost:5002
+    if (env.IsDevelopment() && !runningInContainer)
         serverOptions.ListenLocalhost(5002);
     else
-        serverOptions.ListenAnyIP(80);
+        serverOptions.ListenAnyIP(80); // Docker + Production
 });
+
 
 // Data Protection
 if (env.IsDevelopment())

@@ -1,63 +1,347 @@
 ﻿@model LoginViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Sign in";
 }
-<style>
 
-    .login-container {
-        max-width: 400px; /* Set a max-width for better visual on larger screens */
-        margin: 0 auto; /* Horizontal centering */
+<style>
+    :root{
+        --bg: #0b0f14;
+        --panel: rgba(255,255,255,0.06);
+        --panel2: rgba(255,255,255,0.08);
+        --border: rgba(255,255,255,0.14);
+        --text: rgba(255,255,255,0.96);
+        --muted: rgba(255,255,255,0.72);
+        --accent: #22c55e;
+        --accent2: #0ea5e9;
+        --danger: #ef4444;
     }
 
+    /* Page section so it doesn't fight your fixed-top navbar spacing */
+    .auth-wrap{
+        min-height: calc(100vh - 72px);
+        padding: 28px 16px 40px;
+        display: grid;
+        place-items: center;
+    }
+
+    .auth-shell{
+        width: min(980px, 100%);
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    /* Left: brand/benefits */
+    .auth-brand{
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background:
+            linear-gradient(140deg, rgba(34,197,94,0.14), rgba(14,165,233,0.10)),
+            radial-gradient(800px 520px at 15% 10%, rgba(34,197,94,0.22), transparent 60%),
+            radial-gradient(800px 520px at 85% 15%, rgba(14,165,233,0.18), transparent 60%),
+            rgba(255,255,255,0.04);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .brand-top{
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    .brand-logo{
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid rgba(255,255,255,0.16);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .brand-name{
+        font-weight: 900;
+        letter-spacing: .2px;
+        color: var(--text);
+        margin: 0;
+        line-height: 1.1;
+    }
+    .brand-sub{
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: .98rem;
+    }
+
+    .brand-mid{
+        margin-top: 18px;
+    }
+    .brand-mid h2{
+        margin: 0 0 10px;
+        font-weight: 900;
+        color: var(--text);
+        font-size: clamp(1.4rem, 2vw, 1.8rem);
+        line-height: 1.15;
+    }
+    .brand-mid p{
+        margin: 0;
+        color: rgba(255,255,255,0.78);
+        line-height: 1.6;
+        max-width: 52ch;
+    }
+
+    .feature-row{
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .feature-pill{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: rgba(255,255,255,0.88);
+        font-weight: 700;
+        font-size: .95rem;
+        white-space: nowrap;
+    }
+    .feature-dot{
+        width: 9px; height: 9px;
+        border-radius: 999px;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(34,197,94,0.14);
+        display: inline-block;
+    }
+    .feature-dot.blue{
+        background: var(--accent2);
+        box-shadow: 0 0 0 6px rgba(14,165,233,0.14);
+    }
+
+    .brand-foot{
+        margin-top: 18px;
+        color: rgba(255,255,255,0.62);
+        font-size: .95rem;
+    }
+
+    /* Right: form card */
+    .auth-card{
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(15, 22, 33, 0.72);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 16px 48px rgba(0,0,0,0.40);
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .auth-title{
+        font-weight: 900;
+        font-size: 1.35rem;
+        margin: 0;
+        color: var(--text);
+    }
+    .auth-desc{
+        margin: 6px 0 18px;
+        color: rgba(255,255,255,0.72);
+        line-height: 1.5;
+    }
+
+    .form-floating > .form-control{
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.14);
+        color: var(--text);
+    }
+    .form-floating > .form-control:focus{
+        border-color: rgba(34,197,94,0.45);
+        box-shadow: 0 0 0 0.25rem rgba(34,197,94,0.12);
+    }
+    .form-floating > label{
+        color: rgba(255,255,255,0.62);
+    }
+
+    .row-between{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin: 10px 0 14px;
+    }
+
+    .link-muted{
+        color: rgba(255,255,255,0.72);
+        text-decoration: none;
+        font-weight: 700;
+    }
+    .link-muted:hover{
+        color: rgba(255,255,255,0.92);
+        text-decoration: underline;
+    }
+
+    .btn-pill{
+        border-radius: 999px !important;
+        padding: 12px 18px !important;
+        font-weight: 800;
+        letter-spacing: .2px;
+    }
+    .btn-primary-glow{
+        background: linear-gradient(90deg, var(--accent), #16a34a);
+        border: none;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.24);
+    }
+    .btn-primary-glow:hover{
+        filter: brightness(1.05);
+    }
+
+    .divider{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 18px 0;
+        color: rgba(255,255,255,0.55);
+        font-weight: 700;
+        font-size: .92rem;
+    }
+    .divider:before,
+    .divider:after{
+        content:"";
+        height: 1px;
+        flex: 1;
+        background: rgba(255,255,255,0.14);
+    }
+
+    .google-btn{
+        border-radius: 999px !important;
+        padding: 11px 16px !important;
+        font-weight: 800;
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.90);
+    }
+    .google-btn:hover{
+        background: rgba(255,255,255,0.10);
+    }
+
+    .auth-small{
+        margin-top: 14px;
+        color: rgba(255,255,255,0.62);
+        font-size: .95rem;
+        text-align: center;
+    }
+
+    /* Responsive */
+    @@media (max-width: 991px){
+        .auth-shell{
+            grid-template-columns: 1fr;
+        }
+        .auth-brand{
+            order: 2;
+        }
+        .auth-card{
+            order: 1;
+        }
+    }
 </style>
 
-<div class="login-container">
+<div class="auth-wrap">
+    <div class="auth-shell">
 
-    <form asp-controller="Account" asp-action="Login" method="post">
-        <img class="mb-4" src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
-        <h1 class="h3 mb-3 fw-normal">@ViewData["Title"]</h1>
-
-        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                @ViewBag.ErrorMessage
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <!-- Left panel -->
+        <section class="auth-brand">
+            <div class="brand-top">
+                <img class="brand-logo" src="/Images/logo.jpeg" alt="Restro logo" />
+                <div>
+                    <h3 class="brand-name">Restro</h3>
+                    <div class="brand-sub">QR ordering • Real-time kitchen updates</div>
+                </div>
             </div>
-        }
-       
-        <div class="form-floating">
-            <input type="text" id="UserName" name="UserName" class="form-control" asp-for="UserName" placeholder="Username" required>
-            <label for="UserName">Username</label>
-        </div>
-        <div class="form-floating">
-            <input type="password" id="Password" name="Password" class="form-control" asp-for="Password" placeholder="Password" required>
-            <label for="Password">Password</label>
-        </div>
 
-        <div class="form-check text-start my-3">
-            <input class="form-check-input" asp-for="RememberMe" id="flexCheckDefault">
-            <label class="form-check-label" for="flexCheckDefault">
-                Remember me
-            </label>
-        </div>
+            <div class="brand-mid">
+                <h2>Sign in to manage orders faster.</h2>
+                <p>
+                    Access your account, track orders, and keep customers updated.
+                    Built for speed, clarity, and smooth restaurant operations.
+                </p>
 
-        <button type="submit" class="btn btn-primary w-100 py-2">Sign in</button>
+            </div>
 
-        <div class="mt-2">
-            <a href="@Url.Action("ForgotPassword", "User")">Forgot Password?</a>
-        </div>
+            <div class="brand-foot">
+                Tip: Use a strong password and enable “Remember me” only on trusted devices.
+            </div>
+        </section>
 
-        <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2023</p>
-    </form>
+        <!-- Form -->
+        <section class="auth-card">
+            <h1 class="auth-title">@ViewData["Title"]</h1>
+            <p class="auth-desc">Welcome back — please enter your details.</p>
 
-    <div class="external-login-container mt-3">
-        <p>Or login using:</p>
-        <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get" class="text-center">
-            <input type="hidden" name="provider" value="Google" />
-            <button type="submit" class="btn btn-outline-danger">
-                <i class="fab fa-google"></i> Google
-            </button>
-        </form>
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @ViewBag.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form asp-controller="Account" asp-action="Login" method="post" novalidate>
+                <div class="form-floating mb-3">
+                    <input type="text"
+                           class="form-control"
+                           asp-for="UserName"
+                           id="UserName"
+                           placeholder="Username"
+                           autocomplete="username"
+                           required />
+                    <label for="UserName">Username</label>
+                </div>
+
+                <div class="form-floating mb-2">
+                    <input type="password"
+                           class="form-control"
+                           asp-for="Password"
+                           id="Password"
+                           placeholder="Password"
+                           autocomplete="current-password"
+                           required />
+                    <label for="Password">Password</label>
+                </div>
+
+                <div class="row-between">
+                    <div class="form-check m-0">
+                        <input class="form-check-input" asp-for="RememberMe" id="RememberMe">
+                        <label class="form-check-label" for="RememberMe">Remember me</label>
+                    </div>
+
+                    <a class="link-muted" href="@Url.Action("ForgotPassword", "User")">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary-glow btn-pill w-100">
+                    Sign in
+                </button>
+            </form>
+
+            <div class="divider">or</div>
+
+            <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
+                <input type="hidden" name="provider" value="Google" />
+                <button type="submit" class="google-btn w-100">
+                    <i class="fab fa-google me-2"></i> Continue with Google
+                </button>
+            </form>
+
+            <div class="auth-small">
+                © @DateTime.Now.Year Restro. All rights reserved.
+            </div>
+        </section>
+
     </div>
-
 </div>

@@ -2,173 +2,468 @@
     ViewData["Title"] = "Home";
 }
 <style>
+    :root {
+        --bg: #0b0f14;
+        --panel: rgba(255,255,255,0.06);
+        --panel2: rgba(255,255,255,0.08);
+        --border: rgba(255,255,255,0.14);
+        --text: rgba(255,255,255,0.96);
+        --muted: rgba(255,255,255,0.74);
+        --muted2: rgba(255,255,255,0.62);
+        --accent: #22c55e;
+        --accent2: #0ea5e9;
+        --danger: #ef4444;
+    }
+
+    html, body {
+        height: 100%;
+    }
+
     body {
-        font-family: 'Roboto', sans-serif;
-        color: #333;
-        background-color: #f8f5f1;
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        background: radial-gradient(1100px 650px at 10% 0%, rgba(34,197,94,0.12), transparent 58%), radial-gradient(900px 600px at 90% 15%, rgba(14,165,233,0.12), transparent 58%), var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
-    .hero-section {
-        background: url('https://media.istockphoto.com/id/1409730005/photo/chef-cooking-at-a-restaurant-and-flaming-the-food.webp?s=2048x2048&w=is&k=20&c=o4tpp-hSHPlyGUxXMapznfAjbTeUueKpIkq2fayIOx4=') no-repeat center center;
-        background-size: cover;
-        color: #2e2d2b;
-        padding: 150px 0;
-        text-align: center;
+    /* ===== Layout =====
+           page-wrap fills full width, content-max caps the content in a nice way.
+           Increase max-width if you want it even wider on large monitors.
+        */
+    .page-wrap {
+        width: 100%;
+        padding: clamp(18px, 2.2vw, 34px);
+    }
+
+    .content-max {
+        width: min(1600px, 100%); /* was 1280px -> this is your width fix */
+        margin: 0 auto;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
         position: relative;
-        box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        border-radius: 28px;
+        background: linear-gradient(120deg, rgba(0,0,0,0.78), rgba(0,0,0,0.28)), url('https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=2400&q=80') center/cover no-repeat;
+        box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+        border: 1px solid rgba(255,255,255,0.12);
+        width: 100%;
     }
 
-        .hero-section h1 {
-            color: white;
-            font-size: 3.5em;
-            font-weight: 700;
-            font-family: 'Playfair Display', serif;
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at 18% 15%, rgba(34,197,94,0.30), transparent 58%), radial-gradient(circle at 85% 25%, rgba(14,165,233,0.22), transparent 62%);
+            filter: blur(30px);
+            pointer-events: none;
         }
 
-        .hero-section p {
-            color: white;
-            font-size: 1.5em;
-            font-weight: 500;
-            margin-bottom: 30px;
-        }
-
-        .hero-section .btn {
-            font-size: 1.25em;
-            padding: 15px 30px;
-            border-radius: 30px;
-            background-color: #000;
-            color: #fff;
-        }
-
-            .hero-section .btn:hover {
-                background-color: #444;
-            }
-
-    .features-section {
-        padding: 50px 0;
+    .hero-inner {
+        position: relative;
+        z-index: 1;
+        padding: clamp(44px, 5vw, 92px) clamp(18px, 3.4vw, 70px);
     }
 
-    .feature-item .card {
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: clamp(18px, 2.2vw, 30px);
+        align-items: center;
+    }
+
+    .badge {
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.16);
+        color: rgba(255,255,255,0.86);
+        font-weight: 800;
+        letter-spacing: .2px;
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-title {
+        margin-top: 16px;
+        font-size: clamp(2.8rem, 4.2vw, 4.6rem); /* larger + clearer */
+        font-weight: 950;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    }
+
+    .hero-sub {
+        margin-top: 14px;
+        font-size: clamp(1.15rem, 1.25vw, 1.35rem);
+        line-height: 1.65;
+        color: rgba(255,255,255,0.84);
+        max-width: 70ch;
+    }
+
+    .hero-actions {
+        margin-top: 26px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-pill {
+        border-radius: 999px !important;
+        padding: 13px 20px !important;
+        font-weight: 900;
+        letter-spacing: .2px;
+        transition: transform .15s ease, filter .15s ease, background .15s ease;
+    }
+
+    .btn-primary-glow {
+        background: linear-gradient(90deg, var(--accent), #16a34a);
         border: none;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background-color: #fff;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.26);
     }
 
-        .feature-item .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        .btn-primary-glow:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
         }
 
-    .cta-section {
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        padding: 50px 0;
+    .btn-ghost {
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.18);
+        color: rgba(255,255,255,0.92) !important;
     }
 
-        .cta-section h2 {
-            margin-bottom: 20px;
-            font-family: 'Playfair Display', serif;
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.14);
+            transform: translateY(-1px);
         }
 
-        .cta-section .btn {
-            background-color: #fff;
-            color: #000;
-        }
-
-            .cta-section .btn:hover {
-                background-color: #ccc;
-            }
-
-    .testimonials-section {
-        padding: 50px 0;
+    .microcopy {
+        margin-top: 12px;
+        color: rgba(255,255,255,0.68);
+        font-size: 1rem;
     }
 
-        .testimonials-section .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
+    /* Right-side “professional” card */
+    .hero-card {
+        background: rgba(15, 22, 33, 0.72);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 22px;
+        padding: 18px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 16px 42px rgba(0,0,0,0.35);
+    }
+
+        .hero-card h3 {
+            margin: 2px 0 10px;
+            font-weight: 950;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.92);
+        }
+
+    .hero-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .pill {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 999px;
+        padding: 10px 12px;
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        color: rgba(255,255,255,0.86);
+        font-weight: 800;
+        font-size: 0.95rem;
+        white-space: nowrap;
+    }
+
+    .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        display: inline-block;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(34,197,94,0.12);
+    }
+
+        .dot.blue {
+            background: var(--accent2);
+            box-shadow: 0 0 0 6px rgba(14,165,233,0.12);
+        }
+
+    /* ===== Sections ===== */
+    .section {
+        margin-top: 26px;
+    }
+
+    .cta {
+        border-radius: 26px;
+        background: linear-gradient(135deg, rgba(34,197,94,0.16), rgba(14,165,233,0.12));
+        border: 1px solid rgba(255,255,255,0.14);
+        padding: 34px 26px;
+        box-shadow: 0 16px 44px rgba(0,0,0,0.36);
+    }
+
+        .cta h2 {
+            font-weight: 950;
+            margin: 0;
+            font-size: clamp(1.6rem, 2vw, 2.05rem);
+        }
+
+        .cta p {
+            margin: 10px 0 0 0;
+            color: rgba(255,255,255,0.80);
+            line-height: 1.65;
+            max-width: 78ch;
+            font-size: 1.08rem;
         }
 
     .footer {
-        background-color: #2e2d2b;
-        color: #f8f9fa;
-        padding: 20px 0;
+        margin-top: 26px;
+        padding: 22px 0;
+        color: rgba(255,255,255,0.62);
+        border-top: 1px solid rgba(255,255,255,0.10);
         text-align: center;
+    }
+
+    /* ===== Modal / QR ===== */
+    .modal-content {
+        background: #0f1520 !important;
+        color: var(--text);
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        border-radius: 18px !important;
+    }
+
+    .glass {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 16px;
+        padding: 14px;
+    }
+
+    .qr-hint {
+        color: rgba(255,255,255,0.72);
+        font-size: 0.98rem;
+        margin-top: 10px;
+        line-height: 1.5;
+    }
+
+    .modal-footer .btn-ghost {
+        background: rgba(255,255,255,0.08);
+    }
+
+    /* ===== Responsive ===== */
+    @@media (max-width: 991px) {
+        .content-max {
+            width: 100%;
+        }
+
+        .hero-inner {
+            padding: 36px 18px;
+        }
+
+        .hero-grid {
+            grid-template-columns: 1fr; /* stack */
+        }
+
+        .hero-title {
+            font-size: clamp(2.2rem, 7vw, 3.2rem);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .page-wrap {
+            padding: 14px 12px;
+        }
+
+        .btn-pill {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="container">
-            <h1>Profitez d'une nourriture saine et délicieuse.</h1>
-            <p>Welcome to our restaurant</p>
-            <button id="orderButton" class="btn btn-lg">Order Now</button>
-            <button class="btn btn-lg">Reservation</button>
+
+<div class="page-wrap">
+    <div class="content-max">
+
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-inner">
+                <div class="hero-grid">
+                    <div>
+                        <div class="badge">
+                            <span>🍽️</span>
+                            <span>Restro • QR Ordering • Real-time kitchen updates</span>
+                        </div>
+
+                        <h1 class="hero-title">Healthy, delicious food — delivered with a modern experience.</h1>
+
+                        <p class="hero-sub">
+                            Scan a QR code, browse the menu, and place your order in seconds.
+                            Built for speed, clarity, and a smooth customer journey.
+                        </p>
+
+                        <div class="hero-actions">
+                            <button id="orderButton" class="btn btn-lg btn-pill btn-primary-glow">
+                                Order Now
+                            </button>
+
+                            <a class="btn btn-lg btn-pill btn-ghost" href="#">
+                                Reservation
+                            </a>
+
+                            <a class="btn btn-lg btn-pill btn-ghost" href="#">
+                                Register Your Business
+                            </a>
+                        </div>
+
+                        <div class="microcopy">
+                            Tip: For the best scan result, hold the QR steady and ensure good lighting.
+                        </div>
+                    </div>
+
+                    <div class="hero-card">
+                        <h3>What you get</h3>
+                        <div class="hero-pills">
+                            <span class="pill"><span class="dot"></span> QR ordering</span>
+                            <span class="pill"><span class="dot blue"></span> Live order status</span>
+                            <span class="pill"><span class="dot"></span> Faster checkout</span>
+                            <span class="pill"><span class="dot blue"></span> Kitchen dashboard</span>
+                        </div>
+
+                        <hr style="border-color: rgba(255,255,255,0.10); margin: 16px 0;">
+
+                        <div style="color: rgba(255,255,255,0.78); line-height: 1.6;">
+                            <strong style="color: rgba(255,255,255,0.92);">Professional UX:</strong>
+                            clear CTAs, readable text, and consistent layout across devices.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="section">
+            <div class="cta">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+                    <div>
+                        <h2>Streamline your restaurant operations</h2>
+                        <p>
+                            Reduce ordering friction, improve accuracy, and keep customers informed.
+                            Restro gives you a clean front-end experience and scalable service architecture.
+                        </p>
+                    </div>
+                    <a class="btn btn-light btn-lg btn-pill" href="#">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <small>&copy; 2026 Restro. All rights reserved.</small>
+        </div>
+
+    </div>
+</div>
+
+<!-- QR Scanner Modal (Bootstrap 5) -->
+<div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.10);">
+                <h5 class="modal-title" id="qrScannerModalLabel">Scan QR Code</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="glass">
+                    <div id="qr-reader"></div>
+                    <div class="qr-hint">
+                        Point your camera at the restaurant QR. Once detected, we’ll route you to the menu.
+                    </div>
+                </div>
+
+                <div id="qrResult" class="mt-3" style="color: rgba(255,255,255,0.88); font-weight: 700;"></div>
+            </div>
+
+            <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,0.10);">
+                <button type="button" class="btn btn-ghost btn-pill" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
+</div>
 
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-    <!-- Call to Action Section -->
-    <div class="cta-section">
-        <div class="container">
-            <h2>Ready to revolutionize your restaurant business?</h2>
-            <p>Join Restro today and streamline your ordering process.</p>
-            <a class="btn btn-lg" href="#">Register Your Business</a>
-        </div>
-    </div>
+<script>
+    let html5QrcodeScanner = null;
 
-  
+    const modalEl = document.getElementById('qrScannerModal');
+    const resultEl = document.getElementById('qrResult');
 
-    <!-- Footer -->
-    <div class="footer">
-        <p>&copy; 2024 Restro. All rights reserved.</p>
-    </div>
+    document.getElementById('orderButton').addEventListener('click', function () {
+        const myModal = new bootstrap.Modal(modalEl);
+        myModal.show();
+    });
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script>
-        document.getElementById('orderButton').addEventListener('click', function () {
-            // Show the modal
-            var myModal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
-            myModal.show();
+    modalEl.addEventListener('shown.bs.modal', () => {
+        resultEl.textContent = "";
 
-            var config = { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true };
-            var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
-            html5QrcodeScanner.render(onScanSuccess, onScanError);
+        const config = { fps: 10, qrbox: { width: 280, height: 280 }, rememberLastUsedCamera: true };
+        html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
 
-            // Attempt to modify the button styles after a delay to ensure they've been rendered
-            setTimeout(() => {
-                // Select the buttons created by the library
-                let buttons = document.querySelectorAll('#qr-reader button');
-                buttons.forEach(button => {
-                    // Add Bootstrap button classes
-                    button.classList.remove('button-class'); // Remove the library's default class if necessary
-                    button.classList.add('btn', 'btn-primary'); // Add Bootstrap classes
+        setTimeout(() => {
+            const buttons = document.querySelectorAll('#qr-reader button');
+            buttons.forEach(btn => {
+                btn.classList.add('btn', 'btn-pill');
+                btn.style.borderRadius = '999px';
+                btn.style.padding = '10px 14px';
 
-                    // Specific class additions based on button functionality, if possible
-                    if (button.textContent.includes('Start')) {
-                        button.classList.add('btn-success'); // Example for a "Start" button
-                    } else if (button.textContent.includes('Stop')) {
-                        button.classList.add('btn-danger'); // Example for a "Stop" button
-                    }
-                });
-            }, 1000); // Adjust the delay as needed to ensure the buttons are rendered
-        });
+                const t = (btn.textContent || '').toLowerCase();
+                if (t.includes('start')) btn.classList.add('btn-success');
+                else if (t.includes('stop')) btn.classList.add('btn-danger');
+                else btn.classList.add('btn-secondary');
+            });
+        }, 450);
+    });
 
-        function onScanSuccess(decodedText, decodedResult) {
-            // Handle the decoded text
-            console.log(`Code matched = ${decodedText}`, decodedResult);
-        }
+    modalEl.addEventListener('hidden.bs.modal', async () => {
+        try {
+            if (html5QrcodeScanner) {
+                await html5QrcodeScanner.clear();
+                html5QrcodeScanner = null;
+            }
+            document.getElementById('qr-reader').innerHTML = "";
+        } catch (e) {}
+    });
 
-        function onScanError(errorMessage) {
-            // Handle scan error
-            console.log(`Scan error: ${errorMessage}`);
-        }
-    </script>
+    function onScanSuccess(decodedText, decodedResult) {
+        resultEl.textContent = `QR detected: ${decodedText}`;
+        console.log(`QR matched = ${decodedText}`, decodedResult);
+
+        // Example redirect:
+        // window.location.href = decodedText;
+
+        const myModal = bootstrap.Modal.getInstance(modalEl);
+        if (myModal) myModal.hide();
+    }
+
+    function onScanError(errorMessage) {
+        // keep quiet
+    }
+</script>

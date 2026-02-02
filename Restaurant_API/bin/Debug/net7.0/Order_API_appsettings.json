@@ -5,8 +5,14 @@
       "Microsoft.AspNetCore": "Warning"
     }
   },
-  "ConnectionStrings": {
-    "OrderDbConnection": "Host=orderapi.c1scs0akut74.eu-north-1.rds.amazonaws.com;Port=5432;Database=OrderDb;User Id=postgres;Password=NxPostgrsql;"
+  "MongoDBSettings": {
+    "ConnectionString": "mongodb://your-mongo-host:27017",
+    "DatabaseName": "OrderDb"
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "https://your-domain.example"
+    ]
   },
   "AllowedHosts": "*"
 }

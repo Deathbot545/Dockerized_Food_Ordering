@@ -12,253 +12,466 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Food_Ordering_Web</title>
+    <title>@ViewData["Title"] - Restro</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.9/signalr.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
     <link rel="shortcut icon" href="~/Images/logo.jpeg" type="image/jpeg">
     <link rel="icon" href="~/Images/logo.jpeg" type="image/jpeg">
 
     <style>
+        /* ====== Global theme (matches your Home hero) ====== */
+        :root {
+            --bg: #0b0f14;
+            --panel: rgba(255,255,255,0.06);
+            --panel2: rgba(255,255,255,0.08);
+            --border: rgba(255,255,255,0.14);
+            --text: rgba(255,255,255,0.96);
+            --muted: rgba(255,255,255,0.74);
+            --muted2: rgba(255,255,255,0.62);
+            --accent: #22c55e;
+            --accent2: #0ea5e9;
+            --danger: #ef4444;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
         body {
-            margin-top: 60px;
-            margin-bottom: 0px;
-            font-family: 'Roboto', sans-serif;
-            background-color: #121212;
-            color: #f8f9fa;
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            color: var(--text);
+            background: radial-gradient(1100px 650px at 10% 0%, rgba(34,197,94,0.12), transparent 58%), radial-gradient(900px 600px at 90% 15%, rgba(14,165,233,0.12), transparent 58%), var(--bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .navbar {
-            background-color: #212529;
+        /* App shell to control spacing + full-width pages */
+        .app-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Keep content below fixed navbar without hacks */
+        .app-content {
+            flex: 1;
+            padding-top: 86px; /* navbar height spacing */
+        }
+
+        .layout-max {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 18px;
+        }
+
+
+        /* ====== Navbar (premium glass) ====== */
+        .nav-glass {
+            background: rgba(15, 22, 33, 0.62) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+            backdrop-filter: blur(14px);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            user-select: none;
+        }
+
+            .brand img {
+                height: 40px;
+                width: 40px;
+                border-radius: 12px;
+                object-fit: cover;
+                border: 1px solid rgba(255,255,255,0.14);
+                box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+            }
+
+        .brand-title {
+            font-weight: 900;
+            letter-spacing: .2px;
+            color: rgba(255,255,255,0.92);
+            line-height: 1;
+        }
+
+        .brand-sub {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.62);
+            margin-top: 2px;
+        }
+
+        /* Little status chip */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.86);
+            font-weight: 800;
+            cursor: pointer;
+            transition: background .15s ease, transform .15s ease;
+        }
+
+            .chip:hover {
+                background: rgba(255,255,255,0.11);
+                transform: translateY(-1px);
+            }
+
+            .chip .dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 999px;
+                background: var(--accent2);
+                box-shadow: 0 0 0 6px rgba(14,165,233,0.12);
+            }
+
+        /* Premium buttons */
+        .btn-pill {
+            border-radius: 999px !important;
+            padding: 10px 14px !important;
+            font-weight: 900;
+            letter-spacing: .2px;
+            transition: transform .15s ease, filter .15s ease, background .15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary-glow {
+            background: linear-gradient(90deg, var(--accent), #16a34a);
+            border: none !important;
+            color: #04130a !important;
+            box-shadow: 0 14px 34px rgba(34,197,94,0.22);
+        }
+
+            .btn-primary-glow:hover {
+                filter: brightness(1.05);
+                transform: translateY(-1px);
+            }
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.18) !important;
+            color: rgba(255,255,255,0.92) !important;
+        }
+
+            .btn-ghost:hover {
+                background: rgba(255,255,255,0.14);
+                transform: translateY(-1px);
+            }
+
+        /* ====== Offcanvas (matches hero-card) ====== */
+        .offcanvas {
+            background: rgba(15, 22, 33, 0.86);
+            border-right: 1px solid rgba(255,255,255,0.10);
+            backdrop-filter: blur(16px);
+        }
+
+            .offcanvas .offcanvas-title {
+                font-weight: 900;
+            }
+
+        .menu-section-title {
+            margin: 14px 0 8px;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.62);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            color: rgba(255,255,255,0.86);
+            text-decoration: none;
+            font-weight: 800;
+            background: transparent;
+            border: 1px solid transparent;
+            transition: background .15s ease, border-color .15s ease, transform .15s ease;
+        }
+
+            .menu-link:hover {
+                background: rgba(255,255,255,0.08);
+                border-color: rgba(255,255,255,0.10);
+                transform: translateY(-1px);
+                color: rgba(255,255,255,0.92);
+            }
+
+            .menu-link i {
+                width: 18px;
+                text-align: center;
+                color: rgba(255,255,255,0.75);
+            }
+
+        /* Search */
+        .search-wrap {
+            margin-top: 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        /* ====== Footer ====== */
         .footer {
-            background-color: #343a40;
-            color: #f8f9fa;
-            padding: 40px 0 20px 0;
+            margin-top: 26px;
+            padding: 28px 0 0;
+            color: rgba(255,255,255,0.70);
+            border-top: 1px solid rgba(255,255,255,0.10);
+            background: rgba(15, 22, 33, 0.45);
+            backdrop-filter: blur(12px);
         }
 
             .footer h5 {
-                font-weight: bold;
-                margin-bottom: 20px;
+                font-weight: 900;
+                margin-bottom: 10px;
+                color: rgba(255,255,255,0.90);
             }
 
             .footer a {
-                color: #d1d1d1;
+                color: rgba(255,255,255,0.66);
                 text-decoration: none;
-                margin-bottom: 10px;
                 display: block;
+                margin: 6px 0;
             }
 
                 .footer a:hover {
-                    color: #f8f9fa;
+                    color: rgba(255,255,255,0.92);
                 }
 
-            .footer .social-icons a {
-                font-size: 20px;
-                margin-right: 15px;
+        .social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            margin-right: 10px;
+        }
+
+            .social a:hover {
+                background: rgba(255,255,255,0.12);
             }
 
-                .footer .social-icons a:hover {
-                    color: #007bff;
-                }
+        /* Loading Overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10,14,20,0.72);
+            z-index: 9999;
+        }
 
-            .footer p {
-                color: #d1d1d1;
+            #loadingOverlay .spinner {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 54px;
+                height: 54px;
+                border-radius: 999px;
+                border: 4px solid rgba(255,255,255,0.18);
+                border-top-color: rgba(255,255,255,0.85);
+                animation: spin 0.9s linear infinite;
             }
+
+        @@keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
     </style>
 
     <script>
-        // Show Loading Overlay
-        function showLoadingOverlay() {
-            document.getElementById('loadingOverlay').style.display = 'block';
-        }
-
-        // Hide Loading Overlay
-        function hideLoadingOverlay() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
+        function showLoadingOverlay() { document.getElementById('loadingOverlay').style.display = 'block'; }
+        function hideLoadingOverlay() { document.getElementById('loadingOverlay').style.display = 'none'; }
     </script>
 </head>
+
 <body>
-    <!-- Loading Overlay (Place this in your layout HTML file) -->
-    <div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.7) url('path_to_your_loading_spinner.gif') no-repeat center center; z-index:9999;">
-    </div>
+    <div class="app-shell">
 
-    <nav class="navbar bg-body-tertiary fixed-top">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        <div id="loadingOverlay"><div class="spinner"></div></div>
 
-            <div id="orderStatus" class="text-white d-flex align-items-center" style="cursor: pointer;">
-                <i class="fas fa-truck mr-2"></i><span></span>
-            </div>
+        <!-- Navbar -->
+        <!-- Navbar -->
+        <nav class="navbar nav-glass fixed-top">
+            <div class="container-fluid px-3">
+                <div class="nav-inner">
 
-            <a class="navbar-brand mx-auto" href="#">
-                <img src="/Images/logo.jpeg" alt="Logo" style="height: 40px;"> <!-- Adjust the path and size as needed -->
-                <span class="ms-2">Restro</span>
-            </a>
+                    <button class="navbar-toggler" type="button"
+                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                            aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-            <!-- ... (above part remains unchanged) -->
-            <div class="ms-auto d-flex align-items-center">
-                @if (isAuthenticated)
-                {
-                    <div class="me-2">
-                        <a class="btn btn-outline-primary" href="@Url.Action("Index", "UserProfile")">
-                            Profile
-                        </a>
+                    <div id="orderStatus" class="chip d-none d-md-inline-flex">
+                        <span class="dot"></span>
+                        <span>Order status</span>
                     </div>
-                    <div class="me-2">
-                        <form asp-controller="Account" asp-action="Logout" method="post">
-                            <button type="submit" class="btn btn-outline-danger">Logout</button>
-                        </form>
-                    </div>
-                }
-                else
-                {
-                    <!-- Unauthenticated user links -->
-                    <button type="button" class="btn btn-light text-dark me-2"><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Login">Sign In</a></button>
-                    <button type="button" class="btn btn-primary"><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</a></button>
-                }
-            </div>
 
-            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    @if (!User.Identity.IsAuthenticated)
-                    {
-                        <!-- Wide buttons for Log In and Sign Up -->
-                        <div class="d-flex flex-column mb-3">
-                            <button type="button" class="btn btn-light text-dark me-2"><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Login">Sign In</a></button>
-                            <button type="button" class="btn btn-primary"><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</a></button>
+                    <a class="brand mx-auto" href="/Home/Index" aria-label="Go to home">
+                        <img src="/Images/logo.jpeg" alt="Restro Logo" />
+                        <div class="d-flex flex-column">
+                            <span class="brand-title">Restro</span>
+                            <span class="brand-sub">QR ordering • Live kitchen</span>
                         </div>
-                    }
+                    </a>
 
-                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                        @if (User.IsInRole("Customer"))
+                    <div class="d-flex align-items-center gap-2">
+                        @if (isAuthenticated)
                         {
-                            <!-- Customer-specific links -->
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Customer")">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="@Url.Action("MyOrders", "Customer")">My Orders</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="@Url.Action("UserProfile", "User")">Profile</a>
-                            </li>
-                        }
-                        else if (User.IsInRole("Restaurant"))
-                        {
-                            var isSubscribed = User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;
-                            var subscriptionNeeded = string.IsNullOrEmpty(isSubscribed) || bool.Parse(isSubscribed) == false;
+                            <a class="btn btn-ghost btn-pill" href="@Url.Action("Index", "UserProfile")">
+                                <i class="fas fa-user me-1"></i> Profile
+                            </a>
 
-                            if (subscriptionNeeded)
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" href="@Url.Action("StartSubscription", "Stripe")">Subscribe Now</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <!-- Restaurant-specific links -->
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Restaurant")">Outlets</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">Manage Orders</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">Restaurant Profile</a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="kitchenManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Kitchen Management
-                                    </a>
-                                    <ul class="dropdown-menu" aria-labelledby="kitchenManagementDropdown">
-                                        <li><a class="dropdown-item" href="@Url.Action("AddStaff", "Restaurant")">Add Kitchen Member</a></li>
-                                    </ul>
-                                </li>
-                            }
-                        }
-                        else if (User.IsInRole("Admin"))
-                        {
-                            <!-- Admin-specific links -->
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="@Url.Action("AdminDashboard", "Admin")">Dashboard</a>
-                            </li>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                <button type="submit" class="btn btn-outline-danger btn-pill px-3">
+                                    Logout
+                                </button>
+                            </form>
                         }
                         else
                         {
-                            <!-- Links for unauthenticated users or other roles -->
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="/Home/Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="@Url.Action("Regiser_Bussiness", "Home")">Register Your Business</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="@Url.Action("AboutUs", "Home")">About Us</a>
-                            </li>
+                            <a class="btn btn-ghost btn-pill" asp-controller="Account" asp-action="Login">Sign In</a>
+                            <a class="btn btn-primary-glow btn-pill" asp-controller="Account" asp-action="Register">Sign Up</a>
                         }
-                    </ul>
+                    </div>
 
-                    <form class="d-flex mt-3" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Offcanvas (IMPORTANT: moved outside navbar so it won't get clipped) -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body">
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <div class="d-grid gap-2 mb-3">
+                        <a class="btn btn-ghost btn-pill" asp-controller="Account" asp-action="Login">Sign In</a>
+                        <a class="btn btn-primary-glow btn-pill" asp-controller="Account" asp-action="Register">Sign Up</a>
+                    </div>
+                }
+
+                <div class="menu-section-title">Navigation</div>
+
+                @if (User.IsInRole("Customer"))
+                {
+                    <a class="menu-link" href="@Url.Action("Index", "Customer")"><i class="fas fa-home"></i> Home</a>
+                    <a class="menu-link" href="@Url.Action("MyOrders", "Customer")"><i class="fas fa-receipt"></i> My Orders</a>
+                    <a class="menu-link" href="@Url.Action("UserProfile", "User")"><i class="fas fa-id-badge"></i> Profile</a>
+                }
+                else if (User.IsInRole("Restaurant"))
+                {
+                    var isSubscribed = User.Claims.FirstOrDefault(c => c.Type == "IsSubscribed")?.Value;
+                    var subscriptionNeeded = string.IsNullOrEmpty(isSubscribed) || bool.Parse(isSubscribed) == false;
+
+                    if (subscriptionNeeded)
+                    {
+                        <a class="menu-link" href="@Url.Action("StartSubscription", "Stripe")"><i class="fas fa-credit-card"></i> Subscribe Now</a>
+                    }
+                    else
+                    {
+                        <a class="menu-link" href="@Url.Action("Index", "Restaurant")"><i class="fas fa-store"></i> Outlets</a>
+                        <a class="menu-link" href="#"><i class="fas fa-clipboard-list"></i> Manage Orders</a>
+                        <a class="menu-link" href="#"><i class="fas fa-user-tie"></i> Restaurant Profile</a>
+
+                        <div class="menu-section-title">Kitchen Management</div>
+                        <a class="menu-link" href="@Url.Action("AddStaff", "Restaurant")"><i class="fas fa-user-plus"></i> Add Kitchen Member</a>
+                    }
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    <a class="menu-link" href="@Url.Action("AdminDashboard", "Admin")"><i class="fas fa-chart-line"></i> Dashboard</a>
+                }
+                else
+                {
+                    <a class="menu-link" href="/Home/Index"><i class="fas fa-home"></i> Home</a>
+                    <a class="menu-link" href="@Url.Action("Regiser_Bussiness", "Home")"><i class="fas fa-briefcase"></i> Register Your Business</a>
+                    <a class="menu-link" href="@Url.Action("AboutUs", "Home")"><i class="fas fa-info-circle"></i> About Us</a>
+                }
+
+                <div class="search-wrap">
+                    <form class="d-flex gap-2" role="search">
+                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success btn-pill px-3" type="submit">Search</button>
                     </form>
                 </div>
             </div>
         </div>
-    </nav>
 
-    <div id="loadingAnimation" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
-        <img src="path/to/your/loading.gif" alt="Loading...">
-    </div>
+        <!-- Content -->
+        <div class="app-content">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
 
-   
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="layout-max pb-4">
+                <div class="row g-4 align-items-start">
+                    <div class="col-md-4">
+                        <h5>Follow Us</h5>
+                        <div class="social">
+                            <a href="#" title="Facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" title="Twitter" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" title="Instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
 
-    <footer class="footer text-center text-lg-start">
-        <div class="container">
-            <div class="row">
-                <!-- Social Media Links -->
-                <div class="col-md-4 footer-column">
-                    <h5>Follow Us</h5>
-                    <div class="social-icons">
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <div class="col-md-4">
+                        <h5>Quick Links</h5>
+                        <a href="/Home/Index">Home</a>
+                        <a href="@Url.Action("AboutUs", "Home")">About Us</a>
+                        <a href="#">Contact</a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5>About Restro</h5>
+                        <p class="mb-0" style="color: rgba(255,255,255,0.66); line-height:1.6;">
+                            A modern restaurant experience: QR ordering, live kitchen updates, and faster checkout.
+                        </p>
                     </div>
                 </div>
-                <!-- Quick Links -->
-                <div class="col-md-4 footer-column">
-                    <h5>Quick Links</h5>
-                    <a href="#">Home</a>
-                    <a href="#">About Us</a>
-                    <a href="#">Contact</a>
-                </div>
-                <!-- About Us -->
-                <div class="col-md-4 footer-column">
-                    <h5>About Restro</h5>
-                    <p>Your brief introduction or mission statement here.</p>
-                </div>
             </div>
-        </div>
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-            © 2024 Restro. All rights reserved.
-        </div>
-    </footer>
-    @await RenderSectionAsync("Scripts", required: false)
+
+            <div class="text-center py-3" style="border-top: 1px solid rgba(255,255,255,0.10); color: rgba(255,255,255,0.62);">
+                © 2024 Restro. All rights reserved.
+            </div>
+        </footer>
+
+        @await RenderSectionAsync("Scripts", required: false)
+
+    </div>
 </body>
 </html>

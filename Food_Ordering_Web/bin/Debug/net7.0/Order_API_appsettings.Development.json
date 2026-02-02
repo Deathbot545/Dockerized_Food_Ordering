@@ -1,4 +1,17 @@
 {
+  "MongoDBSettings": {
+    "ConnectionString": "mongodb://localhost:27017",
+    "DatabaseName": "FoodOrdering"
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:5002",
+      "http://localhost:5003",
+      "http://localhost:5173",
+      "http://localhost:8088",
+      "http://localhost:8089"
+    ]
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Information",

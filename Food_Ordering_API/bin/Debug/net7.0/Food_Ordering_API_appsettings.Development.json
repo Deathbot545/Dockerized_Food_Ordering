@@ -1,4 +1,21 @@
 {
+  "ConnectionStrings": {
+    "ApplicationDbConnection": "Host=localhost;Port=5432;Database=ApplicationDb;User ID=postgres;Password=postgres;"
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:5002",
+      "http://localhost:5003",
+      "http://localhost:5173",
+      "http://localhost:8088",
+      "http://localhost:8089"
+    ]
+  },
+  "Jwt": {
+    "Key": "dev-super-secret-key-change-me",
+    "Issuer": "dev",
+    "Audience": "dev"
+  },
   "Logging": {
     "LogLevel": {
       "Default": "Information",

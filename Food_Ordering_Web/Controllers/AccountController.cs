@@ -10,143 +10,211 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
-using Food_Ordering_API.Models;
 using Food_Ordering_API.ViewModels;
-using Food_Ordering_API.DTO;
-using Microsoft.VisualStudio.Services.Users;
-using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds;
-
 
 namespace Food_Ordering_Web.Controllers
 {
-    
     public class AccountController : Controller
     {
-        private readonly HttpClient _httpClient;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly string _apiBaseUrl;
         private readonly ILogger<AccountController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public AccountController( IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AccountController> logger)
+        private readonly Uri? _apiBaseUri;          // e.g. http://localhost:5100/
+        private readonly Uri? _accountApiBaseUri;   // e.g. http://localhost:5100/api/AccountApi/
+
+        private bool DemoEnabled => _configuration.GetValue<bool>("Demo:Enabled");
+
+        public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AccountController> logger)
         {
-         
-            _httpClient = new HttpClient(); // Or however you get your HttpClient
             _httpClientFactory = httpClientFactory;
-            _apiBaseUrl = $"{configuration.GetValue<string>("ApiBaseUrl")}api/AccountApi";  // Modify it here
+            _configuration = configuration;
             _logger = logger;
+
+            var apiBaseUrl = configuration.GetValue<string>("ApiBaseUrl");
+
+            if (!string.IsNullOrWhiteSpace(apiBaseUrl) &&
+                Uri.TryCreate(apiBaseUrl, UriKind.Absolute, out var root))
+            {
+                _apiBaseUri = root;
+                _accountApiBaseUri = new Uri(root, "api/AccountApi/");
+            }
+
+            _logger.LogInformation("DemoEnabled: {DemoEnabled}", DemoEnabled);
+            _logger.LogInformation("ApiBaseUrl: {ApiBaseUrl}", apiBaseUrl ?? "(null)");
+            _logger.LogInformation("AccountApiBaseUrl: {AccountApiBaseUrl}", _accountApiBaseUri?.ToString() ?? "(null)");
         }
 
+        // -----------------------------
+        // Demo Users
+        // -----------------------------
+        private sealed class DemoUser
+        {
+            public string Username { get; set; } = "";
+            public string Password { get; set; } = "";
+            public string Role { get; set; } = "Customer";
+            public bool IsSubscribed { get; set; } = false;
+        }
+
+        private List<DemoUser> GetDemoUsers()
+        {
+            var users = _configuration.GetSection("Demo:Users").Get<List<DemoUser>>();
+            return users ?? new List<DemoUser>();
+        }
+
+        private DemoUser? FindDemoUser(string username, string password)
+        {
+            return GetDemoUsers()
+                .FirstOrDefault(u =>
+                    string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase) &&
+                    u.Password == password);
+        }
+
+        // -----------------------------
+        // Routes
+        // -----------------------------
         [HttpGet]
         public IActionResult SpecialLogin(int outletId, int tableId)
         {
-                return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
-           
+            return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
         }
+
         [HttpGet]
         public IActionResult Register()
         {
             if (TempData["ErrorMessage"] != null)
-            {
-                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
-            }
+                ViewBag.ErrorMessage = TempData["ErrorMessage"]!.ToString();
+
             return View("~/Views/Account/Signup.cshtml");
         }
 
         [HttpPost]
         public async Task<IActionResult> AddUser(string username, string password, string roleName)
         {
-            string apiEndpoint = $"Register/{roleName}";
+            if (DemoEnabled)
+            {
+                // Demo: auto-create/sign-in user without API
+                var demo = new DemoUser
+                {
+                    Username = username,
+                    Password = password,
+                    Role = string.IsNullOrWhiteSpace(roleName) ? "Customer" : roleName,
+                    IsSubscribed = roleName == "Restaurant" // simple rule: restaurant subscribed
+                };
 
-            return await AddUserToApi(apiEndpoint, username, password, "YourActionName", "YourControllerName",roleName);
+                await SignInDemoUser(demo);
+                return RedirectToRoleHome(demo.Role);
+            }
+
+            if (_accountApiBaseUri == null)
+                return StatusCode((int)HttpStatusCode.InternalServerError, "ApiBaseUrl is missing/invalid.");
+
+            var apiEndpoint = $"Register/{roleName}";
+            return await AddUserToApi(apiEndpoint, username, password, roleName);
         }
 
-
-        private async Task<IActionResult> AddUserToApi(string apiEndpoint, string username, string password, string actionName, string controllerName, string roleName)
+        private async Task<IActionResult> AddUserToApi(string apiEndpoint, string username, string password, string roleName)
         {
             try
             {
+                var http = _httpClientFactory.CreateClient();
+
                 var userDto = new { Username = username, Password = password };
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/{apiEndpoint}",
-                    new StringContent(System.Text.Json.JsonSerializer.Serialize(userDto), Encoding.UTF8, "application/json"));
+                var body = new StringContent(System.Text.Json.JsonSerializer.Serialize(userDto), Encoding.UTF8, "application/json");
+
+                var url = new Uri(_accountApiBaseUri!, apiEndpoint);
+                var response = await http.PostAsync(url, body);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
                     var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
-                    if (responseObject != null && responseObject.Token != null)
-                    {
-                        // Directly use the token to handle login
+
+                    if (!string.IsNullOrWhiteSpace(responseObject?.Token))
                         return await HandleLogin(responseObject.Token);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Token was not provided.");
-                        return RedirectToCurrentView(actionName, controllerName, roleName);
-                    }
+
+                    ModelState.AddModelError(string.Empty, "Token was not provided.");
+                    return RedirectToCurrentView(roleName);
                 }
                 else
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
                     var errorResult = System.Text.Json.JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
-                    if (errorResult != null && errorResult.Errors != null)
+
+                    if (errorResult?.Errors != null)
                     {
                         foreach (var error in errorResult.Errors)
-                        {
                             ModelState.AddModelError(string.Empty, error);
-                        }
                     }
-                    else if (!string.IsNullOrEmpty(errorResponse))
+                    else
                     {
-                        // If the error is not in the expected format, still show a generic message
-                        ModelState.AddModelError(string.Empty, "User already exists or other registration error.");
+                        ModelState.AddModelError(string.Empty, "Registration failed.");
                     }
-                    return RedirectToCurrentView(actionName, controllerName, roleName);
-                }
 
+                    return RedirectToCurrentView(roleName);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred");
-                throw;
+                _logger.LogError(ex, "Registration error");
+                return View("Error");
             }
         }
 
-        private IActionResult RedirectToCurrentView(string actionName, string controllerName, string roleName)
+        private IActionResult RedirectToCurrentView(string roleName)
         {
-            // Adjust the logic based on roleName and how you've set up your view paths
             if (roleName == "Restaurant")
-            {
-                // Directly returning the view as per the action method that loads the restaurant owner page
-                return View("Regiser_Bussiness"); // Assuming the view file is in /Views/Home/Regiser_Bussiness.cshtml
-            }
-            else
-            {
-                // Directly returning the view as per the action method that loads the customer signup page
-                return View("Signup"); // Assuming the view file is in /Views/Account/Register.cshtml or /Views/Account/Signup.cshtml based on your setup
-            }
+                return View("Regiser_Bussiness");
+
+            return View("Signup");
         }
 
+        [HttpGet]
         public IActionResult Login()
         {
-
             return View("/Views/Account/Login.cshtml");
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string actionName, string controllerName, int? outletId = null, int? tableId = null)
         {
+            if (DemoEnabled)
+            {
+                var demoUser = FindDemoUser(model.UserName, model.Password);
+                if (demoUser == null)
+                {
+                    ViewBag.ErrorMessage = "Invalid demo credentials.";
+                    return View(model);
+                }
+
+                await SignInDemoUser(demoUser);
+
+                if (outletId.HasValue && tableId.HasValue)
+                    return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
+
+                return RedirectToRoleHome(demoUser.Role);
+            }
+
+            if (_accountApiBaseUri == null)
+            {
+                ViewBag.ErrorMessage = "ApiBaseUrl is missing/invalid.";
+                return View(model);
+            }
+
             try
             {
+                var http = _httpClientFactory.CreateClient();
+
                 var loginDto = new LoginDto
                 {
-                    UsernameOrEmail = model.UserName, // Ensure this is the user's email.
+                    UsernameOrEmail = model.UserName,
                     Password = model.Password
                 };
 
-                // Using System.Text.Json for serialization
                 var jsonPayload = System.Text.Json.JsonSerializer.Serialize(loginDto);
-                var httpResponse = await _httpClient.PostAsync(
-                    $"{_apiBaseUrl}/Login",
+                var url = new Uri(_accountApiBaseUri, "Login");
+
+                var httpResponse = await http.PostAsync(url,
                     new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
 
                 if (httpResponse.IsSuccessStatusCode)
@@ -154,44 +222,347 @@ namespace Food_Ordering_Web.Controllers
                     var responseContent = await httpResponse.Content.ReadAsStringAsync();
                     var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
 
-                    _logger.LogInformation($"Raw API Response: {responseContent}");
-                    if (responseObject != null && responseObject.Token != null)
-                    {
-                        // Now, simply pass the JWT token to HandleLogin
+                    if (!string.IsNullOrWhiteSpace(responseObject?.Token))
                         return await HandleLogin(responseObject.Token, outletId, tableId);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Could not deserialize response.");
-                        ViewBag.ErrorMessage = "Could not deserialize response.";
-                        _logger.LogInformation("JWT token read.");
-                    }
+
+                    ViewBag.ErrorMessage = "Could not deserialize response token.";
+                    return View(model);
                 }
                 else
                 {
                     var responseContent = await httpResponse.Content.ReadAsStringAsync();
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(responseContent);
 
-                    if (errorResponse != null && errorResponse.ContainsKey("message"))
+                    // Keep it simple: show server message if exists
+                    try
                     {
-                        ViewBag.ErrorMessage = errorResponse["message"];
+                        var errorResponse = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(responseContent);
+                        if (errorResponse != null && errorResponse.TryGetValue("message", out var msg))
+                            ViewBag.ErrorMessage = msg;
+                        else
+                            ViewBag.ErrorMessage = "Login failed.";
                     }
-                    else
+                    catch
                     {
-                        ViewBag.ErrorMessage = "An unknown error occurred.";
+                        ViewBag.ErrorMessage = "Login failed.";
                     }
+
+                    return View(model);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred in MyAction");
-                throw; // Rethrow the exception or handle it as needed
+                _logger.LogError(ex, "Login error");
+                return View("Error");
+            }
+        }
+
+        // -----------------------------
+        // Google Auth
+        // -----------------------------
+        [HttpGet]
+        public IActionResult ExternalRegisterOrLogin(string role = null, int? outletId = null, int? tableId = null)
+        {
+            if (DemoEnabled)
+            {
+                // Demo: pretend Google login worked
+                var demo = new DemoUser
+                {
+                    Username = "google.demo@local.test",
+                    Password = "x",
+                    Role = string.IsNullOrWhiteSpace(role) ? "Customer" : role,
+                    IsSubscribed = role == "Restaurant"
+                };
+
+                return RedirectToAction(nameof(DemoGoogleCallback), new { role = demo.Role, outletId, tableId });
             }
 
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("GoogleResponse", new { role = role, outletId = outletId, tableId = tableId })
+            };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DemoGoogleCallback(string role, int? outletId = null, int? tableId = null)
+        {
+            var demo = new DemoUser
+            {
+                Username = "google.demo@local.test",
+                Password = "x",
+                Role = string.IsNullOrWhiteSpace(role) ? "Customer" : role,
+                IsSubscribed = role == "Restaurant"
+            };
+
+            await SignInDemoUser(demo);
+
+            if (outletId.HasValue && tableId.HasValue)
+                return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
+
+            return RedirectToRoleHome(demo.Role);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GoogleResponse(string role = null, int? outletId = null, int? tableId = null)
+        {
+            if (DemoEnabled)
+            {
+                // fallback safety
+                await SignInDemoUser(new DemoUser { Username = "google.demo@local.test", Role = role ?? "Customer", IsSubscribed = role == "Restaurant" });
+                return RedirectToRoleHome(role ?? "Customer");
+            }
+
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            if (result?.Succeeded != true)
+            {
+                _logger.LogError("Google auth failed: {Reason}", result?.Failure?.Message);
+                return Unauthorized();
+            }
+
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            if (claims == null)
+                return BadRequest("No claims found.");
+
+            var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email))
+                return BadRequest("Email claim missing.");
+
+            if (_accountApiBaseUri == null)
+                return StatusCode((int)HttpStatusCode.InternalServerError, "ApiBaseUrl is missing/invalid.");
+
+            var http = _httpClientFactory.CreateClient();
+
+            if (!string.IsNullOrEmpty(role))
+            {
+                // register flow
+                var userDto = new UserDto { Username = email, Password = "" };
+                var json = JsonConvert.SerializeObject(userDto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var url = new Uri(_accountApiBaseUri, $"Register/{role}");
+                var apiResponse = await http.PostAsync(url, content);
+
+                if (!apiResponse.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "Registration with Google failed (maybe user exists).";
+                    return RedirectToAction("Register");
+                }
+
+                var apiResponseContent = await apiResponse.Content.ReadAsStringAsync();
+                var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(apiResponseContent);
+
+                return await HandleLogin(responseObject?.Token ?? "", outletId, tableId);
+            }
+            else
+            {
+                // login flow
+                var loginDto = new LoginDto { UsernameOrEmail = email, Password = "" };
+                var json = JsonConvert.SerializeObject(loginDto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var url = new Uri(_accountApiBaseUri, "GoogleLogin");
+                var response = await http.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
+
+                    return await HandleLogin(responseObject?.Token ?? "", outletId, tableId);
+                }
+
+                TempData["ErrorMessage"] = "User not registered or invalid credentials.";
+                return RedirectToAction("Login", "Account");
+            }
+        }
+
+        // -----------------------------
+        // Sign in helpers
+        // -----------------------------
+        private IActionResult RedirectToRoleHome(string role)
+        {
+            // your roles map to controller names in your app
+            var controller = string.IsNullOrWhiteSpace(role) ? "Home" : role;
+            return RedirectToAction("Index", controller);
+        }
+
+        private async Task SignInDemoUser(DemoUser user)
+        {
+            var isDev = HttpContext.Request.IsHttps == false; // if not https, treat like dev cookie rules
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                new Claim("IsSubscribed", user.IsSubscribed.ToString())
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                claimsPrincipal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                });
+
+            // Optional dummy JWT cookie (so parts of UI expecting it don't crash)
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = !isDev ? true : false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+            };
+            Response.Cookies.Append("jwtCookie", "demo-token", cookieOptions);
+        }
+
+        public async Task<IActionResult> HandleLogin(string token, int? outletId = null, int? tableId = null)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                ViewBag.ErrorMessage = "Missing token.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
+                if (userIdClaim == null)
+                {
+                    _logger.LogError("User ID claim missing in JWT.");
+                    return View("Error");
+                }
+
+                var userNameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+                var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "IsSubscribed");
+
+                var isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out var s) && s;
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, userNameClaim?.Value ?? string.Empty),
+                    new Claim(ClaimTypes.Role, roleClaim?.Value ?? string.Empty),
+                    new Claim(ClaimTypes.NameIdentifier, userIdClaim.Value),
+                    new Claim("IsSubscribed", isSubscribed.ToString())
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                });
+
+                // Store JWT in cookie (dev-safe settings)
+                var secure = HttpContext.Request.IsHttps;
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = secure,
+                    SameSite = secure ? SameSiteMode.None : SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+                };
+                Response.Cookies.Append("jwtCookie", token, cookieOptions);
+
+                if (outletId.HasValue && tableId.HasValue)
+                    return Redirect($"/Order/Menu?outletId={outletId}&tableId={tableId}");
+
+                var role = roleClaim?.Value ?? "Home";
+                return RedirectToAction("Index", role);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Login token handling failed.");
+                return View("Error");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // In demo mode, do NOT call API
+            if (!DemoEnabled && _accountApiBaseUri != null)
+            {
+                try
+                {
+                    var http = _httpClientFactory.CreateClient();
+                    await http.PostAsync(new Uri(_accountApiBaseUri, "Logout"), null);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "API logout call failed (ignored).");
+                }
+            }
+
+            Response.Cookies.Delete("jwtCookie");
+            return RedirectToAction("Login", "Account");
+        }
+
+        // -----------------------------
+        // Profile update
+        // -----------------------------
+        [HttpPost]
+        public async Task<IActionResult> UpdateUserProfile(UserProfileModel model)
+        {
+            if (DemoEnabled)
+            {
+                // Demo: pretend it worked
+                return RedirectToAction("Index", "UserProfile");
+            }
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized("User is not authenticated.");
+
+            if (_apiBaseUri == null)
+                return StatusCode((int)HttpStatusCode.InternalServerError, "ApiBaseUrl missing/invalid.");
+
+            var token = HttpContext.Request.Cookies["jwtCookie"];
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized("JWT token is missing.");
+
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // IMPORTANT: build URL from ApiBaseUrl, not hard-coded domain
+            var requestUrl = new Uri(_apiBaseUri, "api/UserProfileApi/UpdateUserProfile");
+
+            var updateModel = new
+            {
+                UserId = userIdClaim.Value,
+                Email = model.Email,
+                UserName = model.UserName,
+                PhoneNumber = model.PhoneNumber
+            };
+
+            var response = await httpClient.PatchAsync(
+                requestUrl,
+                new StringContent(JsonConvert.SerializeObject(updateModel), Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction("Index", "UserProfile");
+
+            var errorContent = await response.Content.ReadAsStringAsync();
+            ModelState.AddModelError(string.Empty, $"Failed to update profile: {errorContent}");
             return View(model);
         }
 
-
+        // -----------------------------
+        // DTOs used here
+        // -----------------------------
         public class LoginResponse
         {
             [JsonPropertyName("message")]
@@ -214,257 +585,7 @@ namespace Food_Ordering_Web.Controllers
 
             [JsonPropertyName("email")]
             public string Email { get; set; }
-
-            // Add other properties as per API response
         }
-
-        
-
-        [HttpGet]
-        public IActionResult ExternalRegisterOrLogin(string role = null, int? outletId = null, int? tableId = null)
-        {
-            var properties = new AuthenticationProperties
-            {
-                RedirectUri = Url.Action("GoogleResponse", new { role = role, outletId = outletId, tableId = tableId })
-            };
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GoogleResponse(string role = null, int? outletId = null, int? tableId = null)
-        {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-            if (result?.Succeeded == true)
-            {
-                // User is authenticated
-                _logger.LogInformation("User authenticated.");
-            }
-            else
-            {
-                // User is not authenticated
-                _logger.LogError($"Authentication failed. Reason: {result?.Failure?.Message}");
-                return Unauthorized(); // or some other action to handle failure
-            }
-
-
-            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-            if (claims == null)
-            {
-                return BadRequest("No claims found.");
-            }
-
-            string email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            if (string.IsNullOrEmpty(email))
-            {
-                return BadRequest("Email claim missing.");
-            }
-
-            if (!string.IsNullOrEmpty(role))
-            {
-                UserDto userDto = new UserDto { Username = email, Password = "" };
-                var json = JsonConvert.SerializeObject(userDto);
-                _logger.LogInformation($"JSON Payload: {json}");
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var fullUrl = $"{_apiBaseUrl}/Register/{role}";
-                _logger.LogInformation($"Full URL: {fullUrl}");
-
-                var apiResponse = await _httpClient.PostAsync(fullUrl, content);
-
-                if (apiResponse == null)
-                {
-                    _logger.LogError("API Response is null");
-                    return StatusCode((int)HttpStatusCode.InternalServerError);
-                }
-
-                if (!apiResponse.IsSuccessStatusCode)
-                {
-                    var errorContent = await apiResponse.Content.ReadAsStringAsync();
-                    _logger.LogError($"API Response is unsuccessful. StatusCode: {apiResponse.StatusCode}, Content: {errorContent}");
-
-                    // Deserialize the error response to get error messages
-                    var errorResult = System.Text.Json.JsonSerializer.Deserialize<ErrorResponse>(errorContent);
-                    if (errorResult != null && errorResult.Errors != null)
-                    {
-                        foreach (var error in errorResult.Errors)
-                        {
-                            ModelState.AddModelError(string.Empty, error);
-                        }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "User already exists or other registration error.");
-                    }
-
-           
-                    string viewName = role == "Restaurant" ? "Regiser_Bussiness" : "Signup"; // Adjust based on your setup
-                    return View(viewName); // Directly return to the view, keeping the error messages in ModelState
-                }
-
-
-                var apiResponseContent = await apiResponse.Content.ReadAsStringAsync();
-                var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(apiResponseContent);
-
-                if (responseObject == null)
-                {
-                    _logger.LogError("Could not deserialize API response.");
-                    ModelState.AddModelError(string.Empty, "Could not deserialize response.");
-                    return RedirectToAction("SuccessAction");
-                }
-
-                return await HandleLogin(responseObject.Token, outletId, tableId);
-
-
-            }
-            else
-            {
-                // Login flow
-                LoginDto loginDto = new LoginDto { UsernameOrEmail = email, Password = "" };
-                var json = JsonConvert.SerializeObject(loginDto);
-                _logger.LogInformation($"JSON Payload: {json}");
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var fullUrl = $"{_apiBaseUrl}/GoogleLogin";
-                _logger.LogInformation($"Full URL: {fullUrl}");
-                var response = await _httpClient.PostAsync(fullUrl, content);
-                //...
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var responseObject = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(responseContent);
-                    if (responseObject != null)
-                    {
-                       
-                        return await HandleLogin( responseObject.Token, outletId, tableId);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Could not deserialize response.");
-                    }
-                    return RedirectToAction("SuccessAction");
-                }
-                //...
-
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "User not registered or invalid credentials.");
-                    TempData["ErrorMessage"] = "User not registered or invalid credentials."; // Using TempData to store the error message
-                    return RedirectToAction("Login", "Account"); // Redirecting to Login action in Account controller
-                }
-            }
-
-        }
-        public IActionResult IntermediateRedirect(string returnUrl)
-        {
-            _logger.LogInformation("Intermediate redirect to ensure cookie is set.");
-            return Redirect(returnUrl);
-        }
-
-        public async Task<IActionResult> HandleLogin(string token, int? outletId = null, int? tableId = null)
-        {
-            _logger.LogInformation("HandleLogin method entered with JWT token.");
-
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadJwtToken(token);
-
-                // Debugging: Log all claims
-                foreach (var claim in jwtToken.Claims)
-                {
-                    _logger.LogInformation("Claim Type: {ClaimType}, Claim Value: {ClaimValue}", claim.Type, claim.Value);
-                }
-
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
-                if (userIdClaim == null)
-                {
-                    _logger.LogError("User ID claim is missing in the JWT.");
-                    return View("Error");
-                }
-
-                var userNameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name);
-                var roleClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role);
-                var isSubscribedClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "IsSubscribed");
-
-                bool isSubscribed = isSubscribedClaim != null && bool.TryParse(isSubscribedClaim.Value, out bool isSubscribedParsed) && isSubscribedParsed;
-
-                var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, userNameClaim?.Value ?? string.Empty),
-            new Claim(ClaimTypes.Role, roleClaim?.Value ?? string.Empty),
-            new Claim(ClaimTypes.NameIdentifier, userIdClaim.Value),
-            new Claim("IsSubscribed", isSubscribed.ToString())
-        };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, new AuthenticationProperties
-                {
-                    IsPersistent = false,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-                });
-                try
-                {
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true, // Set to true because your site is served over HTTPS
-                        SameSite = SameSiteMode.None, // Necessary for cross-site request if applicable
-                        Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-                    };
-                    var cookiesAfterSignIn = HttpContext.Response.Headers["Set-Cookie"];
-                    Response.Cookies.Append("jwtCookie", token, cookieOptions);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error setting cookie.");
-                }
-
-
-                if (outletId.HasValue && tableId.HasValue)
-                {
-                    string redirectUrl = $"/Order/Menu?outletId={outletId}&tableId={tableId}";
-                    return Redirect(redirectUrl);
-                }
-                else
-                {
-                    string controllerName = roleClaim?.Value ?? "Home";  // Default to Home if role is not found
-                    return RedirectToAction("Index", controllerName);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred during the login process.");
-                return View("Error"); // Ensure there's an Error view available to handle this scenario
-            }
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> Logout()
-        {
-            // Use built-in method to sign out the user
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Optionally, you could also ensure that any API logout logic is handled if necessary
-            // This might include invalidating the token server-side, if your architecture requires it
-            var httpResponse = await _httpClient.PostAsync($"{_apiBaseUrl}/Logout", null);
-            if (!httpResponse.IsSuccessStatusCode)
-            {
-                var error = await httpResponse.Content.ReadAsStringAsync();
-                ModelState.AddModelError(string.Empty, $"Failed to logout: {error}");
-                // Optionally, log this server-side as well
-                _logger.LogError("Failed to logout via API: {Error}", error);
-            }
-
-            // Remove JWT token from HttpOnly cookie
-            Response.Cookies.Delete("jwtCookie");
-
-            // Redirect to the login page or a page indicating successful logout
-            return RedirectToAction("Login", "Account");
-        }
-
 
         public class ErrorResponse
         {
@@ -472,54 +593,17 @@ namespace Food_Ordering_Web.Controllers
             public IEnumerable<string> Errors { get; set; }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateUserProfile(UserProfileModel model)
+        // Minimal DTOs (so this controller compiles even if API project types are not referenced cleanly)
+        public class LoginDto
         {
-            // Extract user ID from the claims
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized("User is not authenticated.");
-            }
-            var userId = userIdClaim.Value;
-
-            // Construct the request to the API
-            var requestUrl = "https://restosolutionssaas.com/api/UserProfileApi/UpdateUserProfile";
-            var httpClient = _httpClientFactory.CreateClient(); // Assuming you have HttpClientFactory injected
-
-            // Retrieve the JWT token from the cookie named "jwtCookie"
-            var token = HttpContext.Request.Cookies["jwtCookie"];
-            if (string.IsNullOrEmpty(token))
-            {
-                return Unauthorized("JWT token is missing.");
-            }
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-
-            var updateModel = new
-            {
-                UserId = userId, // Make sure your API expects a UserId in the body
-                Email = model.Email,
-                UserName = model.UserName,
-                PhoneNumber = model.PhoneNumber
-            };
-
-            var response = await httpClient.PatchAsync(requestUrl, new StringContent(JsonConvert.SerializeObject(updateModel), Encoding.UTF8, "application/json"));
-
-            if (response.IsSuccessStatusCode)
-            {
-                // Handle success
-                // Handle success
-                return RedirectToAction("Index", "UserProfile"); // Adjust "Index" and "UserProfile" as necessary
-            }
-            else
-            {
-                // Handle failure
-                var errorContent = await response.Content.ReadAsStringAsync();
-                ModelState.AddModelError(string.Empty, $"Failed to update profile: {errorContent}");
-                return View(model); // Return back to the edit profile view with error message
-            }
+            public string UsernameOrEmail { get; set; }
+            public string Password { get; set; }
         }
 
+        public class UserDto
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
     }
 }

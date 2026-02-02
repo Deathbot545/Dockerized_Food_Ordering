@@ -3,64 +3,270 @@
 }
 
 <style>
-   
-    .container {
-        margin-top: 50px;
+    :root {
+        --bg: #0b0f14;
+        --panel: rgba(255,255,255,0.06);
+        --panel2: rgba(255,255,255,0.08);
+        --border: rgba(255,255,255,0.14);
+        --text: rgba(255,255,255,0.96);
+        --muted: rgba(255,255,255,0.72);
+        --accent: #22c55e;
+        --accent2: #0ea5e9;
     }
 
-    .btn-google {
-        background-color: #4285F4;
-        color: white;
+    /* Page wrapper to avoid "small in big monitor" */
+    .auth-wrap {
+        min-height: calc(100vh - 110px); /* account for navbar space */
+        padding: 28px 18px 36px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-        .btn-google img {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
+    .auth-shell {
+        width: 100%;
+        max-width: 1100px;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    /* Left marketing panel */
+    .auth-left {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: linear-gradient(120deg, rgba(0,0,0,0.70), rgba(0,0,0,0.35)), url('https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.55);
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+        .auth-left::after {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at 18% 15%, rgba(34,197,94,0.30), transparent 58%), radial-gradient(circle at 85% 25%, rgba(14,165,233,0.22), transparent 62%);
+            filter: blur(30px);
+            pointer-events: none;
         }
 
-    .card {
-        border-radius: 10px;
-        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1);
+        .auth-left > * {
+            position: relative;
+            z-index: 1;
+        }
+
+    .auth-badge {
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.16);
+        color: rgba(255,255,255,0.88);
+        font-weight: 800;
+        letter-spacing: .2px;
+        width: fit-content;
+        backdrop-filter: blur(10px);
+        margin-bottom: 12px;
     }
 
-    .card-header {
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+    .auth-left h2 {
+        margin: 0 0 10px 0;
+        font-weight: 900;
+        line-height: 1.05;
+        font-size: clamp(1.8rem, 2.4vw, 2.4rem);
+        color: rgba(255,255,255,0.96);
+        text-shadow: 0 10px 24px rgba(0,0,0,0.45);
     }
 
-    .toggle-button {
-        cursor: pointer;
+    .auth-left p {
+        margin: 0 0 14px 0;
+        color: rgba(255,255,255,0.78);
+        line-height: 1.6;
+        max-width: 55ch;
+        font-size: 1.02rem;
     }
 
-    .center-button {
+    /* Right: form card */
+    .auth-card {
+        border-radius: 22px;
+        background: rgba(15, 22, 33, 0.72);
+        border: 1px solid rgba(255,255,255,0.14);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 16px 44px rgba(0,0,0,0.35);
+        padding: 22px;
         display: flex;
+        flex-direction: column;
         justify-content: center;
     }
 
-
-    .hidden {
-        display: none;
+    .auth-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
     }
 
- 
+    .auth-logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid rgba(255,255,255,0.18);
+        box-shadow: 0 10px 22px rgba(0,0,0,0.35);
+    }
+
+    .auth-title {
+        margin: 0;
+        font-weight: 900;
+        font-size: 1.35rem;
+        color: rgba(255,255,255,0.95);
+    }
+
+    .auth-sub {
+        margin: 0;
+        color: rgba(255,255,255,0.70);
+        font-size: 0.98rem;
+    }
+
+    .form-label {
+        color: rgba(255,255,255,0.82);
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        background: rgba(255,255,255,0.07) !important;
+        border: 1px solid rgba(255,255,255,0.14) !important;
+        color: rgba(255,255,255,0.92) !important;
+        border-radius: 14px !important;
+        padding: 12px 12px !important;
+    }
+
+        .form-control::placeholder {
+            color: rgba(255,255,255,0.55);
+        }
+
+        .form-control:focus {
+            border-color: rgba(34,197,94,0.55) !important;
+            box-shadow: 0 0 0 4px rgba(34,197,94,0.18) !important;
+        }
+
+    .btn-pill {
+        border-radius: 999px !important;
+        padding: 12px 16px !important;
+        font-weight: 800;
+        letter-spacing: .2px;
+        transition: transform .15s ease, filter .15s ease;
+    }
+
+    .btn-primary-glow {
+        background: linear-gradient(90deg, var(--accent), #16a34a);
+        border: none !important;
+        color: #04130a !important;
+        box-shadow: 0 14px 34px rgba(34,197,94,0.26);
+    }
+
+        .btn-primary-glow:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 16px 0;
+        color: rgba(255,255,255,0.60);
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.14);
+        }
+
+    .btn-google {
+        width: 100%;
+        border-radius: 999px !important;
+        padding: 11px 14px !important;
+        font-weight: 800;
+        background: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.16) !important;
+        color: rgba(255,255,255,0.92) !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: transform .15s ease, background .15s ease;
+    }
+
+        .btn-google:hover {
+            background: rgba(255,255,255,0.12) !important;
+            transform: translateY(-1px);
+        }
+
+    .auth-footnote {
+        margin-top: 14px;
+        color: rgba(255,255,255,0.62);
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* Responsive: stack panels on small screens */
+    @@media (max-width: 991px) {
+        .auth-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-left {
+            min-height: 220px;
+        }
+    }
 </style>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="login-header text-center mb-4">
-                <img src="/path/to/your/logo.png" alt="Your Logo" class="logo">
-                <h2>Welcome to Our Service!</h2>
-                <p>Sign up to get started.</p>
+
+<div class="auth-wrap">
+    <div class="auth-shell">
+
+        <!-- Left panel -->
+        <section class="auth-left">
+            <div class="auth-badge">
+                <span style="width:10px;height:10px;border-radius:999px;background:var(--accent);display:inline-block;box-shadow:0 0 0 6px rgba(34,197,94,0.14);"></span>
+                Restro • Sign up
             </div>
+            <h2>Create your account and start ordering in seconds.</h2>
+            <p>
+                Scan a QR code, browse the menu, and place your order with a smooth, modern experience.
+                Built for speed and clarity.
+            </p>
+        </section>
+
+        <!-- Right panel: form -->
+        <section class="auth-card">
+
+            <div class="auth-header">
+                <!-- Replace with your logo if you have it -->
+                <img class="auth-logo" src="~/Images/logo.jpeg" alt="Restro logo" />
+                <div>
+                    <h1 class="auth-title">Welcome to Restro</h1>
+                    <p class="auth-sub">Create your customer account</p>
+                </div>
+            </div>
+
             <!-- Display Model Errors -->
             @if (!ViewData.ModelState.IsValid)
             {
                 <div class="alert alert-danger">
-                    <ul>
+                    <ul class="mb-0">
                         @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
                         {
                             <li>@error.ErrorMessage</li>
@@ -68,36 +274,44 @@
                     </ul>
                 </div>
             }
-            <div id="customerForm">
-                <form id="signupFormCustomer" method="post" action="/Account/AddUser" class="needs-validation" novalidate>
-                    <div class="form-group mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
-                    </div>
-                    <input type="hidden" name="roleName" value="Customer" />
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Sign Up</button>
-                    </div>
-                </form>
-                <div class="social-login text-center mt-4">
-                    <p class="mb-2">Or join using:</p>
-                    <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
-                        <input type="hidden" name="provider" value="Google" />
-                        <input type="hidden" name="role" value="Customer" />
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="fab fa-google"></i> Google
-                        </button>
-                    </form>
+
+            <form id="signupFormCustomer" method="post" action="/Account/AddUser" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
                 </div>
-            </div>
-        </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password" required>
+                </div>
+
+                <input type="hidden" name="roleName" value="Customer" />
+
+                <button type="submit" class="btn btn-primary-glow btn-pill w-100">
+                    Create account
+                </button>
+
+                <div class="auth-footnote">
+                    By continuing, you agree to our Terms & Privacy Policy.
+                </div>
+            </form>
+
+            <div class="divider">or continue with</div>
+
+            <form asp-controller="Account" asp-action="ExternalRegisterOrLogin" method="get">
+                <input type="hidden" name="provider" value="Google" />
+                <input type="hidden" name="role" value="Customer" />
+                <button type="submit" class="btn-google">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+            </form>
+
+        </section>
     </div>
 </div>
